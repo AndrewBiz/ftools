@@ -33,6 +33,7 @@ module FTools
           if File.directory?(filename)
             raise FTools::Error.new("not a file")
           end        
+          raise FTools::Error.new("no permission to write") unless File.writable?(filename)
           raise FTools::Error.new("wrong type") unless @file_type.include?(File.extname(filename).downcase.slice(1..-1))
           
           result = process_file( filename )
@@ -45,10 +46,11 @@ module FTools
       end
 
     rescue SignalException => e
-      STDERR.puts "Exit on user interrupt Ctrl-C"
+      FTools::puts_error "EXIT on user interrupt Ctrl-C"
       exit 1
     rescue Exception => e
-      STDERR.puts e.message, e.backtrace
+      FTools::puts_error "FATAL: #{e.message}"
+      FTools::puts_error "--backtrace #{e.backtrace}"
       exit 1
     end
 

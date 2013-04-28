@@ -19,7 +19,7 @@ module FTools
         name_id = $2        
         new_basename = "#{$1} #{$3}"
       else
-        raise FTools::Error.new("has wrong name")
+        raise FTools::Error.new("wrong name format")
       end
 
       # changing tag
@@ -27,10 +27,15 @@ module FTools
         tag = MiniExiftool.new( filename, :timestamps => DateTime)
       rescue => e
         raise FTools::Error.new("exif tags reading")
-      end  
-      unless (/^\d{8}-.*/ =~ tag.image_unique_id)
-        tag.image_unique_id = name_id
-        raise FTools::Error.new("exif tag is not saved") unless tag.save 
+      end 
+
+      begin
+        unless (/^\d{8}-.*/ =~ tag.image_unique_id)
+          tag.image_unique_id = name_id
+          fail unless tag.save 
+        end
+      rescue => e
+        raise FTools::Error.new("exif tags writing", e)
       end
 
       # renaming file

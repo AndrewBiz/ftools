@@ -6,42 +6,29 @@ require_relative 'runner.rb'
 require_relative '../mini_exiftool-1.6.0'
 
 module FTools
-  class FTFixIDRunner < FTools::Runner
+  class Runner_ftfixfmd < FTools::Runner
 
     private
     def process_file( filename )
       # checking file name
-      dirname = File.dirname( filename )
+      #dirname = File.dirname( filename )
       extname = File.extname( filename )
       basename = File.basename( filename, extname )
       # check if name = YYYYMMDD-hhmmss_AAA[ID]name
-      if (/^(\d{8}-\d{6}_\w{3})\[(.*)\](.*)/ =~ basename)
-        name_id = $2        
-        new_basename = "#{$1} #{$3}"
+      if (/^(\d{8}-\d{6})(.*)/ =~ basename)
+        fmd = Time.strptime($1, "%Y%m%d-%H%M%S")
       else
-        raise FTools::Error.new("has wrong name")
+        raise FTools::Error.new("wrong name format")
       end
 
-      # changing tag
+      # processing file
       begin
-        tag = MiniExiftool.new( filename, :timestamps => DateTime)
+        File.utime(Time.now, fmd, filename)
       rescue => e
-        raise FTools::Error.new("exif tags reading")
-      end  
-      unless (/^\d{8}-.*/ =~ tag.image_unique_id)
-        tag.image_unique_id = name_id
-        raise FTools::Error.new("exif tag is not saved") unless tag.save 
+        raise FTools::Error.new("setting file modify time", e)
       end
 
-      # renaming file
-      begin
-        new_filename = File.join( dirname, new_basename+extname )      
-        FileUtils.mv(filename, new_filename)
-      rescue => e
-        raise FTools::Error.new("file renaming")
-      end
-
-      return new_filename
+      return filename
     end
 
   end
