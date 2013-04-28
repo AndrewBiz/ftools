@@ -1,0 +1,4 @@
+== ftools
+
+A bundle of small CLIs for renaming, tagging etc. my photos and videos. Helps to keep my photo-video assets in order.
+
