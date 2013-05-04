@@ -5,10 +5,22 @@
 require 'nesty'
 
 module FTools
-  def self.puts_error msg
+
+  @@debug = false
+  def self.debug= val
+    @@debug = val
+  end
+
+  def self.debug
+    @@debug
+  end
+
+  def self.puts_error msg, e=nil
     STDERR.puts "#{File.basename($PROGRAM_NAME)}: #{msg}"
+    if debug and not e.nil?
+      STDERR.puts e.backtrace
+    end
   end
 
   class FTools::Error < Nesty::NestedStandardError; end
-  
 end

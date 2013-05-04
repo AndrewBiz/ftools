@@ -3,19 +3,27 @@
 # (с) ANB Andrew Bizyaev Андрей Бизяев 
 
 require 'docopt'
+require 'fileutils'
 require_relative 'error.rb'
 require_relative 'file_type.rb'
+require_relative 'file_name.rb'
 
 module FTools
   class Runner
 
     def initialize( usage, file_type=[] )
       ARGV.map!{|a| a.encode("internal", "filesystem")}   #workaround for win32
-      @options_cli = Docopt::docopt( usage, version: FTools::VERSION ) 
+      @options_cli = Docopt::docopt( usage, version: FTools::VERSION )
       @file_type = file_type
-      #puts_error @options_cli.to_s if DEBUG 
+      FTools::debug = true if @options_cli['--debug']
+      FTools::puts_error "OPTIONS = #{@options_cli.to_s}" if FTools::debug
+      validate_options
+
     rescue Docopt::Exit => e
       STDERR.puts e.message
+      exit 1
+    rescue Exception => e
+      FTools::puts_error "FATAL: #{e.message}", e
       exit 1
     end
 
@@ -39,7 +47,7 @@ module FTools
           result = process_file( filename )
       
         rescue FTools::Error => e
-          FTools::puts_error "ERROR: '#{line}' - #{e.message}"
+          FTools::puts_error "ERROR: '#{line}' - #{e.message}", e
         else  
           STDOUT.puts result unless result.nil?
         end  
@@ -49,9 +57,13 @@ module FTools
       FTools::puts_error "EXIT on user interrupt Ctrl-C"
       exit 1
     rescue Exception => e
-      FTools::puts_error "FATAL: #{e.message}"
-      FTools::puts_error "--backtrace #{e.backtrace}"
+      FTools::puts_error "FATAL: #{e.message}", e
       exit 1
+    end
+
+    private
+    def validate_options
+
     end
 
   end
