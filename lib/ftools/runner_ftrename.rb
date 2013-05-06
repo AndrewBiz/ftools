@@ -22,10 +22,6 @@ module FTools
       extname = File.extname( filename )
       #file_type = extname.downcase.slice(1..-1)
       basename = File.basename( filename, extname )
-      # check if name = YYYYMMDD-hhmmss_AAA[ID]name
-      if (/^(\d{8}-\d{4})(.*)/ =~ basename)
-        raise FTools::Error.new("already renamed")
-      end
 
       # reading tags
       begin
@@ -44,8 +40,9 @@ module FTools
 
       # renaming file
       begin
-        new_filename = File.join( dirname, FTools::new_basename(basename, date_time_original: dto, author: @author) + extname )      
-        FileUtils.mv(filename, new_filename)
+        new_basename = FTools::new_basename( FTools::clean_name(basename), date_time_original: dto, author: @author)      
+        new_filename = File.join( dirname, new_basename + extname )      
+        FileUtils.mv(filename, new_filename) if basename != new_basename
       rescue => e
         raise FTools::Error.new("file renaming", e)
       end
