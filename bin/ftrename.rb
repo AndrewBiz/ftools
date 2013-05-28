@@ -4,7 +4,7 @@
 require_relative "../lib/ftools/runner_#{File.basename(__FILE__)}"
 
 module FTools 
-  VERSION = "0.0.1"
+  VERSION = "0.0.2"
 end
 
 file_type = FTools::FileTypeImage + FTools::FileTypeVideo
@@ -17,6 +17,8 @@ where YYYYmmdd-HHMMSS is equal to DateTimeOriginal, AAA is the author nickname.
 Input file should be one of the types: #{file_type*","}
 
 Example: input file 'DSC03455.JPG' will be renamed to '20130108-124145_ANB DSC03455.JPG'
+
+! Make sure you have exiftool installed (for more details see http://www.sno.phy.queensu.ca/~phil/exiftool/install.html)
 
 Usage:
   #{tool_name} -a NICKNAME [-D]

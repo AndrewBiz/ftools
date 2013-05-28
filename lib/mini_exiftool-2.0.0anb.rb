@@ -8,7 +8,7 @@
 # Read and write access is done in a clean OO manner.
 #
 # Author: Jan Friedrich
-# Copyright (c) 2007-2012 by Jan Friedrich
+# Copyright (c) 2007-2013 by Jan Friedrich
 # Licensed under the GNU LESSER GENERAL PUBLIC LICENSE,
 # Version 2.1, February 1999
 #
@@ -18,10 +18,9 @@ require 'tempfile'
 require 'pstore'
 require 'rational'
 require 'set'
-require 'shellwords'
 require 'time'
-# ANB
-require 'nesty'
+require 'json' #ANB
+require 'nesty' #ANB
 
 # Simple OO access to the Exiftool command-line application.
 class MiniExiftool
@@ -35,7 +34,7 @@ class MiniExiftool
   attr_reader :filename
   attr_accessor :numerical, :composite, :convert_encoding, :ignore_minor_errors, :errors, :timestamps
 
-  VERSION = '1.6.0'
+  VERSION = '2.0.0'
 
   # +opts+ support at the moment
   # * <code>:numerical</code> for numerical values, default is +false+
@@ -58,6 +57,7 @@ class MiniExiftool
     @convert_encoding = opts[:convert_encoding]
     @ignore_minor_errors = opts[:ignore_minor_errors]
     @timestamps = opts[:timestamps]
+    @coord_format = opts[:coord_format]
     @values = TagHash.new
     @tag_names = TagHash.new
     @changed_values = TagHash.new
@@ -77,7 +77,7 @@ class MiniExiftool
   def load filename
     MiniExiftool.setup
     unless filename && File.exist?(filename)
-      raise MiniExiftool::Error.new("File '#{filename}' does not exist")
+      raise MiniExiftool::Error.new("File '#{filename}' does not exist.")
     end
     if File.directory?(filename)
       raise MiniExiftool::Error.new("'#{filename}' is a directory.")
@@ -90,7 +90,8 @@ class MiniExiftool
     opt_params << (@numerical ? '-n ' : '')
     opt_params << (@composite ? '' : '-e ')
     opt_params << (@convert_encoding ? '-L ' : '')
-    cmd = %Q(#@@cmd -q -q -s -t #{opt_params} #{@@sep_op} "#{filename}") #ANB deleted Shellwords.escape(
+    opt_params << (@coord_format ? "-c \"#{@coord_format}\"" : '')
+    cmd = %Q(#@@cmd -j -q -q -s -t #{opt_params} #{MiniExiftool.escape(filename)})
     if run(cmd)
       parse_output
     else
@@ -162,15 +163,15 @@ class MiniExiftool
       arr_val.map! {|e| convert e}
       tag_params = ''
       arr_val.each do |v|
-        tag_params << %Q(-#{original_tag}="#{v.to_s}" ) #ANB deleted Shellwords.escape(
+        tag_params << %Q(-#{original_tag}=#{MiniExiftool.escape(v)} )
       end
       opt_params = ''
       opt_params << (arr_val.detect {|x| x.kind_of?(Numeric)} ? '-n ' : '')
       opt_params << (@convert_encoding ? '-L ' : '')
       opt_params << (@ignore_minor_errors ? '-m' : '')
-      cmd = %Q(#@@cmd -q -P -overwrite_original #{opt_params} #{tag_params} "#{temp_filename}")
-      if convert_encoding && cmd.respond_to?(:encode)
-        cmd.encode('ISO-8859-1')
+      cmd = %Q(#@@cmd -q -P -overwrite_original #{opt_params} #{tag_params} #{temp_filename})
+      if convert_encoding
+        cmd.encode!('ISO-8859-1')
       end
       result = run(cmd)
       unless result
@@ -289,14 +290,6 @@ class MiniExiftool
     return if @@setup_done
     @@error_file = Tempfile.new 'errors'
     @@error_file.close
-
-    if Float(exiftool_version) < 7.41
-      @@separator = ', '
-      @@sep_op = ''
-    else
-      @@separator = '@@'
-      @@sep_op = '-sep @@'
-    end
     @@setup_done = true
   end
 
@@ -305,13 +298,6 @@ class MiniExiftool
       $stderr.puts cmd
     end
     @output = `#{cmd} 2>#{@@error_file.path}`
-    if convert_encoding # ANB - for ruby 1.9.3 and higher && @output.respond_to?(:force_encoding)
-      @output.force_encoding('ISO-8859-1')
-    else #ANB added 'utf-8 invalid character' issue in some Russian tags workaround
-      @output.encode!('UTF-16', 'UTF-8', :invalid => :replace, :undef => :replace, :replace => '.')
-      @output.encode!('UTF-8', 'UTF-16', :invalid => :replace, :undef => :replace, :replace => '.')
-      @output.force_encoding('UTF-8')
-    end
     @status = $?
     unless @status.exitstatus == 0
       @error_text = File.readlines(@@error_file.path).join
@@ -340,50 +326,47 @@ class MiniExiftool
   end
 
   def parse_output
-    @output.each_line do |line|
-      tag, value = parse_line line
+    JSON.parse(@output)[0].each do |tag,value|
+      value = perform_conversions(value)
       set_value tag, value
     end
   end
 
-  def parse_line line
-    if line =~ /^([^\t]+)\t(.*)$/
-      tag, value = $1, perform_conversions($2)
-    else
-      raise MiniExiftool::Error.new("Malformed line #{line.inspect} of exiftool output.")
-    end
-    return [tag, value]
-  end
-
   def perform_conversions(value)
-      case value
-      when /^\d{4}:\d\d:\d\d \d\d:\d\d:\d\d/
-        s = value.sub(/^(\d+):(\d+):/, '\1-\2-')
-        begin
-          if @timestamps == Time
-            value = Time.parse(s)
-            elsif @timestamps == DateTime
-            value = DateTime.parse(s)
-          else
-            raise MiniExiftool::Error.new("Value #@timestamps not allowed for option timestamps.")
-          end
-        rescue ArgumentError
-          value = false
+    return value unless value.kind_of?(String)
+    if convert_encoding
+      value.encode!('ISO-8859-1')
+    else #ANB workaround for 'utf-8 invalid character' issue in some Russian tags
+      value.encode!('UTF-16', 'UTF-8', :invalid => :replace, :undef => :replace, :replace => '.')
+      value.encode!('UTF-8', 'UTF-16', :invalid => :replace, :undef => :replace, :replace => '.')
+      value.force_encoding('UTF-8')
+    end
+    case value
+    when /^\d{4}:\d\d:\d\d \d\d:\d\d:\d\d/
+      s = value.sub(/^(\d+):(\d+):/, '\1-\2-')
+      begin
+        if @timestamps == Time
+          value = Time.parse(s)
+        elsif @timestamps == DateTime
+          value = DateTime.parse(s)
+        else
+          raise MiniExiftool::Error.new("Value #@timestamps not allowed for option timestamps.")
         end
-      when /^\d+\.\d+$/
-        value = value.to_f
-      when /^0+[1-9]+$/
-        # nothing => String
-      when /^-?\d+$/
-        value = value.to_i
-      when %r(^(\d+)/(\d+)$)
-        value = Rational($1.to_i, $2.to_i)
-      when /^[\d ]+$/
-        # nothing => String
-      when /#{@@separator}/
-        value = value.split @@separator
+      rescue ArgumentError
+        value = false
       end
-      value
+    when /^\+\d+\.\d+$/
+      value = value.to_f
+    when /^0+[1-9]+$/
+      # nothing => String
+    when /^-?\d+$/
+      value = value.to_i
+    when %r(^(\d+)/(\d+)$)
+      value = Rational($1.to_i, $2.to_i)
+    when /^[\d ]+$/
+      # nothing => String
+    end
+    value
   end
 
   def set_value tag, value
@@ -446,6 +429,9 @@ class MiniExiftool
     tags
   end
 
+  def self.escape(val)
+    '"' << val.to_s.gsub(/\\/, '\\'*4).gsub(/"/, '\"') << '"'
+  end
 
   # Hash with indifferent access:
   # DateTimeOriginal == datetimeoriginal == date_time_original

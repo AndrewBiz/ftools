@@ -3,7 +3,7 @@
 # (с) ANB Andrew Bizyaev Андрей Бизяев 
 
 require_relative 'runner.rb'
-require_relative '../mini_exiftool-1.6.0'
+require_relative '../mini_exiftool-2.0.0anb'
 
 module FTools
   class Runner
