@@ -2,6 +2,7 @@
 # encoding: UTF-8
 # (с) ANB Andrew Bizyaev Андрей Бизяев 
 
+require_relative 'ruby_version.rb'
 require 'docopt'
 require 'fileutils'
 require_relative 'error.rb'
