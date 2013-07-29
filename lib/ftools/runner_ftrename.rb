@@ -10,8 +10,7 @@ module FTools
 
     private
     def validate_options
-      @author = @options_cli['--author']||""
-      @author.upcase!
+      @author = @options_cli['--author'].upcase || ""
       raise FTools::Error.new("author is not defined") if @author.empty?
       raise FTools::Error.new("author nickname is too long, max is #{FTools::NicknameMaxSize}") if @author.size > FTools::NicknameMaxSize
     end

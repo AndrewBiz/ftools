@@ -4,7 +4,7 @@
 require_relative "../lib/ftools/runner_#{File.basename(__FILE__)}"
 
 module FTools 
-  VERSION = "0.0.1"
+  VERSION = "0.1.0"
 end
 
 file_type = FTools::FileTypeImage + FTools::FileTypeVideo

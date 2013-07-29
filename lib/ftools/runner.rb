@@ -5,16 +5,28 @@
 require_relative 'ruby_version.rb'
 require 'docopt'
 require 'fileutils'
+require_relative 'os_win.rb'
+require_relative 'os_unix.rb'
 require_relative 'error.rb'
 require_relative 'file_type.rb'
 require_relative 'file_name.rb'
 
 module FTools
+
+  VERSION_CORE = '0.1.1'
+
+  # Main class processing input stream
   class Runner
 
     def initialize( usage, file_type=[] )
-      ARGV.map!{|a| a.encode("internal", "filesystem")}   #workaround for win32
-      @options_cli = Docopt::docopt( usage, version: FTools::VERSION )
+      case FTools.os
+      when :windows 
+        ARGV.map!{|a| a.encode("internal", "filesystem")}   #workaround for win32
+        @os = OSWin.new
+      else 
+        @os = OSUnix.new
+      end  
+      @options_cli = Docopt::docopt( usage, version: "#{FTools::VERSION} (core #{FTools::VERSION_CORE})" )
       @file_type = file_type
       FTools::debug = true if @options_cli['--debug']
       FTools::puts_error "OPTIONS = #{@options_cli.to_s}" if FTools::debug
@@ -30,6 +42,8 @@ module FTools
 
     def run
       ARGV.clear
+      
+      process_before
 
       ARGF.each_line do |line|
         result = nil
@@ -50,9 +64,11 @@ module FTools
         rescue FTools::Error => e
           FTools::puts_error "ERROR: '#{line}' - #{e.message}", e
         else  
-          STDOUT.puts result unless result.nil?
+          @os.output result unless result.nil?
         end  
       end
+
+      process_after
 
     rescue SignalException => e
       FTools::puts_error "EXIT on user interrupt Ctrl-C"
@@ -64,8 +80,16 @@ module FTools
 
     private
     def validate_options
-
+    end
+    
+    def process_before
     end
 
+    def process_file filename
+      filename
+    end
+    
+    def process_after
+    end
   end
 end

@@ -16,7 +16,7 @@ module FTools
   end
 
   def self.puts_error msg, e=nil
-    STDERR.puts "#{File.basename($PROGRAM_NAME)}: #{msg}"
+    STDERR.puts "#{File.basename($PROGRAM_NAME, ".rb")}: #{msg}"
     if debug and not e.nil?
       STDERR.puts e.backtrace
     end

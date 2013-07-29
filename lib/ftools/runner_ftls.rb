@@ -29,16 +29,11 @@ module FTools
           #taboo_files = Dir.glob(xmask, File::FNM_CASEFOLD | File::FNM_DOTMATCH)
           #files_found += files_to_copy.size
           #files_excluded += (files_to_copy - (files_to_copy - taboo_files)).size
-          files_to_process.each { |f| output_file(f) }
+          files_to_process.each { |f| @os.output(f) }
         else
-          output_file(item)
+          @os.output(item)
         end
       end
     end
-
-    def output_file file
-      STDOUT.puts file
-    end
-
   end
 end
