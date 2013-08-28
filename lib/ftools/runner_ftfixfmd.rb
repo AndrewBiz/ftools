@@ -1,8 +1,9 @@
 #!/usr/bin/env ruby -w -U
 # encoding: UTF-8
-# (с) ANB Andrew Bizyaev Андрей Бизяев 
+# (с) ANB Andrew Bizyaev Андрей Бизяев
 
 require_relative 'runner.rb'
+require 'time'
 
 module FTools
   class Runner_ftfixfmd < FTools::Runner

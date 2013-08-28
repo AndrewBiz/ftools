@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby -w -U
 # encoding: UTF-8
-# (с) ANB Andrew Bizyaev Андрей Бизяев 
+# (с) ANB Andrew Bizyaev Андрей Бизяев
 
 require_relative 'runner.rb'
 require_relative '../mini_exiftool-2.0.0anb'
@@ -39,8 +39,8 @@ module FTools
 
       # renaming file
       begin
-        new_basename = FTools::new_basename( FTools::clean_name(basename), date_time_original: dto, author: @author)      
-        new_filename = File.join( dirname, new_basename + extname )      
+        new_basename = FTools::new_basename( FTools::clean_name(basename), date_time_original: dto, author: @author)
+        new_filename = File.join( dirname, new_basename + extname )
         FileUtils.mv(filename, new_filename) if basename != new_basename
       rescue => e
         raise FTools::Error.new("file renaming", e)

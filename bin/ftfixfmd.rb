@@ -3,8 +3,8 @@
 # (с) ANB Andrew Bizyaev Андрей Бизяев
 require_relative '../lib/ftools/runner_ftfixfmd.rb'
 
-module FTools 
-  VERSION = "0.0.1"
+module FTools
+  VERSION = "0.0.2"
 end
 
 file_type = FTools::FileTypeImage + FTools::FileTypeVideo
@@ -12,18 +12,19 @@ tool_name = File.basename(__FILE__, ".rb")
 usage = <<DOCOPT
 *ftools* - *keep your fotos in order* Andrew Bizyaev (c).
 #{tool_name}, version #{FTools::VERSION}.
-#{tool_name} changes an input file modify-date according to the date in the filename. 
-The name of the input file should be in format: YYYYmmdd-HHMMSS*.* 
+#{tool_name} changes an input file modify-date according to the date in the filename.
+The name of the input file should be in format: YYYYmmdd-HHMMSS*.*
 Input file should be one of the types: #{file_type*","}
 
 Usage:
-  #{tool_name}
+  #{tool_name} [-D]
   #{tool_name} -h | --help
   #{tool_name} --version
 
 Optimized to be used via pipes, e.g. ls *|#{tool_name}
 
 Options:
+  -D --debug    Turn on debugging (verbose) mode
   -h --help     Show this screen.
   --version     Show version.
 DOCOPT
