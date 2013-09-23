@@ -1,2 +1,2 @@
 TODO:
-
+- tty - change behavior if stdin is note pipe - example: +if !ARGV.include?("-message") && !STDIN.tty?
