@@ -10,9 +10,9 @@ module FTools
   # determine OS
   def self.os (os_string = RbConfig::CONFIG['host_os'])
     case os_string
-    when /darwin/ then :macosx
-    when /linux/ then :linux
-    when /w32/ then :windows
+    when /darwin/i then :macosx
+    when /linux/i then :linux
+    when /mswin|mingw|w32/i then :windows
     else :unknown
     end
   end

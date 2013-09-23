@@ -1,25 +1,27 @@
 #!/usr/bin/env ruby -U
 # encoding: UTF-8
-# (с) ANB Andrew Bizyaev Андрей Бизяев
+# (c) ANB Andrew Bizyaev
 require_relative "../lib/ftools/runner_#{File.basename(__FILE__)}"
 
-module FTools 
-  VERSION = "0.0.1"
+# Foto Tools
+module FTools
+  VERSION = '0.1.0'
 end
 
 file_type = FTools::FileTypeImage + FTools::FileTypeVideo
-tool_name = File.basename(__FILE__, ".rb")
+tool_name = File.basename(__FILE__, '.rb')
 usage = <<DOCOPT
 *ftools* - *keep your fotos in order* Andrew Bizyaev (c).
-#{tool_name}, version #{FTools::VERSION}, copies the input file into backup directory.
-Input file should be one of the types: #{file_type*","}
+#{tool_name}, version #{FTools::VERSION}, copies the input file into backup
+directory.
+Input file should be one of the types: #{file_type * ","}
 
 Usage:
   #{tool_name} [--backup DIR] [-D]
   #{tool_name} -h | --help
   #{tool_name} --version
 
-Optimized to be used via pipes, e.g. ls *|#{tool_name}|ftrename
+Optimized to be used with other *ftools* via pipes, e.g. ftls |#{tool_name}
 
 Options:
   -b DIR --backup=DIR  Sets the backup directory [Default: ./backup]
@@ -28,5 +30,5 @@ Options:
   --version            Show version.
 DOCOPT
 
-runner = FTools::Runner.new( usage, file_type )
+runner = FTools::Runner.new(usage, file_type)
 runner.run

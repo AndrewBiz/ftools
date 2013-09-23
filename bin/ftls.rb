@@ -1,10 +1,10 @@
 #!/usr/bin/env ruby -U
 # encoding: UTF-8
-# (с) ANB Andrew Bizyaev Андрей Бизяев
+# (c) ANB Andrew Bizyaev
 require_relative "../lib/ftools/runner_#{File.basename(__FILE__)}"
 
 module FTools 
-  VERSION = "0.1.0"
+  VERSION = '0.1.0'
 end
 
 file_type = FTools::FileTypeImage + FTools::FileTypeVideo

@@ -1,10 +1,10 @@
 #!/usr/bin/env ruby -U
 # encoding: UTF-8
-# (с) ANB Andrew Bizyaev Андрей Бизяев
+# (c) ANB Andrew Bizyaev
 require_relative '../lib/ftools/runner_ftfixid.rb'
 
 module FTools 
-  VERSION = "0.0.1"
+  VERSION = '0.1.0'
 end
 
 file_type = FTools::FileTypeImage
@@ -25,7 +25,7 @@ Usage:
   #{tool_name} -h | --help
   #{tool_name} --version
 
-Optimized to be used via pipes, e.g. ls *|#{tool_name}
+Optimized to be used with other *ftools* via pipes, e.g. ftls |#{tool_name}
 
 Options:
   -h --help     Show this screen.

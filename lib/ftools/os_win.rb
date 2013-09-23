@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby -w -U
 # encoding: UTF-8
-# (с) ANB Andrew Bizyaev Андрей Бизяев 
+# (c) ANB Andrew Bizyaev
 require_relative 'os'
 
 module FTools

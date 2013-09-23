@@ -41,6 +41,9 @@ module FTools
     end
 
     def run
+      # raise FTools::Error.new("expecting input via pipe (e.g. ftls|#{File.basename($PROGRAM_NAME, ".rb")})") if STDIN.tty?
+      return if STDIN.tty?
+      
       ARGV.clear
       
       process_before

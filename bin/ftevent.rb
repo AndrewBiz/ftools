@@ -1,7 +1,8 @@
 #!/usr/bin/env ruby -U
 # encoding: UTF-8
 # (c) ANB Andrew Bizyaev
-require_relative '../lib/ftools/runner_ftfixfmd.rb'
+
+require_relative "../lib/ftools/runner_#{File.basename(__FILE__)}"
 
 module FTools
   VERSION = '0.1.0'
@@ -12,8 +13,8 @@ tool_name = File.basename(__FILE__, ".rb")
 usage = <<DOCOPT
 *ftools* - *keep your fotos in order* Andrew Bizyaev (c).
 #{tool_name}, version #{FTools::VERSION}.
-#{tool_name} changes an input file modify-date according to the date in the filename.
-The name of the input file should be in format: YYYYmmdd-HHMMSS*.*
+#{tool_name} collects input file(s) into event directory.
+ modify-date according to the date in the filename.
 Input file should be one of the types: #{file_type*","}
 
 Usage:
@@ -24,10 +25,11 @@ Usage:
 Optimized to be used with other *ftools* via pipes, e.g. ftls |#{tool_name}
 
 Options:
+  -e EVT --event=EVT  Event profile to use [default: ./event.yml]
   -D --debug    Turn on debugging (verbose) mode
   -h --help     Show this screen.
   --version     Show version.
 DOCOPT
 
-runner = FTools::Runner_ftfixfmd.new( usage, file_type )
+runner = FTools::Runner.new( usage, file_type )
 runner.run
