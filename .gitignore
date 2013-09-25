@@ -1,7 +1,21 @@
-pkg/*
 *.gem
 tmp/*
+
+# bundler
 .bundle
-.DS_Store
-*.swp
 Gemfile.lock
+
+# jeweler generated
+pkg
+
+# For MacOS:
+#
+#.DS_Store
+
+# For emacs:
+#*~
+#\#*
+#.\#*
+
+# For vim:
+#*.swp
