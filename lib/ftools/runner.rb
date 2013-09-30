@@ -33,6 +33,7 @@ module FTools
       @file_type = file_type
       FTools.debug = true if @options_cli['--debug']
       FTools.puts_error "OPTIONS = #{@options_cli.to_s}" if FTools.debug
+
       validate_options
 
     rescue Docopt::Exit => e
@@ -56,17 +57,17 @@ module FTools
         begin
           # checking file
           unless filename && File.exist?(filename)
-            fail FTools.Error.new('does not exist')
+            fail FTools::Error.new('does not exist')
           end
-          fail FTools.Error.new('not a file') if File.directory?(filename)
-          fail FTools.Error.new('no permission to write') unless File
+          fail FTools::Error.new('not a file') if File.directory?(filename)
+          fail FTool::Error.new('no permission to write') unless File
             .writable?(filename)
-          fail FTools.Error.new('wrong type') unless @file_type.include?(File
+          fail FTools::Error.new('wrong type') unless @file_type.include?(File
             .extname(filename).downcase.slice(1..-1))
 
           result = process_file(filename)
 
-        rescue FTools.Error => e
+        rescue FTools::Error => e
           FTools.puts_error "ERROR: '#{line}' - #{e.message}", e
         else
           @os.output result unless result.nil?

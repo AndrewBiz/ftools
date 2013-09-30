@@ -7,7 +7,7 @@ module FTools
   VERSION = '0.1.0'
 end
 
-file_type = FTools::FileTypeImage + FTools::FileTypeVideo
+file_type = FTools::FILE_TYPE_IMAGE + FTools::FILE_TYPE_VIDEO
 tool_name = File.basename(__FILE__, ".rb")
 usage = <<DOCOPT
 *ftools* - *keep your fotos in order* Andrew Bizyaev (c).
@@ -32,7 +32,6 @@ DOCOPT
 
 #TODO -f file mask to include files
 #TODO -x exclude files by mask
-#TODO -g global file names
 
-runner = FTools::Runner.new( usage, file_type )
+runner = FTools::Runner.new(usage, file_type)
 runner.run

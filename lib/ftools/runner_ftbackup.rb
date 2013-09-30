@@ -1,6 +1,6 @@
 #!/usr/bin/env ruby -w -U
 # encoding: UTF-8
-# (с) ANB Andrew Bizyaev Андрей Бизяев 
+# (c) ANB Andrew Bizyaev
 
 require_relative 'runner.rb'
 
@@ -9,10 +9,10 @@ module FTools
 
     private
     def validate_options
-      @backup_dir = @options_cli['--backup']||""
-      raise FTools::Error.new("backup dir is not defined") if @backup_dir.empty?
+      @backup_dir = @options_cli['--backup'] || ''
+      raise FTools::Error.new('backup dir is not defined') if @backup_dir.empty?
     end
-    
+
     def process_before
       if File.exist?(@backup_dir)
         raise FTools::Error.new("#{@backup_dir} is not a directory") unless File.directory?(@backup_dir)
@@ -23,21 +23,20 @@ module FTools
         rescue => e
           raise FTools::Error.new("Unable to make dir '#{@backup_dir}'", e)
         end
-      end  
+      end
     end
 
-    def process_file( filename )
-      extname = File.extname( filename )
-      basename = File.basename( filename, extname )
+    def process_file(filename)
+      extname = File.extname(filename)
+      basename = File.basename(filename, extname)
       # copy file
       begin
-        new_filename = File.join( @backup_dir, basename + extname )      
-        FileUtils.cp(filename, new_filename, verbose: FTools::debug )
+        new_filename = File.join(@backup_dir, basename + extname)
+        FileUtils.cp(filename, new_filename, verbose: FTools.debug)
       rescue => e
         raise FTools::Error.new("file copying to #{@backup_dir}", e)
       end
-      return filename
+      filename
     end
-
   end
 end

@@ -7,8 +7,8 @@ module FTools
   VERSION = '0.1.0'
 end
 
-file_type = FTools::FileTypeImage + FTools::FileTypeVideo
-tool_name = File.basename(__FILE__, ".rb")
+file_type = FTools::FILE_TYPE_IMAGE + FTools::FILE_TYPE_VIDEO
+tool_name = File.basename(__FILE__, '.rb')
 usage = <<DOCOPT
 *ftools* - *keep your fotos in order* Andrew Bizyaev (c).
 #{tool_name}, version #{FTools::VERSION}, renames the input file based on EXIF DateTimeOriginal tag and 

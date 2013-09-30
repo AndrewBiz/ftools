@@ -7,7 +7,7 @@ module FTools
   VERSION = '0.1.0'
 end
 
-file_type = FTools::FileTypeImage
+file_type = FTools::FILE_TYPE_IMAGE
 tool_name = File.basename(__FILE__, ".rb")
 usage = <<DOCOPT
 *ftools* - *keep your fotos in order* Andrew Bizyaev (c).

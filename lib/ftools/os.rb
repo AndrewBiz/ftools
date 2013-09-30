@@ -8,7 +8,7 @@ require 'rbconfig'
 module FTools
 
   # determine OS
-  def self.os (os_string = RbConfig::CONFIG['host_os'])
+  def self.os(os_string = RbConfig::CONFIG['host_os'])
     case os_string
     when /darwin/i then :macosx
     when /linux/i then :linux

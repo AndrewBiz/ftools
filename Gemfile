@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-gem 'nesty','~>1.0'
+gem 'nesty', '~>1.0'
 gem 'docopt', '~>0.5'
 gem 'mini_exiftool'
 
@@ -24,6 +24,8 @@ group :development do
   gem 'guard'
   gem 'guard-rspec'
   gem 'guard-rubocop'
-  gem 'rspec', ">= 0"
-  gem 'bundler', ">= 0"
+  gem 'guard-cucumber'
+  gem 'rspec', '>= 0'
+  gem 'aruba'
+  gem 'bundler', '>= 0'
 end
