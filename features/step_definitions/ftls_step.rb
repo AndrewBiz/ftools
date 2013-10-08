@@ -9,3 +9,11 @@ Given(/^empty files named:$/) do |table|
     step %{an empty file named "#{file}"}
   end
 end
+
+Then(/^the stdout should contain each of:$/) do |table|
+  # table is a Cucumber::Ast::Table
+  files = table.raw.flatten
+  files.each do |file|
+    step %{the stdout should contain "#{file}"}
+  end
+end
