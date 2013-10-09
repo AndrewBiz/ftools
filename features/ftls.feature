@@ -26,6 +26,19 @@ Feature: Generate a list of ftools-friendly-files
 
   
   #@announce
+  Scenario: 0 Default output with -h produces usage information 
+    When I successfully run `ftls -h`
+    Then the stderr should contain each of:
+    | Keep Your Photos Clean And Tidy |
+    | © ANB                           |
+    | Example:                        |
+    | Usage:                          |
+    | Options:                        |
+    | -D --debug                      |
+    | -h --help                       |
+    | --version                       |
+
+  #@announce
   Scenario: 1 Default output produces supported-by-ftools file list
     When I successfully run `ftls`
     Then the stdout should contain each of:

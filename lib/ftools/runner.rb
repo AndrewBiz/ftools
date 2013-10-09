@@ -14,7 +14,7 @@ require_relative 'file_name.rb'
 # Foto Tools
 module FTools
 
-  VERSION_CORE = '0.1.2'
+  VERSION_CORE = '0.1.3'
 
   # Main class processing input stream
   class Runner
@@ -38,7 +38,7 @@ module FTools
 
     rescue Docopt::Exit => e
       STDERR.puts e.message
-      exit 1
+      exit 0
     rescue => e
       FTools.puts_error "FATAL: #{e.message}", e
       exit 1

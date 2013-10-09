@@ -1,2 +1,36 @@
-#!/usr/bin/env bash
-/Users/anb/Dropbox/dev/ftools/bin/ftls.rb "$@"
+#!/usr/bin/env ruby -U
+# encoding: UTF-8
+# (c) ANB Andrew Bizyaev
+require_relative "../lib/ftools/#{File.basename(__FILE__)}"
+
+# Foto processing tools
+module FTools
+  VERSION = '0.2.1'
+end
+
+file_type = FTools::FILE_TYPE_IMAGE + FTools::FILE_TYPE_VIDEO
+tool_name = File.basename(__FILE__)
+usage = <<DOCOPT
+ftools - *Keep Your Photos Clean And Tidy* (© ANB).
+#{tool_name}, version #{FTools::VERSION}, scans given directories and
+generates list of files to standart output.
+In short it acts like a smart 'ls' command (or 'dir' in Windows).
+It is a good starting point for all other ftools to be used with pipes.
+ftools friendly file types are: #{file_type}
+
+Example: #{tool_name} -r abc |ftclname => recursively scans 'abc' dir and
+sends all found ftools friendly files to ftclname program.
+
+Usage:
+  #{tool_name} [-D] [-r] [DIR_OR_FILE...]
+  #{tool_name} -h | --help
+  #{tool_name} --version
+
+Options:
+  -D --debug      Turn on debugging (verbose) mode
+  -r --recursive  Recursively scan directories
+  -h --help       Show this screen.
+  --version       Show version.
+DOCOPT
+
+FTools::FTls.new(usage, file_type).run!
