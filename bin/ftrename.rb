@@ -4,7 +4,7 @@
 require_relative "../lib/ftools/runner_#{File.basename(__FILE__)}"
 
 module FTools 
-  VERSION = '0.1.0'
+  VERSION = '0.1.1'
 end
 
 file_type = FTools::FILE_TYPE_IMAGE + FTools::FILE_TYPE_VIDEO
@@ -25,14 +25,15 @@ Usage:
   #{tool_name} -h | --help
   #{tool_name} --version
 
-Optimized to be used with other *ftools* via pipes, e.g. ftls |#{tool_name}
+Optimized to be used with other *ftools* via pipes, e.g.:
+  ftls |#{tool_name} -a ANB
 
 Options:
-  -a NICKNAME --author=NICKNAME  Author nickname should be max #{FTools::NicknameMaxSize} chars long (e.g. ANB)
+  -a NICKNAME --author=NICKNAME  Author nickname should be max of #{FTools::NICKNAME_MAX_SIZE} chars long (e.g. ANB)
   -D --debug    Turn on debugging (verbose) mode
   -h --help     Show this screen.
   --version     Show version.
 DOCOPT
 
-runner = FTools::Runner.new( usage, file_type )
+runner = FTools::Runner.new(usage, file_type)
 runner.run

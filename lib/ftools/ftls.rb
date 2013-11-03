@@ -35,7 +35,8 @@ module FTools
     end
 
     def output_file(file)
-      @os.output(file) if @file_type.include?(File.extname(file).slice(1..-1))
+      @os.output(file) if
+        @file_type.include?(File.extname(file).slice(1..-1).downcase)
     end
 
   end

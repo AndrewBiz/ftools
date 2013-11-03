@@ -10,21 +10,21 @@ module FTools
 
     private
     def validate_options
-      @author = @options_cli['--author'].upcase || ""
-      raise FTools::Error.new("author is not defined") if @author.empty?
-      raise FTools::Error.new("author nickname is too long, max is #{FTools::NicknameMaxSize}") if @author.size > FTools::NicknameMaxSize
+      @author = @options_cli['--author'].upcase || ''
+      raise FTools::Error.new('author is not defined, use --author option') if @author.empty?
+      raise FTools::Error.new("author nickname is too long, max is #{FTools::NICKNAME_MAX_SIZE} chars") if @author.size > FTools::NICKNAME_MAX_SIZE
     end
 
-    def process_file( filename )
+    def process_file(filename)
       # checking file name
       dirname = File.dirname( filename )
       extname = File.extname( filename )
-      #file_type = extname.downcase.slice(1..-1)
+      # file_type = extname.downcase.slice(1..-1)
       basename = File.basename( filename, extname )
 
       # reading tags
       begin
-        tag = MiniExiftool.new( filename, :timestamps => DateTime)
+        tag = MiniExiftool.new(filename, timestamps: DateTime)
       rescue => e
         raise FTools::Error.new("exif tags reading")
       end

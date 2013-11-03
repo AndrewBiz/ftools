@@ -23,7 +23,6 @@ group :development do
   
   gem 'guard'
   gem 'guard-rspec'
-  gem 'guard-rubocop'
   gem 'guard-cucumber'
   gem 'rspec', '>= 0'
   gem 'aruba'
