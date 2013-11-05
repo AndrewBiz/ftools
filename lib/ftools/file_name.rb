@@ -10,7 +10,7 @@ module FTools
   NICKNAME_MIN_SIZE = 3
   NICKNAME_MAX_SIZE = 6
   # TODO: use NICKNAME_SIZE in code
-  # TODO: make test of NICKNAME_SIZE - should be in a range
+  # TODO: NICKNAME - check size, only word, no non-ascii symbols
   NICKNAME_SIZE = 3 # should be in range of MIN and MAX
 
   # ftools file name operations
@@ -31,32 +31,44 @@ module FTools
       default = { prefix: '', clean: '', date: '',
                   time: '', author: '', id: '', flags: '' }
 
-      # TODO: bn =~ %r{^(?<author>\w{#{min},#{max}})}
-      # TODO: m = Regexp.new(srt_regexp).match(file_name)
-
-      case
-
+      case @basename
       # check YYYYmmdd-HHMMSS_AUT[ID]{FLAGS}cleanname
-      when %r{^(?<prefix>(?<date>\d{8})-(?<time>\d{6})_(?<author>\w{3})\[(?<id>.*)\]\{(?<flags>.*)\})(?<clean>.*)} =~ @basename
-        @basename_part = default.merge(prefix: prefix, clean: clean,
-                                       date: date, time: time,
-                                       author: author, id: id, flags: flags)
+      when /^(?<prefix>(?<date>\d{8})-(?<time>\d{6})_(?<author>\w{#{NICKNAME_MIN_SIZE},#{NICKNAME_MAX_SIZE}})\[(?<id>.*)\]\{(?<flags>.*)\})(?<clean>.*)/
+        @basename_part = default.merge(prefix: Regexp.last_match(:prefix),
+                                       clean: Regexp.last_match(:clean),
+                                       date: Regexp.last_match(:date),
+                                       time: Regexp.last_match(:time),
+                                       author: Regexp.last_match(:author),
+                                       id: Regexp.last_match(:id),
+                                       flags: Regexp.last_match(:flags))
+
       # check YYYYmmdd-HHMMSS_AUT[ID]cleanname
-      when %r{^(?<prefix>(?<date>\d{8})-(?<time>\d{6})_(?<author>\w{3})\[(?<id>.*)\])(?<clean>.*)} =~ @basename
-        @basename_part = default.merge(prefix: prefix, clean: clean,
-                                       date: date, time: time,
-                                       author: author, id: id)
+      when /^(?<prefix>(?<date>\d{8})-(?<time>\d{6})_(?<author>\w{#{NICKNAME_MIN_SIZE},#{NICKNAME_MAX_SIZE}})\[(?<id>.*)\])(?<clean>.*)/
+        @basename_part = default.merge(prefix: Regexp.last_match(:prefix),
+                                       clean: Regexp.last_match(:clean),
+                                       date: Regexp.last_match(:date),
+                                       time: Regexp.last_match(:time),
+                                       author: Regexp.last_match(:author),
+                                       id: Regexp.last_match(:id))
+
       # check YYYYmmdd-HHMMSS_AUT_cleanname
-      when %r{^(?<prefix>(?<date>\d{8})-(?<time>\d{6})_(?<author>\w{3})_)(?<clean>.*)} =~ @basename
-        @basename_part = default.merge(prefix: prefix, clean: clean,
-                                       date: date, time: time,
-                                       author: author)
+      when /^(?<prefix>(?<date>\d{8})-(?<time>\d{6})_(?<author>\w{#{NICKNAME_MIN_SIZE},#{NICKNAME_MAX_SIZE}})_)(?<clean>.*)/
+        @basename_part = default.merge(prefix: Regexp.last_match(:prefix),
+                                       clean: Regexp.last_match(:clean),
+                                       date: Regexp.last_match(:date),
+                                       time: Regexp.last_match(:time),
+                                       author: Regexp.last_match(:author))
+
       # STANDARD template
       # check YYYYmmdd-HHMMSS_AUT cleanname
-      when %r{^(?<prefix>(?<date>\d{8})-(?<time>\d{6})_(?<author>\w{3,6}) )(?<clean>.*)} =~ @basename
-        @basename_part = default.merge(prefix: prefix, clean: clean,
-                                       date: date, time: time,
-                                       author: author)
+      when /^(?<prefix>(?<date>\d{8})-(?<time>\d{6})_(?<author>\w{#{NICKNAME_MIN_SIZE},#{NICKNAME_MAX_SIZE}}) )(?<clean>.*)/
+        @basename_part = default.merge(prefix: Regexp.last_match(:prefix),
+                                       clean: Regexp.last_match(:clean),
+                                       date: Regexp.last_match(:date),
+                                       time: Regexp.last_match(:time),
+                                       author: Regexp.last_match(:author))
+
+      # TODO: remaining regexps
 
       else
         @basename_part = default.merge(clean: @basename)

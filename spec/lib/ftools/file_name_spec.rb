@@ -5,6 +5,21 @@
 require_relative '../../../spec/spec_helper'
 require 'file_name'
 
+describe FTools, 'module' do
+  it 'has NICKNAME_MIN_SIZE == 3' do
+    expect(FTools::NICKNAME_MIN_SIZE).to eq 3
+  end
+
+  it 'has NICKNAME_MAX_SIZE == 6' do
+    expect(FTools::NICKNAME_MAX_SIZE).to eq 6
+  end
+
+  it 'has NICKNAME_SIZE within the range of MIN-MAX' do
+    expect(FTools::NICKNAME_SIZE).to be <= FTools::NICKNAME_MAX_SIZE
+    expect(FTools::NICKNAME_SIZE).to be >= FTools::NICKNAME_MIN_SIZE
+  end
+end
+
 describe FTools::FileName, 'object'  do
   it 'stores file dir name' do
     fn = FTools::FileName.new('./aaa/bbb/file.ext')
@@ -21,7 +36,7 @@ describe FTools::FileName, 'object'  do
     expect(fn.extname).to eq('.ext')
   end
 
-  describe 'parses the basename for the file:' do
+  describe 'parses the basename of' do
 
     fn1 = '20011231-112233_ANB[20010101-ABCDEF]{flags}cleanname.jpg'
     it fn1 do
