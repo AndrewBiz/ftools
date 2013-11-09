@@ -12,7 +12,7 @@ module FTools
     def validate_options
       @author = @options_cli['--author'].upcase || ''
       raise FTools::Error.new('author is not defined, use --author option') if @author.empty?
-      raise FTools::Error.new("author nickname is too long, max is #{FTools::NICKNAME_MAX_SIZE} chars") if @author.size > FTools::NICKNAME_MAX_SIZE
+      raise FTools::Error.new("author size should be #{FTools::FTFile::NICKNAME_SIZE} chars") if @author.size != FTools::FTFile::NICKNAME_SIZE
     end
 
     def process_file(filename)

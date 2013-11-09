@@ -4,7 +4,7 @@
 require_relative "../lib/ftools/runner_#{File.basename(__FILE__)}"
 
 module FTools 
-  VERSION = '0.1.1'
+  VERSION = '0.1.2'
 end
 
 file_type = FTools::FILE_TYPE_IMAGE + FTools::FILE_TYPE_VIDEO
@@ -29,7 +29,7 @@ Optimized to be used with other *ftools* via pipes, e.g.:
   ftls |#{tool_name} -a ANB
 
 Options:
-  -a NICKNAME --author=NICKNAME  Author nickname should be max of #{FTools::NICKNAME_MAX_SIZE} chars long (e.g. ANB)
+  -a NICKNAME --author=NICKNAME  Author nickname should be #{FTools::FTFile::NICKNAME_SIZE} chars long (e.g. ANB)
   -D --debug    Turn on debugging (verbose) mode
   -h --help     Show this screen.
   --version     Show version.

@@ -38,6 +38,5 @@ module FTools
       @os.output(file) if
         @file_type.include?(File.extname(file).slice(1..-1).downcase)
     end
-
   end
 end

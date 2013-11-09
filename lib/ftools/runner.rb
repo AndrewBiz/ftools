@@ -8,8 +8,7 @@ require 'fileutils'
 require_relative 'os_win.rb'
 require_relative 'os_unix.rb'
 require_relative 'error.rb'
-require_relative 'file_type.rb'
-require_relative 'file_name.rb'
+require_relative 'ft_file.rb'
 
 # Foto Tools
 module FTools
