@@ -38,6 +38,57 @@ describe FTools::FTFile do
     expect(fn.extname).to eq('.ext')
   end
 
+  describe 'validates the author NICKNAME' do
+    an1 = 'A'
+    it "and reports wrong size for '#{an1}'" do
+      ok, message = FTools::FTFile.validate_author(an1)
+      expect(ok).to be_false
+      expect(message).to include('wrong author size')
+    end
+    an2 = 'ANNB'
+    it "and reports wrong size for '#{an2}'" do
+      ok, message = FTools::FTFile.validate_author(an2)
+      expect(ok).to be_false
+      expect(message).to include('wrong author size')
+    end
+    an3 = 'ANB'
+    it "and keeps silince for '#{an3}'" do
+      ok, message = FTools::FTFile.validate_author(an3)
+      expect(ok).to be_true
+      expect(message).to be_empty
+    end
+    an4 = 'A N'
+    it "and reports wrong SPACE char for '#{an4}'" do
+      ok, message = FTools::FTFile.validate_author(an4)
+      expect(ok).to be_false
+      expect(message).to include('should not contain spaces')
+    end
+    an5 = 'A_B'
+    it "and reports wrong '_' char for '#{an5}'" do
+      ok, message = FTools::FTFile.validate_author(an5)
+      expect(ok).to be_false
+      expect(message).to include('_')
+    end
+    an6 = 'A-B'
+    it "and reports wrong '-' char for '#{an6}'" do
+      ok, message = FTools::FTFile.validate_author(an6)
+      expect(ok).to be_false
+      expect(message).to include('-')
+    end
+    an7 = 'A5B'
+    it "and reports wrong DIGIT char for '#{an7}'" do
+      ok, message = FTools::FTFile.validate_author(an7)
+      expect(ok).to be_false
+      expect(message).to include('should not contain digits')
+    end
+    an8 = 'AБB'
+    it "and reports wrong non-ASCII char for '#{an8}'" do
+      ok, message = FTools::FTFile.validate_author(an8)
+      expect(ok).to be_false
+      expect(message).to include('should contain only ASCII')
+    end
+  end
+
   describe 'parses the basename of' do
 
     fn1 = '20011231-112233_ANB[20010101-ABCDEF]{flags}cleanname.jpg'
@@ -101,18 +152,6 @@ describe FTools::FTFile do
         expect(obj.basename_part[:date]).to eq '20011231'
         expect(obj.basename_part[:time]).to eq '112233'
         expect(obj.basename_part[:author]).to eq 'ANDREW'
-        expect(obj.basename_part[:id]).to eq ''
-        expect(obj.basename_part[:flags]).to eq ''
-      end
-      fn6 = '20011231-112233_ANB_cleanname.jpg'
-      it fn6 do
-        obj = FTools::FTFile.new(fn6)
-        expect(obj.basename_part[:prefix]).to eq \
-        '20011231-112233_ANB_'
-        expect(obj.basename_part[:clean]).to eq 'cleanname'
-        expect(obj.basename_part[:date]).to eq '20011231'
-        expect(obj.basename_part[:time]).to eq '112233'
-        expect(obj.basename_part[:author]).to eq 'ANB'
         expect(obj.basename_part[:id]).to eq ''
         expect(obj.basename_part[:flags]).to eq ''
       end

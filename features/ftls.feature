@@ -3,9 +3,23 @@ Feature: Generate a list of ftools-friendly-files
   In order to simplify chosing the foto\video files for further process
   As a photographer
   I want to get the list of foto\video files in a form of a plain text
-  (one file by line)
+  (one filename by line)
 
-  Background:
+  #@announce
+  Scenario: 0 Default output with -h produces usage information 
+    When I successfully run `ftls -h`
+    Then the stderr should contain each of:
+    | Keep Your Photos Clean And Tidy |
+    | © ANB                           |
+    | Example:                        |
+    | Usage:                          |
+    | Options:                        |
+    | -D --debug                      |
+    | -h --help                       |
+    | --version                       |
+
+  #@announce
+  Scenario: 1 Default output produces supported-by-ftools file list
     Given empty files named:
     | foto.jpeg       |
     | foto.jpg        |
@@ -23,23 +37,6 @@ Feature: Generate a list of ftools-friendly-files
     | video.dv        |
     | video.mov       |
     | video_wrong.3gp |
-
-  
-  #@announce
-  Scenario: 0 Default output with -h produces usage information 
-    When I successfully run `ftls -h`
-    Then the stderr should contain each of:
-    | Keep Your Photos Clean And Tidy |
-    | © ANB                           |
-    | Example:                        |
-    | Usage:                          |
-    | Options:                        |
-    | -D --debug                      |
-    | -h --help                       |
-    | --version                       |
-
-  #@announce
-  Scenario: 1 Default output produces supported-by-ftools file list
     When I successfully run `ftls`
     Then the stdout should contain each of:
     | foto.jpeg |
@@ -56,21 +53,20 @@ Feature: Generate a list of ftools-friendly-files
     | video.dv  |
     | video.mts |
     | video.mov |
+    And the stdout should not contain "foto_wrong.psd"
+    And the stdout should not contain "video_wrong.3gp"
   
   #@announce
-  Scenario: 2 Default output DOES NOT show unsupported files
-    When I successfully run `ftls`
-    Then the stdout should not contain "foto_wrong.psd"
-    And  the stdout should not contain "video_wrong.3gp"
-
-  #@announce
-  Scenario: 3 The output DOES NOT show unsupported files EVEN if I intentionally enter it as a parameter
+  Scenario: 2 The output DOES NOT show unsupported files EVEN if I intentionally enter it as a parameter
+    Given empty files named:
+    | foto_wrong.psd  |
+    | video_wrong.3gp |
     When I successfully run `ftls foto_wrong.psd video_wrong.3gp`
     Then the stdout should not contain "foto_wrong.psd"
     And  the stdout should not contain "video_wrong.3gp"
 
   #@announce
-  Scenario: 4 The output shows files inside directories entered as paramenets
+  Scenario: 3 The output shows files inside directories entered as paramenets
     Given a directory named "fotos"
     And empty files named:
     | ./fotos/f4.jpg       |
@@ -95,7 +91,7 @@ Feature: Generate a list of ftools-friendly-files
     | videos/v4.dv  |
 
   #@announce
-  Scenario: 5 The output DOES NOT show usopported files inside directories entered as paramenets
+  Scenario: 4 The output DOES NOT show usopported files inside directories entered as paramenets
     Given a directory named "fotos"
     And empty files named:
     | ./fotos/f5_wrong.ppp  |
@@ -107,7 +103,7 @@ Feature: Generate a list of ftools-friendly-files
     And  the stdout should not contain "videos/v5_wrong.vvv"
 
   #@announce
-  Scenario: 6 The output shows files inside directories and subdirectories
+  Scenario: 5 The output shows files inside directories and subdirectories
     Given a directory named "fotos"
     And empty files named:
     | ./fotos/f6.jpg         |
@@ -124,7 +120,7 @@ Feature: Generate a list of ftools-friendly-files
     | fotos/fotos2/fotos3/f6.png   |
 
   #@announce
-  Scenario: 7 Default output produces supported-by-ftools file list with CAPITALIZED extentions
+  Scenario: 6 Default output produces supported-by-ftools file list with CAPITALIZED extentions
     Given a directory named "capitalized"
     Given empty files named:
     | foto_cap.JPG            |

@@ -15,10 +15,22 @@ module FTools
     # filename constants
     NICKNAME_MIN_SIZE = 3
     NICKNAME_MAX_SIZE = 6
-    # TODO: NICKNAME - check size, only word, no non-ascii symbols
     NICKNAME_SIZE = 3 # should be in range of MIN and MAX
-
     ZERO_DATE = DateTime.strptime('0000', '%Y')
+
+    def self.validate_author(author)
+      case
+      when author.size != NICKNAME_SIZE
+        return [false, "wrong author size, should be #{NICKNAME_SIZE} chars"]
+      when /[-_\s]/.match(author)
+        return [false, 'author should not contain spaces [_- ]']
+      when /[\d]/.match(author)
+        return [false, 'author should not contain digits']
+      when /[\W]/.match(author)
+        return [false, 'author should contain only ASCII chars']
+      end
+      [true, '']
+    end
 
     attr_reader :filename, :dirname, :extname, :basename, :basename_part,
                 :date_time
@@ -73,6 +85,7 @@ module FTools
         strptime_string += time
       end
 
+      return ZERO_DATE if strptime_string.empty?
       DateTime.strptime(strptime_string, strptime_template)
 
     rescue ArgumentError

@@ -1,1 +1,1 @@
-@C:\Dropbox\dev\ftools\bin\"%~n0.rb" %*
+@C:\Dropbox\dev\ftools\bin\"%~n0" %*

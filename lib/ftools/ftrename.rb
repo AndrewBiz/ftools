@@ -1,14 +1,15 @@
-#!/usr/bin/env ruby -w -U
+#!/usr/bin/env ruby -U
 # encoding: UTF-8
-# (с) ANB Andrew Bizyaev Андрей Бизяев
+# (c) ANB Andrew Bizyaev
 
-require_relative 'runner.rb'
+require_relative 'runner'
 require_relative '../mini_exiftool-2.0.0anb'
 
+# TODO: to refactor!
 module FTools
-  class Runner
-
+  class FTrename < Runner
     private
+
     def validate_options
       @author = @options_cli['--author'].upcase || ''
       raise FTools::Error.new('author is not defined, use --author option') if @author.empty?
@@ -48,6 +49,5 @@ module FTools
 
       return new_filename
     end
-
   end
 end

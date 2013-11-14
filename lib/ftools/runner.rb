@@ -12,12 +12,10 @@ require_relative 'ft_file.rb'
 
 # Foto Tools
 module FTools
-
-  VERSION_CORE = '0.1.3'
+  VERSION_CORE = '0.2.0'
 
   # Main class processing input stream
   class Runner
-
     def initialize(usage, file_type = [])
       case FTools.os
       when :windows
@@ -43,7 +41,7 @@ module FTools
       exit 1
     end
 
-    def run
+    def run!
       return if STDIN.tty?
 
       ARGV.clear
@@ -52,22 +50,21 @@ module FTools
 
       ARGF.each_line do |line|
         result = nil
-        filename = line.chomp!
+        filename = line.chomp
         begin
           # checking file
-          unless filename && File.exist?(filename)
-            fail FTools::Error.new('does not exist')
-          end
-          fail FTools::Error.new('not a file') if File.directory?(filename)
-          fail FTool::Error.new('no permission to write') unless File
+          fail(FTools::Error, 'does not exist') unless \
+            filename && File.exist?(filename)
+          fail(FTools::Error, 'not a file') if File.directory?(filename)
+          fail(FTools::Error, 'no permission to write') unless File
             .writable?(filename)
-          fail FTools::Error.new('wrong type') unless @file_type.include?(File
-            .extname(filename).downcase.slice(1..-1))
+          fail(FTools::Error, 'wrong type') unless \
+            @file_type.include?(File.extname(filename).downcase.slice(1..-1))
 
           result = process_file(filename)
 
         rescue FTools::Error => e
-          FTools.puts_error "ERROR: '#{line}' - #{e.message}", e
+          FTools.puts_error "ERROR: '#{filename}' - #{e.message}", e
         else
           @os.output result unless result.nil?
         end

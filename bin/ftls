@@ -5,7 +5,7 @@ require_relative "../lib/ftools/#{File.basename(__FILE__)}"
 
 # Foto processing tools
 module FTools
-  VERSION = '0.2.1'
+  VERSION = '0.2.2'
 end
 
 file_type = FTools::FILE_TYPE_IMAGE + FTools::FILE_TYPE_VIDEO
@@ -16,7 +16,7 @@ ftools - *Keep Your Photos Clean And Tidy* (© ANB).
 generates list of files to standart output.
 In short it acts like a smart 'ls' command (or 'dir' in Windows).
 It is a good starting point for all other ftools to be used with pipes.
-ftools friendly file types are: #{file_type}
+ftools friendly files: #{file_type * ','}
 
 Example: #{tool_name} -r abc |ftclname => recursively scans 'abc' dir and
 sends all found ftools friendly files to ftclname program.

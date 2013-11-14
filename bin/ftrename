@@ -1,2 +1,46 @@
-#!/usr/bin/env bash
-/Users/anb/Dropbox/dev/ftools/bin/ftrename.rb "$@"
+#!/usr/bin/env ruby -U
+# encoding: UTF-8
+# (c) ANB Andrew Bizyaev
+require_relative "../lib/ftools/#{File.basename(__FILE__)}"
+
+# Foto processing tools
+module FTools
+  VERSION = '0.2.0'
+end
+
+file_type = FTools::FILE_TYPE_IMAGE + FTools::FILE_TYPE_VIDEO
+tool_name = File.basename(__FILE__)
+usage = <<DOCOPT
+ftools - *Keep Your Photos Clean And Tidy* (© ANB).
+#{tool_name}, version #{FTools::VERSION}, renames the input file based on EXIF
+DateTimeOriginal tag and author NICKNAME provided. The target file name
+format is YYYYmmdd-HHMMSS_AAA ORIGINAL.EXT, where:
+  YYYYmmdd-HHMMSS - DateTimeOriginal (normally Date and Time of photo creation),
+  AAA - the author nickname,
+  ORIGINAL.EXT - the photo name was given by digital camera.
+Input file should be one of the types: #{file_type * ","}
+
+Example: input file DSC03455.JPG will be renamed to
+20130108-124145_ANB DSC03455.JPG
+#{tool_name} is optimized to be used with other *ftools* via pipes, e.g.:
+  ftls | #{tool_name} -a ANB
+
+! Make sure you have exiftool installed (for more details see
+http://www.sno.phy.queensu.ca/~phil/exiftool/install.html)
+
+Usage:
+  #{tool_name} -a NICKNAME [-D]
+  #{tool_name} -h | --help
+  #{tool_name} --version
+
+Options:
+  -a NICKNAME --author=NICKNAME  Author nickname should be #{FTools::FTFile::NICKNAME_SIZE} chars long,
+                                 have no spaces and other non-word chars,
+                                 have no digits,
+                                 have only ASCII chars (e.g. ANB)
+  -D --debug    Turn on debugging (verbose) mode
+  -h --help     Show this screen.
+  --version     Show version.
+DOCOPT
+
+FTools::FTrename.new(usage, file_type).run!
