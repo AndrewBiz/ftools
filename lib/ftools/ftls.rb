@@ -7,7 +7,6 @@ require_relative 'runner'
 module FTools
   # list generation
   class FTls < Runner
-
     def run!
       @options_cli['DIR_OR_FILE'] = ['.'] if @options_cli['DIR_OR_FILE'].empty?
       @options_cli['DIR_OR_FILE'].each do |item|
