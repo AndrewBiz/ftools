@@ -1,2 +1,33 @@
-#!/usr/bin/env bash
-/Users/anb/Dropbox/dev/ftools/bin/ftfixfmd.rb "$@"
+#!/usr/bin/env ruby -U
+# encoding: UTF-8
+# (c) ANB Andrew Bizyaev
+
+require_relative "../lib/ftools/#{File.basename(__FILE__)}"
+
+# Foto processing tools
+module FTools
+  VERSION = '0.2.0'
+end
+
+file_type = FTools::FILE_TYPE_IMAGE + FTools::FILE_TYPE_VIDEO
+tool_name = File.basename(__FILE__)
+usage = <<DOCOPT
+ftools - *Keep Your Photos Clean And Tidy* (© ANB).
+#{tool_name}, version #{FTools::VERSION}, changes an input file modify-date
+according to the date encoded in the filename. The name of the
+file should start with YYYYmmdd-HHMMSS string.
+Optimized to be used with other *ftools* via pipes.
+Example: ftls | ftrename -a anb | #{tool_name}
+
+Usage:
+  #{tool_name} [-D]
+  #{tool_name} -h | --help
+  #{tool_name} --version
+
+Options:
+  -D --debug    Turn on debugging (verbose) mode
+  -h --help     Show this screen.
+  --version     Show version.
+DOCOPT
+
+FTools::FTfixfmd.new(usage, file_type).run!

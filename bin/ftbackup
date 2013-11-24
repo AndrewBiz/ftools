@@ -1,2 +1,31 @@
-#!/usr/bin/env bash
-/Users/anb/Dropbox/dev/ftools/bin/ftbackup.rb "$@"
+#!/usr/bin/env ruby -U
+# encoding: UTF-8
+# (c) ANB Andrew Bizyaev
+require_relative "../lib/ftools/#{File.basename(__FILE__)}"
+
+# Foto processing tools
+module FTools
+  VERSION = '0.2.0'
+end
+
+file_type = FTools::FILE_TYPE_IMAGE + FTools::FILE_TYPE_VIDEO
+tool_name = File.basename(__FILE__)
+usage = <<DOCOPT
+ftools - *Keep Your Photos Clean And Tidy* (© ANB).
+#{tool_name}, version #{FTools::VERSION}, copies the input file into backup directory.
+Optimized to be used with other *ftools* via pipes.
+Example: ftls | #{tool_name} | ftrename
+
+Usage:
+  #{tool_name} [--backup DIR] [-D]
+  #{tool_name} -h | --help
+  #{tool_name} --version
+
+Options:
+  -b DIR --backup=DIR  Sets the backup directory [Default: ./backup]
+  -D --debug           Turn on debugging (verbose) mode
+  -h --help            Show this screen.
+  --version            Show version.
+DOCOPT
+
+FTools::FTbackup.new(usage, file_type).run!

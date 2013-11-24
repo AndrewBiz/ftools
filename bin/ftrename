@@ -1,6 +1,7 @@
 #!/usr/bin/env ruby -U
 # encoding: UTF-8
 # (c) ANB Andrew Bizyaev
+
 require_relative "../lib/ftools/#{File.basename(__FILE__)}"
 
 # Foto processing tools

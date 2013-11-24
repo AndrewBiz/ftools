@@ -5,7 +5,7 @@ require_relative "../lib/ftools/#{File.basename(__FILE__)}"
 
 # Foto processing tools
 module FTools
-  VERSION = '0.2.2'
+  VERSION = '0.2.4'
 end
 
 file_type = FTools::FILE_TYPE_IMAGE + FTools::FILE_TYPE_VIDEO
@@ -13,7 +13,7 @@ tool_name = File.basename(__FILE__)
 usage = <<DOCOPT
 ftools - *Keep Your Photos Clean And Tidy* (© ANB).
 #{tool_name}, version #{FTools::VERSION}, scans given directories and
-generates list of files to standart output.
+generates list of files to standard output.
 In short it acts like a smart 'ls' command (or 'dir' in Windows).
 It is a good starting point for all other ftools to be used with pipes.
 ftools friendly files: #{file_type * ','}
