@@ -9,13 +9,13 @@ Gemfile.lock
 pkg
 
 # For MacOS:
-#
-#.DS_Store
+.DS_Store
+.picasa.ini
 
 # For emacs:
-#*~
-#\#*
-#.\#*
+*~
+\#*
+.\#*
 
 # For vim:
-#*.swp
+*.swp

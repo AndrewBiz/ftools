@@ -6,7 +6,6 @@ require 'rbconfig'
 
 # foto tools
 module FTools
-
   # determine OS
   def self.os(os_string = RbConfig::CONFIG['host_os'])
     case os_string

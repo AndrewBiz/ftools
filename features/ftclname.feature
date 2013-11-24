@@ -6,7 +6,7 @@ Feature: Clean filenames
   (the names they get in digital photo camera)
 
   #@announce
-  Scenario: 0 Default output with -h produces usage information 
+  Scenario: 00 Default output with -h produces usage information 
     When I successfully run `ftclname -h`
     Then the stderr should contain each of:
     | Keep Your Photos Clean And Tidy |
@@ -17,6 +17,12 @@ Feature: Clean filenames
     | -D --debug                      |
     | -h --help                       |
     | --version                       |
+    | -v                              |
+
+  #@announce
+  Scenario: 01 Output with -v produces version information 
+    When I successfully run `ftclname -v`
+    Then the output should match /[0-9]+\.[0-9]+\.[0-9]+ \(core [0-9]+\.[0-9]+\.[0-9]+\)/
 
   #@announce
   Scenario: 1 Standard named files are renamed to origin

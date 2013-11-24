@@ -6,14 +6,13 @@ require_relative "../lib/ftools/#{File.basename(__FILE__)}"
 
 # Foto processing tools
 module FTools
-  VERSION = '0.2.0'
-end
+  VERSION = '0.2.1'
 
-file_type = FTools::FILE_TYPE_IMAGE + FTools::FILE_TYPE_VIDEO
-tool_name = File.basename(__FILE__)
-usage = <<DOCOPT
+  file_type = FILE_TYPE_IMAGE + FILE_TYPE_VIDEO + FILE_TYPE_AUDIO
+  tool_name = File.basename(__FILE__)
+  usage = <<DOCOPT
 ftools - *Keep Your Photos Clean And Tidy* (© ANB).
-#{tool_name}, version #{FTools::VERSION}, changes an input file modify-date
+#{tool_name}, version #{VERSION}, changes an input file modify-date
 according to the date encoded in the filename. The name of the
 file should start with YYYYmmdd-HHMMSS string.
 Optimized to be used with other *ftools* via pipes.
@@ -22,12 +21,13 @@ Example: ftls | ftrename -a anb | #{tool_name}
 Usage:
   #{tool_name} [-D]
   #{tool_name} -h | --help
-  #{tool_name} --version
+  #{tool_name} -v | --version
 
 Options:
   -D --debug    Turn on debugging (verbose) mode
   -h --help     Show this screen.
-  --version     Show version.
+  -v --version     Show version.
 DOCOPT
 
-FTools::FTfixfmd.new(usage, file_type).run!
+  FTfixfmd.new(usage, file_type).run!
+end

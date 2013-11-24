@@ -5,38 +5,26 @@
 require_relative 'runner.rb'
 
 module FTools
-  class Runner
-
+  # collecting media files into EVENT folder
+  class FTevent < Runner
     private
 
     def validate_options
-      # TODO read event
-      @event = FTools::Event.new(@options_cli['--event'])
+      # TODO: read event
+      # @event = Event.new(@options_cli['--event'])
       # raise FTools::Error.new("author is not defined") if @author.empty?
     end
-    
+
     def process_before
-      # TODO create event dir and copy event to it
+      # TODO: create event dir and copy event to it
       # raise FTools::Error.new("author is not defined") if @author.empty?
     end
 
-    def process_file( filename )
-      dirname = File.dirname( filename )
-      extname = File.extname( filename )
-      basename = File.basename( filename, extname )
-      
-      # TODO check if the file in proper YYYYmmdd* format
-
-      # renaming file
-      new_filename = File.join( dirname, basename + extname )
-      #begin
-      #  FileUtils.mv(filename, new_filename) if basename != new_basename
-      #rescue => e
-      #  raise FTools::Error.new("file renaming", e)
-      #end
-
-      return new_filename
+    def process_file(filename)
+      ftf = FTFile.new(filename)
+      # TODO: new_filename
+      new_filename = ftf.filename # !
+      new_filename
     end
-
   end
 end

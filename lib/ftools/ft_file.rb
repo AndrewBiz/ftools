@@ -9,6 +9,7 @@ module FTools
   # media type constants
   FILE_TYPE_IMAGE = %w{jpg jpeg tif tiff orf arw png dng}
   FILE_TYPE_VIDEO = %w{avi mp4 mpg mts dv mov}
+  FILE_TYPE_AUDIO = %w{wav}
 
   # ftools file name operations
   class FTFile
@@ -16,18 +17,18 @@ module FTools
     NICKNAME_MIN_SIZE = 3
     NICKNAME_MAX_SIZE = 6
     NICKNAME_SIZE = 3 # should be in range of MIN and MAX
-    ZERO_DATE = DateTime.strptime('0000', '%Y')
-
+    ZERO_DATE = DateTime.new(0)
+    
     def self.validate_author(author)
       case
       when author.size != NICKNAME_SIZE
-        return [false, "wrong author size, should be #{NICKNAME_SIZE} chars"]
+        return [false, "'#{author}' wrong author size, should be #{NICKNAME_SIZE} chars long"]
       when /[-_\s]/.match(author)
-        return [false, 'author should not contain spaces [_- ]']
+        return [false, "'#{author}' author should not contain spaces [_- ]"]
       when /[\d]/.match(author)
-        return [false, 'author should not contain digits']
+        return [false, "'#{author}' author should not contain digits"]
       when /[\W]/.match(author)
-        return [false, 'author should contain only ASCII chars']
+        return [false, "'#{author}' author should contain only ASCII chars"]
       end
       [true, '']
     end
@@ -53,6 +54,13 @@ module FTools
 
     def date_time_ok?
       @date_time != ZERO_DATE
+    end
+
+    def date_time_to_time
+      Time.new(@date_time.year, @date_time.month, @date_time.day,
+               @date_time.hour, @date_time.min, @date_time.sec)
+               # no use of @date_time.zone - assuming file's timezone always
+               # equals to photografer's computer timezone
     end
 
     def basename_is_standard?
@@ -150,42 +158,4 @@ module FTools
       end
     end
   end
-
-  # TODO: DEPRECATED TO DELETE!
-  def self.new_basename( basename, date_time_original: DateTime.civil, author: "XXX" )
-    %Q{#{date_time_original.strftime('%Y%m%d-%H%M%S')}_#{author} #{basename}}    
-  end
-
-  def self.clean_name( name )
-    # + check if name = YYYYmmdd-HHMMSS_AAA[ID]{bla}name
-    if (/^(\d{8}-\d{6}_\w{3}\[.*\]\{.*\})(.*)/ =~ name)
-      return $2
-    end
-    # + check if name = YYYYmmdd-HHMMSS_AAA[ID]name
-    if (/^(\d{8}-\d{6}_\w{3}\[.*\])(.*)/ =~ name)
-      return $2
-    end
-    # + check if name = YYYYmmdd-HHMMSS_AAA name
-    if (/^(\d{8}-\d{6}_\w{3} )(.*)/ =~ name)
-      return $2
-    end
-    # check if name = YYYYmmdd-HHMM_AAA_name
-    if (/^(\d{8}-\d{4}[-_\s]\w{3}[-\s_])(.*)/ =~ name)
-      return $2
-    end
-    # check if name = YYYYmmdd-HHMM_name
-    if (/^(\d{8}-\d{4}[-\s_])(.*)/ =~ name)
-      return $2
-    end
-    # check if name = YYYYmmdd_name
-    if (/^(\d{8}[-\s_])(.*)/ =~ name)
-      return $2
-    end
-    # check if name = YYYY_name
-    if (/^(\d{4}[-\s_])(.*)/ =~ name)
-      return $2
-    end
-    name
-  end
-
 end

@@ -14,62 +14,104 @@
 #
 
 require 'fileutils'
-require 'tempfile'
+require 'json'
 require 'pstore'
 require 'rational'
+require 'rbconfig'
 require 'set'
+require 'tempfile'
 require 'time'
-require 'json' #ANB
-require 'nesty' #ANB
+require 'nesty' # ANB
 
 # Simple OO access to the Exiftool command-line application.
 class MiniExiftool
+
+  VERSION = '2.3.0'
 
   # Name of the Exiftool command-line application
   @@cmd = 'exiftool'
 
   # Hash of the standard options used when call MiniExiftool.new
-  @@opts = { :numerical => false, :composite => true, :convert_encoding => false, :ignore_minor_errors => false, :timestamps => Time }
+  @@opts = { :numerical => false, :composite => true, :ignore_minor_errors => false,
+   :replace_invalid_chars => false, :timestamps => Time }
 
-  attr_reader :filename
-  attr_accessor :numerical, :composite, :convert_encoding, :ignore_minor_errors, :errors, :timestamps
+  # Encoding of the filesystem (filenames in command line)
+  @@fs_enc = Encoding.find('filesystem')
 
-  VERSION = '2.0.0'
+  def self.opts_accessor *attrs
+    attrs.each do |a|
+      define_method a do
+        @opts[a]
+      end
+      define_method "#{a}=" do |val|
+        @opts[a] = val
+      end
+    end
+  end
+
+  attr_reader :filename, :errors
+
+  opts_accessor :numerical, :composite, :ignore_minor_errors,
+    :replace_invalid_chars, :timestamps
+
+  @@encoding_types = %w(exif iptc xmp png id3 pdf photoshop quicktime aiff mie vorbis)
+
+  def self.encoding_opt enc_type
+    (enc_type.to_s + '_encoding').to_sym
+  end
+
+  @@encoding_types.each do |enc_type|
+    opts_accessor encoding_opt(enc_type)
+  end
 
   # +opts+ support at the moment
   # * <code>:numerical</code> for numerical values, default is +false+
   # * <code>:composite</code> for including composite tags while loading,
   #   default is +true+
-  # * <code>:convert_encoding</code> convert encoding (See -L-option of
-  #   the exiftool command-line application, default is +false+)
   # * <code>:ignore_minor_errors</code> ignore minor errors (See -m-option
-  # of the exiftool command-line application, default is +false+)
+  #   of the exiftool command-line application, default is +false+)
+  # * <code>:coord_format</code> set format for GPS coordinates (See
+  #   -c-option of the exiftool command-line application, default is +nil+
+  #   that means exiftool standard)
+  # * <code>:replace_invalid_chars</code> replace string for invalid
+  #   UTF-8 characters or +false+ if no replacing should be done,
+  #   default is +false+
   # * <code>:timestamps</code> generating DateTime objects instead of
   #   Time objects if set to <code>DateTime</code>, default is +Time+
   #
   #   <b>ATTENTION:</b> Time objects are created using <code>Time.local</code>
   #   therefore they use <em>your local timezone</em>, DateTime objects instead
   #   are created <em>without timezone</em>!
+  # * <code>:exif_encoding</code>, <code>:iptc_encoding</code>,
+  #   <code>:xmp_encoding</code>, <code>:png_encoding</code>,
+  #   <code>:id3_encoding</code>, <code>:pdf_encoding</code>,
+  #   <code>:photoshop_encoding</code>, <code>:quicktime_encoding</code>,
+  #   <code>:aiff_encoding</code>, <code>:mie_encoding</code>,
+  #   <code>:vorbis_encoding</code> to set this specific encoding (see
+  #   -charset option of the exiftool command-line application, default is
+  #   +nil+: no encoding specified)
   def initialize filename=nil, opts={}
-    opts = @@opts.merge opts
-    @numerical = opts[:numerical]
-    @composite = opts[:composite]
-    @convert_encoding = opts[:convert_encoding]
-    @ignore_minor_errors = opts[:ignore_minor_errors]
-    @timestamps = opts[:timestamps]
-    @coord_format = opts[:coord_format]
+    @opts = @@opts.merge opts
+    if @opts[:convert_encoding]
+      warn 'Option :convert_encoding is not longer supported!'
+      warn 'Please use the String#encod* methods.'
+    end
     @values = TagHash.new
-    @tag_names = TagHash.new
     @changed_values = TagHash.new
     @errors = TagHash.new
     load filename unless filename.nil?
   end
 
   def initialize_from_hash hash # :nodoc:
-    hash.each_pair do |tag,value|
-      set_value tag, perform_conversions(value)
-    end
-    set_attributes_by_heuristic
+    set_values hash
+    set_opts_by_heuristic
+    self
+  end
+
+  def initialize_from_json json # :nodoc:
+    @output = json
+    @errors.clear
+    parse_output
     self
   end
 
@@ -84,18 +126,20 @@ class MiniExiftool
     end
     @filename = filename
     @values.clear
-    @tag_names.clear
     @changed_values.clear
-    opt_params = ''
-    opt_params << (@numerical ? '-n ' : '')
-    opt_params << (@composite ? '' : '-e ')
-    opt_params << (@convert_encoding ? '-L ' : '')
-    opt_params << (@coord_format ? "-c \"#{@coord_format}\"" : '')
-    cmd = %Q(#@@cmd -j -q -q -s -t #{opt_params} #{MiniExiftool.escape(filename)})
-    if run(cmd)
+    params = '-j '
+    params << (@opts[:numerical] ? '-n ' : '')
+    params << (@opts[:composite] ? '' : '-e ')
+    params << (@opts[:coord_format] ? "-c \"#{@opts[:coord_format]}\"" : '')
+    @@encoding_types.each do |enc_type|
+      if enc_val = @opts[MiniExiftool.encoding_opt(enc_type)]
+        params << "-charset #{enc_type}=#{enc_val} "
+      end
+    end
+    if run(cmd_gen(params, @filename))
       parse_output
-    else      
-      fail(MiniExiftool::Error, @error_text)
+    else
+      raise MiniExiftool::Error.new(@error_text)
     end
     self
   end
@@ -111,7 +155,7 @@ class MiniExiftool
   end
 
   # Set the value of a tag.
-  def []=(tag, val)
+  def []= tag, val
     @changed_values[tag] = val
   end
 
@@ -139,7 +183,7 @@ class MiniExiftool
 
   # Returns an array of the tags (original tag names) of the read file.
   def tags
-    @values.keys.map { |key| @tag_names[key] }
+    @values.keys.map { |key| MiniExiftool.original_tag(key) }
   end
 
   # Returns an array of all changed tags.
@@ -155,32 +199,26 @@ class MiniExiftool
     temp_file = Tempfile.new('mini_exiftool')
     temp_file.close
     temp_filename = temp_file.path
-    FileUtils.cp filename, temp_filename
+    FileUtils.cp filename.encode(@@fs_enc), temp_filename
     all_ok = true
     @changed_values.each do |tag, val|
       original_tag = MiniExiftool.original_tag(tag)
       arr_val = val.kind_of?(Array) ? val : [val]
-      arr_val.map! {|e| convert e}
-      tag_params = ''
+      arr_val.map! {|e| convert_before_save(e)}
+      params = '-q -P -overwrite_original '
+      params << (arr_val.detect {|x| x.kind_of?(Numeric)} ? '-n ' : '')
+      params << (@opts[:ignore_minor_errors] ? '-m ' : '')
       arr_val.each do |v|
-        tag_params << %Q(-#{original_tag}=#{MiniExiftool.escape(v)} )
+        params << %Q(-#{original_tag}=#{escape(v)} )
       end
-      opt_params = ''
-      opt_params << (arr_val.detect {|x| x.kind_of?(Numeric)} ? '-n ' : '')
-      opt_params << (@convert_encoding ? '-L ' : '')
-      opt_params << (@ignore_minor_errors ? '-m' : '')
-      cmd = %Q(#@@cmd -q -P -overwrite_original #{opt_params} #{tag_params} #{temp_filename})
-      if convert_encoding
-        cmd.encode!('ISO-8859-1')
-      end
-      result = run(cmd)
+      result = run(cmd_gen(params, temp_filename))
       unless result
         all_ok = false
         @errors[tag] = @error_text.gsub(/Nothing to do.\n\z/, '').chomp
       end
     end
     if all_ok
-      FileUtils.cp temp_filename, filename
+      FileUtils.cp temp_filename, filename.encode(@@fs_enc)
       reload
     end
     temp_file.delete
@@ -190,7 +228,7 @@ class MiniExiftool
   def save!
     unless save
       err = []
-      self.errors.each do |key, value|
+      @errors.each do |key, value|
         err << "(#{key}) #{value}"
       end
       raise MiniExiftool::Error.new("MiniExiftool couldn't save. The following errors occurred: #{err.empty? ? "None" : err.join(", ")}")
@@ -202,7 +240,7 @@ class MiniExiftool
   def to_hash
     result = {}
     @values.each do |k,v|
-      result[@tag_names[k]] = v
+      result[MiniExiftool.original_tag(k)] = v
     end
     result
   end
@@ -213,17 +251,26 @@ class MiniExiftool
     to_hash.to_yaml
   end
 
-  # Create a MiniExiftool instance from a hash. Default value conversions will be applied if neccesary.
-  def self.from_hash hash
-    instance = MiniExiftool.new
+  # Create a MiniExiftool instance from a hash. Default value
+  # conversions will be applied if neccesary.
+  def self.from_hash hash, opts={}
+    instance = MiniExiftool.new nil, opts
     instance.initialize_from_hash hash
+    instance
+  end
+
+  # Create a MiniExiftool instance from JSON data. Default value
+  # conversions will be applied if neccesary.
+  def self.from_json json, opts={}
+    instance = MiniExiftool.new nil, opts
+    instance.initialize_from_json json
     instance
   end
 
   # Create a MiniExiftool instance from YAML data created with
   # MiniExiftool#to_yaml
-  def self.from_yaml yaml
-    MiniExiftool.from_hash YAML.load(yaml)
+  def self.from_yaml yaml, opts={}
+    MiniExiftool.from_hash YAML.load(yaml), opts
   end
 
   # Returns the command name of the called Exiftool application.
@@ -279,7 +326,7 @@ class MiniExiftool
   end
 
   # Exception class
-  class MiniExiftool::Error < Nesty::NestedStandardError; end #ANB added nesty
+  class MiniExiftool::Error < Nesty::NestedStandardError; end # ANB
 
   ############################################################################
   private
@@ -293,6 +340,10 @@ class MiniExiftool
     @@setup_done = true
   end
 
+  def cmd_gen arg_str='', filename
+    [@@cmd, arg_str.encode('UTF-8'), escape(filename.encode(@@fs_enc))].map {|s| s.force_encoding('UTF-8')}.join(' ')
+  end
+
   def run cmd
     if $DEBUG
       $stderr.puts cmd
@@ -301,6 +352,7 @@ class MiniExiftool
     @status = $?
     unless @status.exitstatus == 0
       @error_text = File.readlines(@@error_file.path).join
+      @error_text.force_encoding('UTF-8')
       return false
     else
       @error_text = ''
@@ -308,7 +360,7 @@ class MiniExiftool
     end
   end
 
-  def convert val
+  def convert_before_save val
     case val
     when Time
       val = val.strftime('%Y:%m:%d %H:%M:%S')
@@ -326,31 +378,30 @@ class MiniExiftool
   end
 
   def parse_output
-    JSON.parse(@output)[0].each do |tag,value|
-      value = perform_conversions(value)
-      set_value tag, value
+    adapt_encoding
+    set_values JSON.parse(@output).first
+  end
+
+  def adapt_encoding
+    @output.force_encoding('UTF-8')
+    if @opts[:replace_invalid_chars] && !@output.valid_encoding?
+      @output.encode!('UTF-16le', invalid: :replace, replace: @opts[:replace_invalid_chars]).encode!('UTF-8')
     end
   end
 
-  def perform_conversions(value)
+  def convert_after_load tag, value
     return value unless value.kind_of?(String)
-    if convert_encoding
-      value.encode!('ISO-8859-1')
-    else #ANB workaround for 'utf-8 invalid character' issue in some Russian tags
-      value.encode!('UTF-16', 'UTF-8', :invalid => :replace, :undef => :replace, :replace => '.')
-      value.encode!('UTF-8', 'UTF-16', :invalid => :replace, :undef => :replace, :replace => '.')
-      value.force_encoding('UTF-8')
-    end
+    return value unless value.valid_encoding?
     case value
     when /^\d{4}:\d\d:\d\d \d\d:\d\d:\d\d/
       s = value.sub(/^(\d+):(\d+):/, '\1-\2-')
       begin
-        if @timestamps == Time
+        if @opts[:timestamps] == Time
           value = Time.parse(s)
-        elsif @timestamps == DateTime
+        elsif @opts[:timestamps] == DateTime
           value = DateTime.parse(s)
         else
-          raise MiniExiftool::Error.new("Value #@timestamps not allowed for option timestamps.")
+          raise MiniExiftool::Error.new("Value #{@opts[:timestamps]} not allowed for option timestamps.")
         end
       rescue ArgumentError
         value = false
@@ -369,26 +420,27 @@ class MiniExiftool
     value
   end
 
-  def set_value tag, value
-    @tag_names[tag] = tag
-    @values[tag] = value
-  end
-
-  def set_attributes_by_heuristic
-    self.composite = tags.include?('ImageSize') ? true : false
-    self.numerical = self.file_size.kind_of?(Integer) ? true : false
-    # TODO: Is there a heuristic to determine @convert_encoding?
-    self.timestamps = self.FileModifyDate.kind_of?(DateTime) ? DateTime : Time
-  end
-
-  def temp_filename
-    unless @temp_filename
-      temp_file = Tempfile.new('mini-exiftool')
-      temp_file.close
-      FileUtils.cp(@filename, temp_file.path)
-      @temp_filename = temp_file.path
+  def set_values hash
+    hash.each_pair do |tag,val|
+      @values[tag] = convert_after_load(tag, val)
     end
-    @temp_filename
+    # Remove filename specific tags use attr_reader
+    # MiniExiftool#filename instead
+    # Cause: value of tag filename and attribute
+    # filename have different content, the latter
+    # holds the filename with full path (like the
+    # sourcefile tag) and the former the basename
+    # of the filename also there is no official
+    # "original tag name" for sourcefile
+    %w(directory filename sourcefile).each do |t|
+      @values.delete(t)
+    end
+  end
+
+  def set_opts_by_heuristic
+    @opts[:composite] = tags.include?('ImageSize')
+    @opts[:numerical] = self.file_size.kind_of?(Integer)
+    @opts[:timestamps] = self.FileModifyDate.kind_of?(DateTime) ? DateTime : Time
   end
 
   def self.pstore_get attribute
@@ -400,14 +452,16 @@ class MiniExiftool
     result
   end
 
+  @@running_on_windows = /mswin|mingw|cygwin/ === RbConfig::CONFIG['host_os']
+
   def self.load_or_create_pstore
     # This will hopefully work on *NIX and Windows systems
     home = ENV['HOME'] || ENV['HOMEDRIVE'] + ENV['HOMEPATH'] || ENV['USERPROFILE']
-    subdir = RUBY_PLATFORM =~ /\bmswin/i ? '_mini_exiftool' : '.mini_exiftool'
+    subdir = @@running_on_windows ? '_mini_exiftool' : '.mini_exiftool'
     FileUtils.mkdir_p(File.join(home, subdir))
-    filename = File.join(home, subdir, 'exiftool_tags_' << exiftool_version.gsub('.', '_') << '.pstore')
-    @@pstore = PStore.new filename
-    if !File.exist?(filename) || File.size(filename) == 0
+    pstore_filename = File.join(home, subdir, 'exiftool_tags_' << exiftool_version.gsub('.', '_') << '.pstore')
+    @@pstore = PStore.new pstore_filename
+    if !File.exist?(pstore_filename) || File.size(pstore_filename) == 0
       @@pstore.transaction do |ps|
         ps[:all_tags] = all_tags = determine_tags('list')
         ps[:writable_tags] = determine_tags('listw')
@@ -429,8 +483,14 @@ class MiniExiftool
     tags
   end
 
-  def self.escape(val)
-    '"' << val.to_s.gsub(/\\/, '\\'*4).gsub(/"/, '\"') << '"'
+  if @@running_on_windows
+    def escape val
+      '"' << val.to_s.gsub(/([\\"])/, "\\\\\\1") << '"'
+    end
+  else
+    def escape val
+      '"' << val.to_s.gsub(/([\\"$])/, "\\\\\\1") << '"'
+    end
   end
 
   # Hash with indifferent access:

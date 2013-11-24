@@ -11,13 +11,13 @@ module  FTools
     private
 
     def process_file(filename)
-      ftf = FTools::FTFile.new(filename)
+      ftf = FTFile.new(filename)
       new_filename = File.join(ftf.dirname,
                                ftf.basename_part[:clean] + ftf.extname)
       FileUtils.mv(filename, new_filename) unless filename == new_filename
       new_filename
     rescue
-      raise(FTools::Error, 'file renaming')
+      raise FTools::Error, 'file renaming'
     end
   end
 end

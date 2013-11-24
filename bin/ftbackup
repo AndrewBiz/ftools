@@ -5,27 +5,27 @@ require_relative "../lib/ftools/#{File.basename(__FILE__)}"
 
 # Foto processing tools
 module FTools
-  VERSION = '0.2.0'
-end
+  VERSION = '0.2.1'
 
-file_type = FTools::FILE_TYPE_IMAGE + FTools::FILE_TYPE_VIDEO
-tool_name = File.basename(__FILE__)
-usage = <<DOCOPT
+  file_type = FILE_TYPE_IMAGE + FILE_TYPE_VIDEO + FILE_TYPE_AUDIO
+  tool_name = File.basename(__FILE__)
+  usage = <<DOCOPT
 ftools - *Keep Your Photos Clean And Tidy* (© ANB).
-#{tool_name}, version #{FTools::VERSION}, copies the input file into backup directory.
+#{tool_name}, version #{VERSION}, copies the input file into backup directory.
 Optimized to be used with other *ftools* via pipes.
-Example: ftls | #{tool_name} | ftrename
+Example: ftls | #{tool_name} | ftrename ...
 
 Usage:
   #{tool_name} [--backup DIR] [-D]
   #{tool_name} -h | --help
-  #{tool_name} --version
+  #{tool_name} -v | --version
 
 Options:
   -b DIR --backup=DIR  Sets the backup directory [Default: ./backup]
   -D --debug           Turn on debugging (verbose) mode
   -h --help            Show this screen.
-  --version            Show version.
+  -v --version         Show version.
 DOCOPT
 
-FTools::FTbackup.new(usage, file_type).run!
+  FTbackup.new(usage, file_type).run!
+end

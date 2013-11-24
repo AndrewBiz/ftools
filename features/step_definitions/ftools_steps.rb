@@ -2,11 +2,30 @@
 # encoding: UTF-8
 # (c) ANB Andrew Bizyaev
 
+require 'fileutils'
+
+# FEATURES_ROOT = File.join(File.dirname(__FILE__), '..')
+
 Given(/^empty files named:$/) do |table|
   # table is a Cucumber::Ast::Table
   files = table.raw.flatten
   files.each do |file|
     step %{an empty file named "#{file}"}
+  end
+end
+
+Given(/^example file "(.*?)" copied to "(.*?)"$/) do |arg1, arg2|
+  basename = File.basename(arg1)
+  file_out = File.join(current_dir, arg2, basename)
+  FileUtils.cp(arg1, file_out)
+end
+
+Given(/^example files from "(.*?)" copied to "(.*?)" named:$/) do |arg1, arg2, table|
+  # table is a Cucumber::Ast::Table
+  files = table.raw.flatten
+  files.each do |file|
+    file_in = File.join(arg1, file)
+    step %{example file "#{file_in}" copied to "#{arg2}"}
   end
 end
 

@@ -3,33 +3,22 @@
 # (c) ANB Andrew Bizyaev
 
 require_relative 'runner.rb'
-require 'time'
 
+# Foto processing tools
 module FTools
-  class Runner_ftfixfmd < FTools::Runner
-
+  # Fixing file's date-time modification property
+  class FTfixfmd < Runner
     private
-    def process_file( filename )
-      # checking file name
-      #dirname = File.dirname( filename )
-      extname = File.extname( filename )
-      basename = File.basename( filename, extname )
-      # check if name = YYYYMMDD-hhmmss_AAA[ID]name
-      if (/^(\d{8}-\d{6})(.*)/ =~ basename)
-        fmd = Time.strptime($1, "%Y%m%d-%H%M%S")
-      else
-        raise FTools::Error.new("wrong name format")
-      end
 
-      # processing file
+    def process_file(filename)
+      ftf = FTFile.new(filename)
+      fail FTools::Error, 'no date-time in the name' unless ftf.date_time_ok?
       begin
-        File.utime(Time.now, fmd, filename)
-      rescue => e
-        raise FTools::Error.new("setting file modify time", e)
+        File.utime(Time.now, ftf.date_time_to_time, filename)
+      rescue
+        raise FTools::Error.new, 'setting file modify time'
       end
-
-      return filename
+      filename
     end
-
   end
 end

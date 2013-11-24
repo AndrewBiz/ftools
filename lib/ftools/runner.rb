@@ -26,7 +26,7 @@ module FTools
         @os = OSUnix.new
       end
       @options_cli = Docopt.docopt(usage, version:
-                   "#{FTools::VERSION} (core #{FTools::VERSION_CORE})")
+                   "#{VERSION} (core #{VERSION_CORE})")
       @file_type = file_type
       FTools.debug = true if @options_cli['--debug']
       FTools.puts_error "OPTIONS = #{@options_cli.to_s}" if FTools.debug
