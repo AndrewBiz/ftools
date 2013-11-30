@@ -25,7 +25,7 @@ Feature: Rename photo and video files
     Then the output should match /[0-9]+\.[0-9]+\.[0-9]+ \(core [0-9]+\.[0-9]+\.[0-9]+\)/
 
   #@announce
-  Scenario: 1 Original named files are renamed to ftools standard
+  Scenario: 1 Originally named files are renamed to ftools standard
     Given a directory named "2rename"
     And example files from "features/media/sony_jpg" copied to "2rename" named:
    | DSC03403.JPG |
@@ -43,3 +43,15 @@ Feature: Rename photo and video files
     | 20130104-120745_ANB DSC03499.JPG |
     | 20130105-150446_ANB DSC03802.JPG |
     | 20130107-115201_ANB DSC04032.JPG |
+    And the following files should exist:
+    | ./20130103-103254_ANB DSC03313.JPG |
+    | ./20130103-153908_ANB DSC03403.JPG |
+    | ./20130104-120745_ANB DSC03499.JPG |
+    | ./20130105-150446_ANB DSC03802.JPG |
+    | ./20130107-115201_ANB DSC04032.JPG |
+    And the following files should not exist:
+    | ./DSC03313.JPG |
+    | ./DSC03403.JPG |
+    | ./DSC03499.JPG |
+    | ./DSC03802.JPG |
+    | ./DSC04032.JPG |
