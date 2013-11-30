@@ -20,11 +20,11 @@ module FTools
       # raise FTools::Error.new("author is not defined") if @author.empty?
     end
 
-    def process_file(filename)
-      ftf = FTFile.new(filename)
+    def process_file(ftfile)
+      ftfile_out = ftfile.clone
       # TODO: new_filename
-      new_filename = ftf.filename # !
-      new_filename
+
+      ftfile_out
     end
   end
 end

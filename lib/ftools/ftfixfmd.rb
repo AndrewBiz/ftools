@@ -10,15 +10,15 @@ module FTools
   class FTfixfmd < Runner
     private
 
-    def process_file(filename)
-      ftf = FTFile.new(filename)
-      fail FTools::Error, 'no date-time in the name' unless ftf.date_time_ok?
+    def process_file(ftfile)
+      fail FTools::Error, 'wrong date-time in the name' unless
+        ftfile.date_time_ok?
       begin
-        File.utime(Time.now, ftf.date_time_to_time, filename)
+        File.utime(Time.now, ftfile.date_time_to_time, ftfile.filename)
       rescue
         raise FTools::Error.new, 'setting file modify time'
       end
-      filename
+      ftfile
     end
   end
 end

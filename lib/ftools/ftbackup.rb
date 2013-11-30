@@ -29,10 +29,11 @@ module FTools
       end
     end
 
-    def process_file(filename)
-      new_filename = File.join(@backup_dir, File.basename(filename))
-      FileUtils.cp(filename, new_filename, verbose: FTools.debug)
-      filename
+    def process_file(ftfile)
+      backup_path = File.join(@backup_dir,
+                              ftfile.basename + ftfile.extname)
+      FileUtils.cp(ftfile.filename, backup_path, verbose: FTools.debug)
+      ftfile
     rescue
       raise FTools::Error, "file copying to #{@backup_dir}"
     end

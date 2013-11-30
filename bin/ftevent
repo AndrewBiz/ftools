@@ -5,7 +5,7 @@ require_relative "../lib/ftools/#{File.basename(__FILE__)}"
 
 # Foto processing tools
 module FTools
-  VERSION = '0.2.0'
+  VERSION = '0.3.0'
 
   file_type = FILE_TYPE_IMAGE + FILE_TYPE_VIDEO + FILE_TYPE_AUDIO
   tool_name = File.basename(__FILE__)

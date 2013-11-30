@@ -33,16 +33,21 @@ Feature: Clean filenames
     | 20130104-005311_ANBANB DSC00004.JPG |
     When I successfully run `ftls_ftclname`
     Then the stdout should contain each of:
-    | DSC00001.JPG            |
-    | DSC00002.JPG            |
-    | DSC00003.JPG            |
-    | DSC00004.JPG            |
+    | DSC00001.JPG |
+    | DSC00002.JPG |
+    | DSC00003.JPG |
+    | DSC00004.JPG |
     And the stdout should not contain any of:
     | 20130101-005311 |
     | ANB             |
     | ANBA            |
     | ANBAN           |
     | ANBANB          |
+    And the following files should exist:
+    | DSC00001.JPG |
+    | DSC00002.JPG |
+    | DSC00003.JPG |
+    | DSC00004.JPG |
 
   #@announce
   Scenario: 2 Non-Standard named files are renamed to origin as well
@@ -100,4 +105,22 @@ Feature: Clean filenames
     | 2013_                                         |
     | 2013-                                         |
     | 2013                                          |
-
+    And the following files should exist:
+    | DSC10001.JPG   |
+    | DSC10002.JPG   |
+    | DSC10003.JPG   |
+    | DSC10004.JPG   |
+    | DSC10005.JPG   |
+    | DSC10006.JPG   |
+    | DSC10007.JPG   |
+    | DSC10008.JPG   |
+    | DSC10009.JPG   |
+    | DSC10010.JPG   |
+    | DSC10011.JPG   |
+    | DSC10012.JPG   |
+    | DSC10013.JPG   |
+    | DSC10014.JPG   |
+    | CLEAN NAME.JPG |
+    | CLEAN_NAME.JPG |
+    | CLEAN-NAME.JPG |
+    | CLEANNAME.JPG  |

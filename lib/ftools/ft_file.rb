@@ -2,7 +2,8 @@
 # encoding: UTF-8
 # (c) ANB Andrew Bizyaev
 
-require 'time'
+require 'date'
+require 'fileutils'
 
 # Foto tools
 module FTools
@@ -13,12 +14,24 @@ module FTools
 
   # ftools file name operations
   class FTFile
+    include Comparable
+
     # filename constants
     NICKNAME_MIN_SIZE = 3
     NICKNAME_MAX_SIZE = 6
     NICKNAME_SIZE = 3 # should be in range of MIN and MAX
     ZERO_DATE = DateTime.new(0)
-    
+
+    def self.validate_file!(filename, file_type)
+      fail FTools::Error, 'does not exist'  unless
+        filename && File.exist?(filename)
+      fail FTools::Error, 'not a file' if File.directory?(filename)
+      fail FTools::Error, 'no permission to write' unless
+        File.writable_real?(filename)
+      fail FTools::Error, 'unsupported type' unless
+        file_type.include?(File.extname(filename).slice(1..-1).downcase)
+    end
+
     def self.validate_author(author)
       case
       when author.size != NICKNAME_SIZE
@@ -34,22 +47,61 @@ module FTools
     end
 
     attr_reader :filename, :dirname, :extname, :basename, :basename_part,
-                :date_time
+                :basename_clean, :date_time, :author
 
     def initialize(filename)
-      @filename = filename
-      @dirname = File.dirname(@filename)
-      @extname = File.extname(@filename)
-      @basename = File.basename(@filename, @extname)
-      parse_basename
-      @date_time = reveal_date_time
+      set_state(filename)
     end
 
-    def generate_basename(clean_name: 'NNN',
-                          date_time: ZERO_DATE,
-                          author: 'XXX')
-      # Generating standard FT name
-      %Q{#{date_time.strftime('%Y%m%d-%H%M%S')}_#{(author + "XXXXXX")[0, NICKNAME_SIZE]} #{clean_name}}
+    def to_s
+      "#{@filename}"
+    end
+
+    def <=>(other)
+      @filename <=> other.filename
+    end
+
+    def basename_standard(basename_clean: @basename_clean,
+                          date_time: @date_time,
+                          author: @author)
+      %Q{#{date_time.strftime('%Y%m%d-%H%M%S')}_#{(author.upcase + "XXXXXX")[0, NICKNAME_SIZE]} #{basename_clean}}
+    end
+
+    def basename_is_standard?
+      @basename == basename_standard
+    end
+
+    def standardize(dirname: @dirname, basename_clean: @basename_clean,
+                    extname: @extname, date_time: @date_time,
+                    author: @author)
+      File.join(dirname,
+                basename_standard(basename_clean: basename_clean,
+                                  date_time: date_time,
+                                  author: author) + extname)
+    end
+
+    def standardize!(dirname: @dirname, basename_clean: @basename_clean,
+                     extname: @extname, date_time: @date_time,
+                     author: @author)
+
+      filename = standardize(dirname: dirname, basename_clean: basename_clean,
+                             extname: extname, date_time: date_time,
+                             author: author)
+      set_state(filename)
+      filename
+    end
+
+    def cleanse(dirname: @dirname, basename_clean: @basename_clean,
+                extname: @extname)
+      File.join(dirname, basename_clean + extname)
+    end
+
+    def cleanse!(dirname: @dirname, basename_clean: @basename_clean,
+               extname: @extname)
+      filename = cleanse(dirname: dirname, basename_clean: basename_clean,
+                         extname: extname)
+      set_state(filename)
+      filename
     end
 
     def date_time_ok?
@@ -63,13 +115,18 @@ module FTools
                # equals to photografer's computer timezone
     end
 
-    def basename_is_standard?
-      @basename == generate_basename(clean_name: @basename_part[:clean],
-                                     date_time: @date_time,
-                                     author: @basename_part[:author])
-    end
-
     private
+
+    def set_state(filename)
+      @dirname = File.dirname(filename)
+      @extname = File.extname(filename)
+      @basename = File.basename(filename, @extname)
+      @filename = File.join(@dirname, @basename + @extname)
+      parse_basename
+      @basename_clean = @basename_part[:clean]
+      @date_time = reveal_date_time
+      @author = @basename_part[:author] || ''
+    end
 
     def reveal_date_time
       date = @basename_part[:date]

@@ -16,22 +16,18 @@ module FTools
       fail FTools::Error, msg unless ok
     end
 
-    def process_file(filename)
-      ftf = FTFile.new(filename)
+    def process_file(ftfile)
+      ftfile_out = ftfile.clone
       begin
-        tag = MiniExiftool.new(filename, timestamps: DateTime)
+        tag = MiniExiftool.new(ftfile.filename, timestamps: DateTime)
         dto = tag.date_time_original || tag.create_date || FTFile::ZERO_DATE
       rescue
         raise FTools::Error, 'EXIF tags reading'
       end
-
-      new_basename = ftf.generate_basename(clean_name: ftf.basename_part[:clean],
-                                           date_time: dto,
-                                           author: @author)
-      new_filename = File.join(ftf.dirname,
-                               new_basename + ftf.extname)
-      FileUtils.mv(filename, new_filename) unless filename == new_filename
-      new_filename
+      ftfile_out.standardize!(date_time: dto, author: @author)
+      FileUtils.mv(ftfile.filename, ftfile_out.filename) unless
+        ftfile == ftfile_out
+      ftfile_out
     rescue
       raise FTools::Error, 'file renaming'
     end

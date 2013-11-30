@@ -23,6 +23,21 @@ describe FTools::FTFile, 'constants' do
 end
 
 describe FTools::FTFile do
+  it 'stores filename with dirname .' do
+    fn = FTools::FTFile.new('file.ext')
+    expect(fn.filename).to eq('./file.ext')
+  end
+
+  it 'stores filename with dirname aaa/bbb' do
+    fn = FTools::FTFile.new('aaa/bbb/file.ext')
+    expect(fn.filename).to eq('aaa/bbb/file.ext')
+  end
+
+  it 'prints object as filename' do
+    fn = FTools::FTFile.new('file.ext')
+    expect(fn.to_s).to eq('./file.ext')
+  end
+
   it 'stores file dir name' do
     fn = FTools::FTFile.new('./aaa/bbb/file.ext')
     expect(fn.dirname).to eq('./aaa/bbb')
@@ -36,6 +51,15 @@ describe FTools::FTFile do
   it 'stores file extention name' do
     fn = FTools::FTFile.new('./aaa/bbb/file.ext')
     expect(fn.extname).to eq('.ext')
+  end
+
+  it 'is comparable to other FT objects via filename' do
+    fn1 = FTools::FTFile.new('file1.ext')
+    fn2 = FTools::FTFile.new('file2.ext')
+    fn3 = FTools::FTFile.new('file1.ext')
+
+    expect(fn1 == fn2).to be_false
+    expect(fn1 == fn3).to be_true
   end
 
   describe 'validates the author NICKNAME' do
@@ -390,6 +414,138 @@ describe FTools::FTFile do
     it fts10 do
       obj = FTools::FTFile.new(fts10)
       expect(obj.basename_is_standard?).to be_false
+    end
+    # author shpuld be upcased
+    fts11 = '20011231-112233_anb cleanname.jpg'
+    it fts11 do
+      obj = FTools::FTFile.new(fts11)
+      expect(obj.basename_is_standard?).to be_false
+    end
+  end
+
+  describe 'generates standard file name' do
+    describe 'without changes of the inner state' do
+      it 'when I set only date_time and author' do
+        obj = FTools::FTFile.new('cleanname.jpg')
+        expect(obj.standardize(date_time: DateTime.strptime('20131130-183657', '%Y%m%d-%H%M%S'),
+                               author: 'anb'))
+          .to eq './20131130-183657_ANB cleanname.jpg'
+        expect(obj.basename).to eq 'cleanname'
+        expect(obj.basename_clean).to eq 'cleanname'
+        expect(obj.dirname).to eq '.'
+        expect(obj.extname).to eq '.jpg'
+        expect(obj.author).to be_empty
+        expect(obj.date_time).to eq DateTime.new(0)
+        expect(obj.basename_is_standard?).to be_false
+      end
+      it 'when I change all parts of the filename' do
+        obj = FTools::FTFile.new('cleanname.jpg')
+        expect(obj.standardize(basename_clean: 'clean_name',
+                               extname: '.jpeg',
+                               dirname: 'changed/dir',
+                               date_time: DateTime.strptime('20131130-183657', '%Y%m%d-%H%M%S'),
+                               author: 'anb'))
+          .to eq 'changed/dir/20131130-183657_ANB clean_name.jpeg'
+        expect(obj.basename).to eq 'cleanname'
+        expect(obj.basename_clean).to eq 'cleanname'
+        expect(obj.dirname).to eq '.'
+        expect(obj.extname).to eq '.jpg'
+        expect(obj.author).to be_empty
+        expect(obj.date_time).to eq DateTime.new(0)
+        expect(obj.basename_is_standard?).to be_false
+      end
+    end
+    describe 'and updates inner state' do
+      it 'when I set only date_time and author' do
+        obj = FTools::FTFile.new('cleanname.jpg')
+        expect(obj.standardize!(date_time: DateTime.strptime('20131130-183657', '%Y%m%d-%H%M%S'),
+                               author: 'anb'))
+          .to eq './20131130-183657_ANB cleanname.jpg'
+        expect(obj.filename).to eq './20131130-183657_ANB cleanname.jpg'
+        expect(obj.basename).to eq '20131130-183657_ANB cleanname'
+        expect(obj.basename_clean).to eq 'cleanname'
+        expect(obj.dirname).to eq '.'
+        expect(obj.extname).to eq '.jpg'
+        expect(obj.author).to eq 'ANB'
+        expect(obj.date_time).to eq DateTime.strptime('20131130-183657', '%Y%m%d-%H%M%S')
+        expect(obj.basename_is_standard?).to be_true
+      end
+      it 'when I change all parts of the filename' do
+        obj = FTools::FTFile.new('cleanname.jpg')
+        expect(obj.standardize!(basename_clean: 'clean_name',
+                                extname: '.jpeg',
+                                dirname: 'changed/dir',
+                                date_time: DateTime.strptime('20131130-183657', '%Y%m%d-%H%M%S'),
+                                author: 'anb'))
+          .to eq 'changed/dir/20131130-183657_ANB clean_name.jpeg'
+        expect(obj.filename).to eq 'changed/dir/20131130-183657_ANB clean_name.jpeg'
+        expect(obj.basename).to eq '20131130-183657_ANB clean_name'
+        expect(obj.basename_clean).to eq 'clean_name'
+        expect(obj.dirname).to eq 'changed/dir'
+        expect(obj.extname).to eq '.jpeg'
+        expect(obj.author).to eq 'ANB'
+        expect(obj.date_time).to eq DateTime.strptime('20131130-183657', '%Y%m%d-%H%M%S')
+        expect(obj.basename_is_standard?).to be_true
+      end
+    end
+  end
+
+  describe 'generates clean file name' do
+    describe 'without changes of the inner state' do
+      fcl01 = '20131130-183657_ANB cleanname.jpg'
+      it "when I just clean the name for #{fcl01}" do
+        obj = FTools::FTFile.new(fcl01)
+        expect(obj.cleanse).to eq './cleanname.jpg'
+        expect(obj.basename).to eq '20131130-183657_ANB cleanname'
+        expect(obj.basename_clean).to eq 'cleanname'
+        expect(obj.dirname).to eq '.'
+        expect(obj.extname).to eq '.jpg'
+        expect(obj.author).to eq 'ANB'
+        expect(obj.date_time).to eq DateTime.strptime('20131130-183657', '%Y%m%d-%H%M%S')
+        expect(obj.basename_is_standard?).to be_true
+      end
+      fcl02 = '20131130-183657_ANB cleanname.jpg'
+      it "when I change all parts of the #{fcl01}" do
+        obj = FTools::FTFile.new(fcl02)
+        expect(obj.cleanse(dirname: 'new/dir',
+                           basename_clean: 'clean_name',
+                           extname: '.jpeg')).to eq 'new/dir/clean_name.jpeg'
+        expect(obj.basename).to eq '20131130-183657_ANB cleanname'
+        expect(obj.basename_clean).to eq 'cleanname'
+        expect(obj.dirname).to eq '.'
+        expect(obj.extname).to eq '.jpg'
+        expect(obj.author).to eq 'ANB'
+        expect(obj.date_time).to eq DateTime.strptime('20131130-183657', '%Y%m%d-%H%M%S')
+        expect(obj.basename_is_standard?).to be_true
+      end
+    end
+    describe 'and updates inner state' do
+      fcl03 = '20131130-183657_ANB cleanname.jpg'
+      it "when I just clean the name for #{fcl03}" do
+        obj = FTools::FTFile.new(fcl03)
+        expect(obj.cleanse!).to eq './cleanname.jpg'
+        expect(obj.basename).to eq 'cleanname'
+        expect(obj.basename_clean).to eq 'cleanname'
+        expect(obj.dirname).to eq '.'
+        expect(obj.extname).to eq '.jpg'
+        expect(obj.author).to be_empty
+        expect(obj.date_time).to eq DateTime.new(0)
+        expect(obj.basename_is_standard?).to be_false
+      end
+      fcl04 = '20131130-183657_ANB cleanname.jpg'
+      it "when I change all parts of the #{fcl04}" do
+        obj = FTools::FTFile.new(fcl04)
+        expect(obj.cleanse!(dirname: 'new/dir',
+                            basename_clean: 'clean_name',
+                            extname: '.jpeg')).to eq 'new/dir/clean_name.jpeg'
+        expect(obj.basename).to eq 'clean_name'
+        expect(obj.basename_clean).to eq 'clean_name'
+        expect(obj.dirname).to eq 'new/dir'
+        expect(obj.extname).to eq '.jpeg'
+        expect(obj.author).to be_empty
+        expect(obj.date_time).to eq DateTime.new(0)
+        expect(obj.basename_is_standard?).to be_false
+      end
     end
   end
 end
