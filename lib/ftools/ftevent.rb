@@ -17,7 +17,20 @@ module FTools
 
     def process_before
       # TODO: create event dir and copy event to it
-      # raise FTools::Error.new("author is not defined") if @author.empty?
+      # raise FTools::Error.new("author is not defined") if  @author.empty?
+      event_dir = '20130102-08 Круиз Балтика'
+      if File.exist?(event_dir)
+        fail FTools::Error, "#{event_dir} is not a directory" unless
+          File.directory?(event_dir)
+        fail FTools::Error, "#{event_dir} is not writable" unless
+          File.writable?(event_dir)
+      else
+        begin
+          Dir.mkdir event_dir
+        rescue
+          raise FTools::Error, "Unable to create event dir '#{event_dir}'"
+        end
+      end
     end
 
     def process_file(ftfile)
