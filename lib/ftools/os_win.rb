@@ -11,7 +11,7 @@ module FTools
     private
 
     def prepare(message)
-      message.gsub(/#{"/"}/, '\\')
+      message.to_s.gsub(/#{"/"}/, '\\')
     end
   end
 end

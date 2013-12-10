@@ -9,7 +9,7 @@ module FTools
     private
 
     def prepare(message)
-      message
+      message.to_s
     end
   end
 end
