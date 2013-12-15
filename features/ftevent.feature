@@ -32,8 +32,8 @@ Feature: Pack files to events
     When I cd to "2event"
     And I successfully run `ftls_ftevent`
 
-    Then a directory named "20130102-08 Круиз Балтика" should exist
- 
+    Then a directory named "20130102-08_01 Круиз Балтика" should exist
+    And a file named "20130102-08_01 Круиз Балтика/event.yml" should exist 
 #    And example files from "features/media/sony_jpg" copied to "2event" named:
 #  | DSC03403.JPG |
 #  | DSC03313.JPG |
