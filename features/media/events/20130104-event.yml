@@ -3,12 +3,12 @@
 ---
 :event:
   :title: "Baltica Travel" # Event title (mwg_coll:CollectionName)
-  :sort: "_01" #OPTIONAL event sort order - if several subevents in one period
+#  :sort: "_01" #OPTIONAL event sort order - if several subevents in one period
   :uri: "anblab.net" # mwg-coll:CollectionURI - адрес фотки в интернете
 
 # Event period
-  :date_start: "2013-01-02 00:00:00" #YYYY-mm-dd HH:MM:SS[.ss][+/-HH:MM]
-  :date_end: "2013-01-08 23:59:59" #YYYY-mm-dd HH:MM:SS[.ss][+/-HH:MM]
+  :date_start: "2013-01-04 00:00:00" #YYYY-mm-dd HH:MM:SS[.ss][+/-HH:MM]
+#  :date_end: "2013-01-08 23:59:59" #YYYY-mm-dd HH:MM:SS[.ss][+/-HH:MM]
 
   :keywords: # XMP:Subject (MWG:Keywords)
     # Описание события (Что? Объект)

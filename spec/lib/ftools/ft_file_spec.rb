@@ -548,4 +548,28 @@ describe FTools::FTFile do
       end
     end
   end
+
+  describe 'changes dirname' do
+    fcn01 = '20131130-183657_ANB cleanname.jpg'
+    it 'when I set new dirname' do
+      obj = FTools::FTFile.new(fcn01)
+      expect(obj.basename).to eq '20131130-183657_ANB cleanname'
+      expect(obj.basename_clean).to eq 'cleanname'
+      expect(obj.dirname).to eq '.'
+      expect(obj.extname).to eq '.jpg'
+      expect(obj.author).to eq 'ANB'
+      expect(obj.date_time).to eq DateTime.strptime('20131130-183657', '%Y%m%d-%H%M%S')
+      expect(obj.basename_is_standard?).to be_true
+
+      obj.dirname = 'new/dir/name'
+      expect(obj.filename).to eq 'new/dir/name/20131130-183657_ANB cleanname.jpg'
+      expect(obj.basename).to eq '20131130-183657_ANB cleanname'
+      expect(obj.basename_clean).to eq 'cleanname'
+      expect(obj.dirname).to eq 'new/dir/name'
+      expect(obj.extname).to eq '.jpg'
+      expect(obj.author).to eq 'ANB'
+      expect(obj.date_time).to eq DateTime.strptime('20131130-183657', '%Y%m%d-%H%M%S')
+      expect(obj.basename_is_standard?).to be_true
+    end
+  end
 end

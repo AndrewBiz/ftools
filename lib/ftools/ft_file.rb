@@ -105,6 +105,11 @@ module FTools
       filename
     end
 
+    def dirname=(dirname = @dirname)
+      @dirname = dirname
+      @filename = File.join(@dirname, @basename + @extname)
+    end
+
     def date_time_ok?
       @date_time != ZERO_DATE
     end

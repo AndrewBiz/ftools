@@ -11,8 +11,7 @@ module FTools
     private
 
     def validate_options
-      # TODO: parent_dir to event
-      @event = Event.new(@options_cli['--event'])
+      @event = Event.new(@options_cli['--event'], @options_cli['--parent_dir'])
     end
 
     def process_before
@@ -21,10 +20,19 @@ module FTools
     end
 
     def process_file(ftfile)
-      ftfile_out = ftfile.clone
-      # TODO: new_filename
+      fail FTools::Error, 'non-standard name, use ftrename to rename' unless
+        ftfile.basename_is_standard?
 
+      ftfile_out = ftfile.clone
+      fail FTools::Error, 'out of event dates' unless
+        (ftfile_out.date_time <= @event.date_end) &&
+        (ftfile_out.date_time >= @event.date_start)
+      ftfile_out.dirname = @event.dirname
+      FileUtils.mv(ftfile.filename, ftfile_out.filename) unless
+        ftfile == ftfile_out
       ftfile_out
+    rescue SystemCallError => e
+      raise FTools::Error, 'file moving - ' + e.message
     end
   end
 end
