@@ -2,23 +2,23 @@
 # encoding: UTF-8
 # (c) ANB Andrew Bizyaev
 
-require_relative "../lib/ftools/#{File.basename(__FILE__)}"
-
 # Foto processing tools
 module FTools
-  VERSION = '0.3.0'
+  tool_name = File.basename(__FILE__)
+  require_relative "../lib/ftools/#{tool_name}"
+
+  VERSION = '0.3.2'
 
   file_type = FILE_TYPE_IMAGE + FILE_TYPE_VIDEO + FILE_TYPE_AUDIO
-  tool_name = File.basename(__FILE__)
   usage = <<DOCOPT
-ftools - *Keep Your Photos Clean And Tidy* (© ANB).
+ftools - *Keep Your Photos Clean And Tidy* (c) ANB.
 #{tool_name}, version #{VERSION}, renames the input file based on EXIF
 DateTimeOriginal tag and author NICKNAME provided. The target file name
 format is YYYYmmdd-HHMMSS_AAA ORIGINAL.EXT, where:
-  YYYYmmdd-HHMMSS - DateTimeOriginal (normally Date and Time of photo creation),
+  YYYYmmdd-HHMMSS - DateTimeOriginal (normally Date-Time of photo creation),
   AAA - the author nickname,
   ORIGINAL.EXT - the photo name was given by digital camera.
-Input file should be one of the types: #{file_type * ","}
+Input file should be one of the types: #{file_type * ','}
 
 Example: input file DSC03455.JPG will be renamed to
 20130108-124145_ANB DSC03455.JPG
@@ -34,7 +34,7 @@ Usage:
   #{tool_name} -v | --version
 
 Options:
-  -a NICKNAME --author=NICKNAME  Author nickname should be #{FTFile::NICKNAME_SIZE} chars long,
+  -a NICKNAME --author=NICKNAME  Author nickname size should be #{FTFile::NICKNAME_SIZE} chars,
                                  have no spaces and other non-word chars,
                                  have no digits,
                                  have only ASCII chars (e.g. ANB)
@@ -43,5 +43,5 @@ Options:
   -v --version  Show version.
 DOCOPT
 
-  FTrename.new(usage, file_type).run!
+  FTools.const_get(tool_name.capitalize).new(usage, file_type).run!
 end

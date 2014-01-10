@@ -7,7 +7,7 @@ require_relative 'runner.rb'
 # Foto processing tools
 module FTools
   # Fixing file's date-time modification property
-  class FTfixfmd < Runner
+  class Ftfixfmd < Runner
     private
 
     def process_file(ftfile)

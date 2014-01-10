@@ -6,7 +6,7 @@ require_relative 'runner.rb'
 
 module FTools
   # backup files
-  class FTbackup < Runner
+  class Ftbackup < Runner
     private
 
     def validate_options

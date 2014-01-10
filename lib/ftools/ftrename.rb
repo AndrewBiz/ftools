@@ -7,7 +7,7 @@ require_relative '../mini_exiftool-2.3.0anb'
 
 module FTools
   # Rename original files to ftools standard
-  class FTrename < Runner
+  class Ftrename < Runner
     private
 
     def validate_options

@@ -9,7 +9,7 @@ Feature: Backup files
     When I successfully run `ftbackup -h`
     Then the stderr should contain each of:
     | Keep Your Photos Clean And Tidy |
-    | © ANB                           |
+    | ANB                             |
     | Example:                        |
     | Usage:                          |
     | Options:                        |

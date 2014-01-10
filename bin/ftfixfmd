@@ -2,16 +2,16 @@
 # encoding: UTF-8
 # (c) ANB Andrew Bizyaev
 
-require_relative "../lib/ftools/#{File.basename(__FILE__)}"
-
 # Foto processing tools
 module FTools
-  VERSION = '0.3.0'
+  tool_name = File.basename(__FILE__)
+  require_relative "../lib/ftools/#{tool_name}"
+
+  VERSION = '0.3.2'
 
   file_type = FILE_TYPE_IMAGE + FILE_TYPE_VIDEO + FILE_TYPE_AUDIO
-  tool_name = File.basename(__FILE__)
   usage = <<DOCOPT
-ftools - *Keep Your Photos Clean And Tidy* (© ANB).
+ftools - *Keep Your Photos Clean And Tidy* (c) ANB.
 #{tool_name}, version #{VERSION}, changes an input file modify-date
 according to the date encoded in the filename. The name of the
 file should start with YYYYmmdd-HHMMSS string.
@@ -29,5 +29,5 @@ Options:
   -v --version     Show version.
 DOCOPT
 
-  FTfixfmd.new(usage, file_type).run!
+  FTools.const_get(tool_name.capitalize).new(usage, file_type).run!
 end

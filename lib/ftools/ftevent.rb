@@ -7,7 +7,7 @@ require_relative 'event'
 
 module FTools
   # collecting media files into EVENT folder
-  class FTevent < Runner
+  class Ftevent < Runner
     private
 
     def validate_options

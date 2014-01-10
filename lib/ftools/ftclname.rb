@@ -7,7 +7,7 @@ require_relative 'runner.rb'
 # Foto processing tools
 module  FTools
   # Rename file
-  class FTclname < Runner
+  class Ftclname < Runner
     private
 
     def process_file(ftfile)
