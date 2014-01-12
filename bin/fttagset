@@ -7,28 +7,34 @@ module FTools
   tool_name = File.basename(__FILE__)
   require_relative "../lib/ftools/#{tool_name}"
 
-  VERSION = '0.3.2'
-
+  VERSION = '0.1.0'
+  # TODO: only supported types - to check
   file_type = FILE_TYPE_IMAGE + FILE_TYPE_VIDEO + FILE_TYPE_AUDIO
   usage = <<DOCOPT
 ***************************************************
 ftools - *Keep Your Photos Clean And Tidy* (c) ANB
 ***************************************************
-#{tool_name}, version #{VERSION}, changes an input file modify-date
-according to the date encoded in the filename. The name of the
-file should start with YYYYmmdd-HHMMSS string.
+#{tool_name}, version #{VERSION}, writes EXIF tags into given file(s) using EVENT
+description (event.yml file) and CREATORs and PLACEs database.
+#{tool_name} can only process files: #{file_type * ','}
+
 Optimized to be used with other *ftools* via pipes.
-Example: ftls | ftrename -a anb | #{tool_name}
+Example: ftls | #{tool_name}
 
 Usage:
-  #{tool_name} [-D]
+  #{tool_name} [-e EVT] [-c CRT] [p PLC] [-D]
   #{tool_name} -h | --help
   #{tool_name} -v | --version
 
 Options:
+  -e EVT --event=EVT     Event profile to use [default: ./event.yml]
+  -c CRT --creators=CRT  CREATORs (authors) database,
+                         yaml format [default: ~/ftools/creators.yml]
+  -p PLC --paces=PLC     PLACESs database,
+                         yaml format [default: ~/ftools/places.yml]
   -D --debug    Turn on debugging (verbose) mode
   -h --help     Show this screen.
-  -v --version     Show version.
+  -v --version  Show version.
 DOCOPT
 
   FTools.const_get(tool_name.capitalize).new(usage, file_type).run!

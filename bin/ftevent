@@ -11,7 +11,9 @@ module FTools
 
   file_type = FILE_TYPE_IMAGE + FILE_TYPE_VIDEO + FILE_TYPE_AUDIO
   usage = <<DOCOPT
-ftools - *Keep Your Photos Clean And Tidy* (c) ANB.
+***************************************************
+ftools - *Keep Your Photos Clean And Tidy* (c) ANB
+***************************************************
 #{tool_name}, version #{VERSION}, collects input file(s) into EVENT directory.
 ftools friendly files: #{file_type * ','}
 

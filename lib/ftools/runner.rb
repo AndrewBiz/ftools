@@ -24,6 +24,7 @@ module FTools
       else
         @os = OSUnix.new
       end
+      @tool_name = File.basename($PROGRAM_NAME)
       @options_cli = Docopt.docopt(usage, version:
                    "#{VERSION} (core #{VERSION_CORE})")
       @file_type = file_type
