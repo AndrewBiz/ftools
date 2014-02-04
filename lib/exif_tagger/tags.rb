@@ -3,6 +3,8 @@
 # (c) ANB Andrew Bizyaev
 
 require_relative 'error'
+require_relative 'tag/tag.rb'
+
 # loading *Tag classes
 lib_dir = File.join(__dir__, 'tag', '*.rb')
 Dir.glob(lib_dir).each { |file| require_relative file }

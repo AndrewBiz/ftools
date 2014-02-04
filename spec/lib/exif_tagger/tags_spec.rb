@@ -7,7 +7,7 @@ require 'exif_tagger'
 
 describe ExifTagger::Tags do
 
-  it 'saves :keywords value' do
+  it 'saves :keywords tag value' do
     mytags = ExifTagger::Tags.new
     val_array = %w{aaa bbb ааа ббб}
     mytags[:keywords] = val_array
@@ -27,7 +27,7 @@ describe ExifTagger::Tags do
     expect(script).to include('-MWG:Keywords-=ббб')
     expect(script).to include('-MWG:Keywords+=ббб')
   end
- 
+
   # it 'adds exiftool instructions into script file' do
   #                  collection_name: 'Test Event',
   #                  collection_uri: 'www.leningrad.spb.ru',
