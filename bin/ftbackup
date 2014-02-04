@@ -12,7 +12,7 @@ module FTools
   file_type = FILE_TYPE_IMAGE + FILE_TYPE_VIDEO + FILE_TYPE_AUDIO
   usage = <<DOCOPT
 ***************************************************
-ftools - *Keep Your Photos Clean And Tidy* (c) ANB
+ftools - *Keep Your Photos In Order* (c) ANB
 ***************************************************
 #{tool_name}, version #{VERSION}, copies the input file into backup directory.
 Optimized to be used with other *ftools* via pipes.

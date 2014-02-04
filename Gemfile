@@ -3,11 +3,12 @@ source 'https://rubygems.org'
 gem 'nesty', '~>1.0'
 gem 'docopt', '~>0.5'
 gem 'mini_exiftool'
+gem 'active_support', '~>3.0'
+gem 'i18n'
 
 # Add dependencies to develop your gem here.
 # Include everything needed to run rake, tests, features, etc.
 group :development do
-
   require 'rbconfig'
 
   if RbConfig::CONFIG['target_os'] =~ /darwin/i
@@ -27,4 +28,5 @@ group :development do
   gem 'rspec', '>= 0'
   gem 'aruba'
   gem 'bundler', '>= 0'
+  gem 'fuubar'
 end

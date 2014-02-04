@@ -20,5 +20,6 @@ module FTools
     STDERR.puts e.backtrace if @debug && !e.nil?
   end
 
-  class FTools::Error < Nesty::NestedStandardError; end
+  class Error < Nesty::NestedStandardError; end
+  class ExiftoolTagger < Error; end
 end

@@ -26,7 +26,7 @@ describe FTools::Event do
     allow(YAML).to receive(:load_file).and_return(hash)
   end
 
-  it 'stores parameters from event profile' do
+  it 'stores parameters of the event profile' do
     event = FTools::Event.new('./event.yml')
     expect(event.profile).to eq('./event.yml')
     expect(event.title).to eq('Круиз Балтика')

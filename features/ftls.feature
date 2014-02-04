@@ -9,15 +9,15 @@ Feature: Generate a list of ftools-friendly-files
   Scenario: 00 Default output with -h produces usage information 
     When I successfully run `ftls -h`
     Then the stderr should contain each of:
-    | Keep Your Photos Clean And Tidy |
-    | ANB                             |
-    | Example:                        |
-    | Usage:                          |
-    | Options:                        |
-    | -D --debug                      |
-    | -h --help                       |
-    | --version                       |
-    | -v                              |
+    | Keep Your Photos In Order |
+    | ANB                       |
+    | Example:                  |
+    | Usage:                    |
+    | Options:                  |
+    | -D --debug                |
+    | -h --help                 |
+    | --version                 |
+    | -v                        |
 
   #@announce
   Scenario: 01 Output with -v produces version information 

@@ -12,7 +12,7 @@ module FTools
   file_type = FILE_TYPE_IMAGE + FILE_TYPE_VIDEO + FILE_TYPE_AUDIO
   usage = <<DOCOPT
 ***************************************************
-ftools - *Keep Your Photos Clean And Tidy* (c) ANB
+ftools - *Keep Your Photos In Order* (c) ANB
 ***************************************************
 #{tool_name}, version #{VERSION}, renames the input file to it's
 original (given by digital camera) name. Its useful when need to roll back
