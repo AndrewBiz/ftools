@@ -6,10 +6,10 @@ require_relative 'tag'
 
 module ExifTagger
   module Tag
-    # MWG:Keywords, string[0,64]+, List of Strings
-    #   = IPTC:Keywords, XMP-dc:Subject
-    class Keywords < Tag
-      MAX_BYTESIZE = 64
+    # NMG:Creator, string[0,32]+, List of strings
+    #   = EXIF:Artist, IPTC:By-line, XMP-dc:Creator
+    class Creator < Tag
+      MAX_BYTESIZE = 32
 
       def initialize(value_raw = [])
         super(Array(value_raw).flatten.map { |i| i.to_s })
@@ -18,8 +18,12 @@ module ExifTagger
       def to_write_script
         str = ''
         @value.each do |o|
-          str << %Q{-MWG:Keywords-=#{o}\n}
-          str << %Q{-MWG:Keywords+=#{o}\n}
+          # -MWG:Creator-=Andrey Bizyaev (photographer)
+          # -MWG:Creator+=Andrey Bizyaev (photographer)
+          # -MWG:Creator-=Andrey Bizyaev (camera owner)
+          # -MWG:Creator+=Andrey Bizyaev (camera owner)
+          # str << %Q{-MWG:Keywords-=#{o}\n}
+          # str << %Q{-MWG:Keywords+=#{o}\n}
         end
         str
       end

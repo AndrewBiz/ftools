@@ -2,5 +2,5 @@
 # encoding: UTF-8
 # (c) ANB Andrew Bizyaev
 
-require_relative 'tags'
+require_relative 'tag_collection'
 # require_relative 'writer'

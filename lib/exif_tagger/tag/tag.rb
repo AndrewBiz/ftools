@@ -10,10 +10,24 @@ module ExifTagger
     class Tag
       include Comparable
 
-      attr_reader :errors, :value
+      attr_reader :errors, :value, :value_invalid
+
+      def initialize(value_norm)
+        @value = value_norm
+        @errors = []
+        @value_invalid = []
+        validate
+        @value.freeze
+        @errors.freeze
+        @value_invalid.freeze
+      end
 
       def tag_id
         self.class.to_s.demodulize.underscore.to_sym
+      end
+
+      def tag_name
+        self.class.to_s.demodulize
       end
 
       def <=>(other)

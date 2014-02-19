@@ -7,5 +7,5 @@ require 'nesty'
 # Foto tools
 module ExifTagger
   class Error < Nesty::NestedStandardError; end
-  class ExiftoolTagger < Error; end
+  class UnknownTag < Error; end
 end
