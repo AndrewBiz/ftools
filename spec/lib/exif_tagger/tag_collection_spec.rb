@@ -43,6 +43,7 @@ describe ExifTagger::TagCollection do
     mytags.delete(:keywords)
 
     expect(mytags[:keywords]).to be_nil
+
     expect(mytags.item(:keywords)).to be_nil
   end
 
@@ -56,33 +57,36 @@ describe ExifTagger::TagCollection do
     mytags = ExifTagger::TagCollection.new
     mytags[:creator] = %w{Andrey\ Bizyaev Matz}
     mytags[:copyright] = %{2014 (c) Andrey Bizyaev. All Rights Reserved.}
-
     mytags[:keywords] = %w{keyword1 keyword2}
+    mytags[:world_region] = %{Europe}
+    mytags[:country] = %{Russia}
+    mytags[:state] = %{State}
+    mytags[:location] = %{Pushkin street 1}
+    gps = { gps_latitude: '55 36 31.49',
+            gps_latitude_ref: 'N',
+            gps_longitude: '37 43 28.27',
+            gps_longitude_ref: 'E',
+            gps_altitude: '170.0',
+            gps_altitude_ref: 'Above Sea Level' }
+    mytags[:gps_created] = gps
+    coll = { collection_name: 'Collection Name',
+             collection_uri: 'www.site.com' }
+    mytags[:collections] = coll
+    mytags[:image_unique_id] = '20140223-003748-0123'
 
     expect(mytags[:creator]).to match_array(%w{Andrey\ Bizyaev Matz})
     expect(mytags[:copyright]).to include(%{2014 (c) Andrey Bizyaev. All Rights Reserved.})
-
     expect(mytags[:keywords]).to match_array(%w{keyword1 keyword2})
+    expect(mytags[:world_region]).to include(%{Europe})
+    expect(mytags[:country]).to include(%{Russia})
+    expect(mytags[:state]).to include(%{State})
+    expect(mytags[:location]).to include(%{Pushkin street 1})
+    expect(mytags[:gps_created]).to eql(gps)
+    expect(mytags[:collections]).to eql(coll)
+    expect(mytags[:image_unique_id]).to include('20140223-003748-0123')
   end
 end
 
-# WorldRegion = -XMP:LocationCreatedWorldRegion=Europe
-#    -XMP-iptcExt:LocationShownWorldRegion
-# -MWG:Country=Russia
-# CountryCode = -XMP-iptcCore:CountryCode=RU
-#    -XMP-iptcExt:LocationShownCountryCode
-# -MWG:State=Москва
-# -MWG:City=Москва
-# -MWG:Location=Вавилова 23
-# -GPSLatitude=" 55 41 49.51"
-# -GPSLatitudeRef=N
-# -GPSLongitude=" 37°34 23.61"
-# -GPSLongitudeRef=E
-# -GPSAltitude=131.0
-# -GPSAltitudeRef=Above Sea Level
-# -XMP-mwg-coll:Collections-={CollectionName=имя коллекции, CollectionURI=www.rbc.ru}
-# -XMP-mwg-coll:Collections+={CollectionName=имя коллекции, CollectionURI=www.rbc.ru}
-# -ImageUniqueID=23232342434
 # -IPTC:CodedCharacterSet=UTF8
 # -EXIF:ModifyDate=now
 

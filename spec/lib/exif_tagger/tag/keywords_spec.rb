@@ -8,44 +8,45 @@ require 'tag/keywords'
 Tag = ExifTagger::Tag::Keywords
 
 describe Tag do
-  it 'saves the value' do
-    val = %w{aaa bbb ааа ббб}
-    tag = Tag.new(val)
+  val1 = %w{aaa bbb ййй ццц}
+  context "when saves the #{val1}" do
+    subject { Tag.new(val1) }
+    its(:value) { should match_array(val1) }
+    its(:to_s) { should include(val1.to_s) }
+    its(:tag_id) { should be(:keywords) }
+    its(:tag_name) { should eq('Keywords') }
+    it { should be_valid }
+    its(:errors) { should  be_empty }
+    its(:value_invalid) { should be_empty }
 
-    expect(tag.value).to match_array(val)
-    expect(tag.to_s).to include(val.to_s)
-    expect(tag.tag_id).to be(:keywords)
-    expect(tag.tag_name).to eq('Keywords')
-    expect(tag).to be_valid
-    expect(tag.errors).to be_empty
-    expect(tag.value_invalid).to be_empty
-
-    script = tag.to_write_script
-    expect(script).to include('-MWG:Keywords-=aaa')
-    expect(script).to include('-MWG:Keywords+=aaa')
-    expect(script).to include('-MWG:Keywords-=bbb')
-    expect(script).to include('-MWG:Keywords+=bbb')
-    expect(script).to include('-MWG:Keywords-=ааа')
-    expect(script).to include('-MWG:Keywords+=ааа')
-    expect(script).to include('-MWG:Keywords-=ббб')
-    expect(script).to include('-MWG:Keywords+=ббб')
+    it 'generates write_script to be used with exiftool' do
+      script = subject.to_write_script
+      expect(script).to include('-MWG:Keywords-=aaa')
+      expect(script).to include('-MWG:Keywords+=aaa')
+      expect(script).to include('-MWG:Keywords-=bbb')
+      expect(script).to include('-MWG:Keywords+=bbb')
+      expect(script).to include('-MWG:Keywords-=ййй')
+      expect(script).to include('-MWG:Keywords+=ййй')
+      expect(script).to include('-MWG:Keywords-=ццц')
+      expect(script).to include('-MWG:Keywords+=ццц')
+    end
   end
 
-  it 'converts value to flat array of strings' do
-    val = ['aaa', ['bbb', 'ааа'], 'ббб', [1, [2, 3]]]
-    val_normal = ['aaa', 'bbb', 'ааа', 'ббб', '1', '2', '3']
-    tag = Tag.new(val)
-
-    expect(tag.value).to match_array(val_normal)
-    expect(tag).to be_valid
-    expect(tag.errors).to be_empty
-    expect(tag.value_invalid).to be_empty
+  val2 = ['www', ['eee', 'rrr'], 'ttt', [1, [2, 3]]]
+  context "when gets a non-flat array as input: #{val2}" do
+    subject { Tag.new(val2) }
+    val_normal = ['www', 'eee', 'rrr', 'ttt', '1', '2', '3']
+    it 'converts the input to the flat array of strings' do
+      expect(subject.value).to match_array(val_normal)
+    end
+    it { should be_valid }
+    its(:errors) { should  be_empty }
+    its(:value_invalid) { should be_empty }
   end
 
-  it 'prevents values and errors to be altered' do
-    val = %w{aaa bbb}
+  it 'prevents its properties to be altered' do
+    val = %w{zzz xxx}
     tag = Tag.new(val)
-
     expect { tag.value << 'newvalue' }.to raise_error(RuntimeError)
     expect { tag.value[0] = 'modvalue' }.to raise_error(RuntimeError)
     expect { tag.value_invalid << 'new invalid value' }.to raise_error(RuntimeError)
@@ -66,7 +67,8 @@ describe Tag do
 
     expect(tag.value).to match_array(val_ok)
     expect(tag.valid?).to be_false
-    expect(tag.value_invalid.empty?).to be_false
+    expect(tag).not_to be_valid
+    expect(tag.value_invalid).not_to be_empty
     expect(tag.value_invalid).to match_array(val_nok)
 
     estr = tag.errors.inspect
