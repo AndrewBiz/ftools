@@ -34,7 +34,7 @@ module FTools
                                                 composite: true,
                                                 timestamps: DateTime)
       rescue
-        raise FTools::Error, "EXIF tags reading - #{e.message} - #{e.cause}"
+        raise FTools::Error, "EXIF tags reading - #{e.message}"
       end
 
       # TMP!

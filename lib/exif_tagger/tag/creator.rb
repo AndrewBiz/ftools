@@ -6,7 +6,7 @@ require_relative 'tag'
 
 module ExifTagger
   module Tag
-    # NMG:Creator, string[0,32]+, List of strings
+    # MWG:Creator, string[0,32]+, List of strings
     #   = EXIF:Artist, IPTC:By-line, XMP-dc:Creator
     class Creator < Tag
       MAX_BYTESIZE = 32
@@ -18,12 +18,8 @@ module ExifTagger
       def to_write_script
         str = ''
         @value.each do |o|
-          # -MWG:Creator-=Andrey Bizyaev (photographer)
-          # -MWG:Creator+=Andrey Bizyaev (photographer)
-          # -MWG:Creator-=Andrey Bizyaev (camera owner)
-          # -MWG:Creator+=Andrey Bizyaev (camera owner)
-          # str << %Q{-MWG:Keywords-=#{o}\n}
-          # str << %Q{-MWG:Keywords+=#{o}\n}
+          str << %Q{-MWG:Creator-=#{o}\n}
+          str << %Q{-MWG:Creator+=#{o}\n}
         end
         str
       end

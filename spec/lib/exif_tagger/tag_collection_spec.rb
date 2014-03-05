@@ -73,6 +73,8 @@ describe ExifTagger::TagCollection do
              collection_uri: 'www.site.com' }
     mytags[:collections] = coll
     mytags[:image_unique_id] = '20140223-003748-0123'
+    mytags[:coded_character_set] = 'UTF8'
+    mytags[:modify_date] = 'now'
 
     expect(mytags[:creator]).to match_array(%w{Andrey\ Bizyaev Matz})
     expect(mytags[:copyright]).to include(%{2014 (c) Andrey Bizyaev. All Rights Reserved.})
@@ -84,11 +86,10 @@ describe ExifTagger::TagCollection do
     expect(mytags[:gps_created]).to eql(gps)
     expect(mytags[:collections]).to eql(coll)
     expect(mytags[:image_unique_id]).to include('20140223-003748-0123')
+    expect(mytags[:coded_character_set]).to include('UTF8')
+    expect(mytags[:modify_date]).to include('now')
   end
 end
-
-# -IPTC:CodedCharacterSet=UTF8
-# -EXIF:ModifyDate=now
 
 # DateTimeOriginal                : 2013-03-07 10:51:07
 # CreateDate                      : 2013-03-07 10:51:07

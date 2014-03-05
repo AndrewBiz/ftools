@@ -16,8 +16,16 @@ module FTools
   end
 
   def self.puts_error(msg, e = nil)
-    STDERR.puts "#{File.basename($PROGRAM_NAME, ".rb")}: #{msg}"
-    STDERR.puts e.backtrace if @debug && !e.nil?
+    prefix = File.basename($PROGRAM_NAME, '.rb')
+    STDERR.puts "#{prefix}: #{msg}"
+    if @debug && !e.nil?
+      if e.respond_to?(:cause) && !e.cause.nil?
+        STDERR.puts "#{prefix}: CAUSE: #{e.cause} - #{e.cause.message}"
+      end
+      e.backtrace.each do |b|
+        STDERR.puts "#{prefix}: BACKTRACE: #{b}"
+      end
+    end
   end
 
   class Error < Nesty::NestedStandardError; end

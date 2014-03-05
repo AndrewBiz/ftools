@@ -2,7 +2,7 @@
 # encoding: UTF-8
 # (c) ANB Andrew Bizyaev
 
-RUBY_VERSION_WANTED = '2.1.0'
+RUBY_VERSION_WANTED = '2.0.0'
 
 begin
   fail "Ruby version must be >= #{RUBY_VERSION_WANTED}" if

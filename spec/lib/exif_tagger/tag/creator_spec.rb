@@ -3,32 +3,28 @@
 # (c) ANB Andrew Bizyaev
 
 require_relative '../../../../spec/spec_helper'
-require 'tag/keywords'
+require 'tag/creator'
 
-Tag = ExifTagger::Tag::Keywords
+Tag = ExifTagger::Tag::Creator
 
 describe Tag do
-  val1 = %w{aaa bbb ййй ццц}
+  val1 = %w{Andrew Natalia}
   context "when saves the #{val1}" do
     subject { Tag.new(val1) }
     its(:value) { should match_array(val1) }
     its(:to_s) { should include(val1.to_s) }
-    its(:tag_id) { should be(:keywords) }
-    its(:tag_name) { should eq('Keywords') }
+    its(:tag_id) { should be(:creator) }
+    its(:tag_name) { should eq('Creator') }
     it { should be_valid }
     its(:errors) { should  be_empty }
     its(:value_invalid) { should be_empty }
 
     it 'generates write_script to be used with exiftool' do
       script = subject.to_write_script
-      expect(script).to include('-MWG:Keywords-=aaa')
-      expect(script).to include('-MWG:Keywords+=aaa')
-      expect(script).to include('-MWG:Keywords-=bbb')
-      expect(script).to include('-MWG:Keywords+=bbb')
-      expect(script).to include('-MWG:Keywords-=ййй')
-      expect(script).to include('-MWG:Keywords+=ййй')
-      expect(script).to include('-MWG:Keywords-=ццц')
-      expect(script).to include('-MWG:Keywords+=ццц')
+      expect(script).to include('-MWG:Creator-=Andrew')
+      expect(script).to include('-MWG:Creator+=Andrew')
+      expect(script).to include('-MWG:Creator-=Natalia')
+      expect(script).to include('-MWG:Creator+=Natalia')
     end
   end
 
@@ -56,12 +52,12 @@ describe Tag do
   context 'when gets invalid values' do
     val_ok = []
     val_ok << 'just test string' # bytesize=16
-    val_ok << '1234567890123456789012345678901234567890123456789012345678901234' # bytesize=64
-    val_ok << 'абвгдеёжзийклмнопрстуфхцчшщъыьэю' # bytesize=64
+    val_ok << '12345678901234567890123456789012' # bytesize=32
+    val_ok << 'абвгдеёжзийклмно' # bytesize=32
     val_nok = []
-    val_nok << '12345678901234567890123456789012345678901234567890123456789012345' # bytesize=65
-    val_nok << 'абвгдеёжзийклмнопрстуфхцчшщъыьэюZ' # bytesize=65
-    val_nok << 'абвгдеёжзийклмнопрстуфхцчшщъыьэюя' # bytesize=66
+    val_nok << '123456789012345678901234567890123' # bytesize=33
+    val_nok << 'абвгдеёжзийклмноZ' # bytesize=33
+    val_nok << 'абвгдеёжзийклмноп' # bytesize=34
 
     subject { Tag.new((val_ok + val_nok).sort) }
     its(:value) { should match_array(val_ok) }
