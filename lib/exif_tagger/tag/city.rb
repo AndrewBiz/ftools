@@ -6,17 +6,17 @@ require_relative 'tag'
 
 module ExifTagger
   module Tag
-    # NMG:Copyright, string[0,128]
-    #   = EXIF:Copyright IPTC:CopyrightNotice XMP-dc:Rights
-    class Copyright < Tag
-      MAX_BYTESIZE = 128
+    # MWG:Country, String[0,32]
+    #   = IPTC:City XMP-photoshop:City XMP-iptcExt:LocationShownCity 
+    class City < Tag
+      MAX_BYTESIZE = 32
 
       def initialize(value_raw = '')
         super(value_raw.to_s)
       end
 
       def to_write_script
-        %Q{-MWG:Copyright=#{@value}\n}
+        %Q{-MWG:City=#{@value}\n}
       end
 
       private

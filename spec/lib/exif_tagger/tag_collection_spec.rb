@@ -61,6 +61,7 @@ describe ExifTagger::TagCollection do
     mytags[:world_region] = %{Europe}
     mytags[:country] = %{Russia}
     mytags[:state] = %{State}
+    mytags[:city] = %{Moscow}
     mytags[:location] = %{Pushkin street 1}
     gps = { gps_latitude: '55 36 31.49',
             gps_latitude_ref: 'N',
@@ -82,6 +83,7 @@ describe ExifTagger::TagCollection do
     expect(mytags[:world_region]).to include(%{Europe})
     expect(mytags[:country]).to include(%{Russia})
     expect(mytags[:state]).to include(%{State})
+    expect(mytags[:city]).to include(%{Moscow})
     expect(mytags[:location]).to include(%{Pushkin street 1})
     expect(mytags[:gps_created]).to eql(gps)
     expect(mytags[:collections]).to eql(coll)

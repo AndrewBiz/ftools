@@ -5,22 +5,25 @@
 require_relative 'tag'
 
 module ExifTagger
+  # Tag
   module Tag
     # Collections (struct+)
     #   CollectionName
     #   CollectionURI
+    VALID_KEYS = [:collection_name, :collection_uri]
+
+    # Collections tag
     class Collections < Tag
       def initialize(value_raw = {})
-        super(value_raw.each { |k, v| value_raw[k] = v.to_s })
+        super
+        # super(value_raw.each { |k, v| value_raw[k] = v.to_s })
       end
 
       def to_write_script
         str = ''
-        @value.each do |o|
-          # -XMP-mwg-coll:Collections-={CollectionName=имя коллекции, CollectionURI=www.rbc.ru}
-          # -XMP-mwg-coll:Collections+={CollectionName=имя коллекции, CollectionURI=www.rbc.ru}
-          # str << %Q{-MWG:Keywords-=#{o}\n}
-          # str << %Q{-MWG:Keywords+=#{o}\n}
+        unless @value.empty?
+          str << %Q{-XMP-mwg-coll:Collections-={CollectionName=#{@value[:collection_name]}, CollectionURI=#{@value[:collection_uri]}}\n}
+          str << %Q{-XMP-mwg-coll:Collections+={CollectionName=#{@value[:collection_name]}, CollectionURI=#{@value[:collection_uri]}}\n}
         end
         str
       end
@@ -29,10 +32,13 @@ module ExifTagger
 
       def validate
         @value.each do |k, v|
-          # @errors << %{#{tag_name}: '#{v}' } +
-          #           %{is #{bsize - MAX_BYTESIZE} bytes longer than allowed #{MAX_BYTESIZE}}
-          # @value_invalid << v
-          # @value = {}
+          unless VALID_KEYS.include? k
+            @errors << %{#{tag_name}: KEY '#{k}' is wrong}
+          end
+        end
+        unless @errors.empty?
+          @value_invalid << @value
+          @value = {}
         end
       end
     end

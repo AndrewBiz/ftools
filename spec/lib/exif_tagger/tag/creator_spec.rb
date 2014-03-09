@@ -5,12 +5,10 @@
 require_relative '../../../../spec/spec_helper'
 require 'tag/creator'
 
-Tag = ExifTagger::Tag::Creator
-
-describe Tag do
+describe ExifTagger::Tag::Creator do
   val1 = %w{Andrew Natalia}
   context "when saves the #{val1}" do
-    subject { Tag.new(val1) }
+    subject { ExifTagger::Tag::Creator.new(val1) }
     its(:value) { should match_array(val1) }
     its(:to_s) { should include(val1.to_s) }
     its(:tag_id) { should be(:creator) }
@@ -30,7 +28,7 @@ describe Tag do
 
   val2 = ['www', ['eee', 'rrr'], 'ttt', [1, [2, 3]]]
   context "when gets a non-flat array as input: #{val2}" do
-    subject { Tag.new(val2) }
+    subject { ExifTagger::Tag::Creator.new(val2) }
     val_normal = ['www', 'eee', 'rrr', 'ttt', '1', '2', '3']
     it 'converts the input to the flat array of strings' do
       expect(subject.value).to match_array(val_normal)
@@ -42,7 +40,7 @@ describe Tag do
 
   it 'prevents its properties to be altered from outside' do
     val = %w{zzz xxx}
-    tag = Tag.new(val)
+    tag = ExifTagger::Tag::Creator.new(val)
     expect { tag.value << 'newvalue' }.to raise_error(RuntimeError)
     expect { tag.value[0] = 'modvalue' }.to raise_error(RuntimeError)
     expect { tag.value_invalid << 'new invalid value' }.to raise_error(RuntimeError)
@@ -59,7 +57,7 @@ describe Tag do
     val_nok << 'абвгдеёжзийклмноZ' # bytesize=33
     val_nok << 'абвгдеёжзийклмноп' # bytesize=34
 
-    subject { Tag.new((val_ok + val_nok).sort) }
+    subject { ExifTagger::Tag::Creator.new((val_ok + val_nok).sort) }
     its(:value) { should match_array(val_ok) }
     it { should_not be_valid }
     its(:value_invalid) { should_not be_empty }

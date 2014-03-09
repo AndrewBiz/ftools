@@ -6,24 +6,18 @@ require_relative 'tag'
 
 module ExifTagger
   module Tag
-    # MWG:Country, String
+    # MWG:Country, String[0,64]
     #   = IPTC:Country-PrimaryLocationName XMP-photoshop:Country
     #       XMP-iptcExt:LocationShownCountryName
     class Country < Tag
       MAX_BYTESIZE = 64
 
-      def initialize(value_raw = [])
+      def initialize(value_raw = '')
         super(value_raw.to_s)
       end
 
       def to_write_script
-        str = ''
-        @value.each do |o|
-          # -MWG:Country=Russia
-          # str << %Q{-MWG:Keywords-=#{o}\n}
-          # str << %Q{-MWG:Keywords+=#{o}\n}
-        end
-        str
+        %Q{-MWG:Country=#{@value}\n}
       end
 
       private
@@ -31,9 +25,9 @@ module ExifTagger
       def validate
         bsize = @value.bytesize
         if bsize > MAX_BYTESIZE
-          @errors << %{#{tag_name}: '#{v}' } +
+          @errors << %{#{tag_name}: '#{@value}' } +
                      %{is #{bsize - MAX_BYTESIZE} bytes longer than allowed #{MAX_BYTESIZE}}
-          @value_invalid << v
+          @value_invalid << @value
           @value = ''
         end
       end
