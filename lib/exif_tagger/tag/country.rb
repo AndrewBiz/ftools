@@ -17,7 +17,9 @@ module ExifTagger
       end
 
       def to_write_script
-        %Q{-MWG:Country=#{@value}\n}
+        str = ''
+        str << %Q{-MWG:Country=#{@value}\n} unless @value.empty?
+        str
       end
 
       private

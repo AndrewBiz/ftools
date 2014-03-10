@@ -31,16 +31,38 @@ describe ExifTagger::Tag::Collections do
     expect { tag.errors << 'new error' }.to raise_error(RuntimeError)
   end
 
-  context 'when gets invalid values' do
-    val_nok = {coll_name_wrong: 'xyz', coll_uri_wrong: 'xyz'}
-    subject { ExifTagger::Tag::Collections.new(val_nok) }
-    its(:value) { should be_empty }
-    it { should_not be_valid }
-    its(:value_invalid) { should_not be_empty }
-    its(:value_invalid) { should eql([val_nok]) }
-
-    val_nok.each do |k,v|
-      its('errors.inspect') { should include("'#{k.to_s}'") }
+  context 'when gets invalid input' do
+    context 'with unknown key' do
+      val_nok = { coll_name_wrong: 'xyz', collection_uri: 'www.xyz.com' }
+      subject { ExifTagger::Tag::Collections.new(val_nok) }
+      its(:value) { should be_empty }
+      it { should_not be_valid }
+      its(:value_invalid) { should_not be_empty }
+      its(:value_invalid) { should eql([val_nok]) }
+      its('errors.inspect') { should include("'coll_name_wrong' is unknown") }
+      its(:to_write_script) { should be_empty }
     end
+    context 'when mandatory keys are missed' do
+      val_nok = { collection_uri: 'www.xyz.com' }
+      subject { ExifTagger::Tag::Collections.new(val_nok) }
+      its(:value) { should be_empty }
+      it { should_not be_valid }
+      its(:value_invalid) { should_not be_empty }
+      its(:value_invalid) { should eql([val_nok]) }
+      its('errors.inspect') { should include("'collection_name' is missed") }
+      its(:to_write_script) { should be_empty }
+    end
+
+    # val_nok = {coll_name_wrong: 'xyz', coll_uri_wrong: 'xyz'}
+    # subject { ExifTagger::Tag::Collections.new(val_nok) }
+    # its(:value) { should be_empty }
+    # it { should_not be_valid }
+    # its(:value_invalid) { should_not be_empty }
+    # its(:value_invalid) { should eql([val_nok]) }
+    # its(:to_write_script) { should be_empty }
+
+    # val_nok.each do |k,v|
+    #   its('errors.inspect') { should include("'#{k.to_s}'") }
+    # end
   end
 end

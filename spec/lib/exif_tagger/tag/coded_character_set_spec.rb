@@ -39,5 +39,6 @@ describe ExifTagger::Tag::CodedCharacterSet do
     it { should_not be_valid }
     its(:value_invalid) { should_not be_empty }
     its(:value_invalid) { should match_array([val_nok]) }
+    its(:to_write_script) { should be_empty }
   end
 end

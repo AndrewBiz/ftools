@@ -16,7 +16,9 @@ module ExifTagger
       end
 
       def to_write_script
-        %Q{-MWG:Copyright=#{@value}\n}
+        str = ''
+        str << %Q{-MWG:Copyright=#{@value}\n} unless @value.empty?
+        str
       end
 
       private

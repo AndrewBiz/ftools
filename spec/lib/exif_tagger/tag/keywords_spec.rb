@@ -69,9 +69,11 @@ describe ExifTagger::Tag::Keywords do
 
     val_nok.each do |i|
       its('errors.inspect') { should include("'#{i.to_s}'") }
+      its(:to_write_script) { should_not include("#{i.to_s}") }
     end
     val_ok.each do |i|
       its('errors.inspect') { should_not include("'#{i.to_s}'") }
+      its(:to_write_script) { should include("#{i.to_s}") }
     end
   end
 end

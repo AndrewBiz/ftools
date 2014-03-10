@@ -5,18 +5,14 @@
 require_relative 'tag'
 
 module ExifTagger
-  # Tag
   module Tag
     # Collections (struct+)
     #   CollectionName
     #   CollectionURI
-    VALID_KEYS = [:collection_name, :collection_uri]
-
-    # Collections tag
     class Collections < Tag
+      VALID_KEYS = [:collection_name, :collection_uri]
       def initialize(value_raw = {})
         super
-        # super(value_raw.each { |k, v| value_raw[k] = v.to_s })
       end
 
       def to_write_script
@@ -31,10 +27,13 @@ module ExifTagger
       private
 
       def validate
-        @value.each do |k, v|
-          unless VALID_KEYS.include? k
-            @errors << %{#{tag_name}: KEY '#{k}' is wrong}
-          end
+        unknown_keys = @value.keys - VALID_KEYS
+        unknown_keys.each do |k|
+          @errors << %{#{tag_name}: KEY '#{k}' is unknown}
+        end
+        missed_keys = VALID_KEYS - @value.keys
+        missed_keys.each do |k|
+          @errors << %{#{tag_name}: KEY '#{k}' is missed}
         end
         unless @errors.empty?
           @value_invalid << @value

@@ -14,8 +14,11 @@ module ExifTagger
   class TagCollection
     include Enumerable
 
-    def initialize
+    def initialize(init_values = {})
       @collection = []
+      init_values.each do |k, v|
+        self[k] = v
+      end
     end
 
     def each(&block)
@@ -30,7 +33,7 @@ module ExifTagger
 
     def []=(tag, value)
       delete(tag)
-      @collection << produce_tag(tag, value)
+      @collection << produce_tag(tag, value.dup)
     end
 
     def [](tag)

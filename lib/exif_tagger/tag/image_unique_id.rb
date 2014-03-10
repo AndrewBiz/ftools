@@ -8,7 +8,7 @@ module ExifTagger
   module Tag
     # ImageUniqueID, String
     class ImageUniqueId < Tag
-      MAX_BYTESIZE = 64
+      MAX_BYTESIZE = 32 # no limit in EXIF spec
 
       def initialize(value_raw = [])
         super(value_raw.to_s)
@@ -16,11 +16,7 @@ module ExifTagger
 
       def to_write_script
         str = ''
-        @value.each do |o|
-          # -ImageUniqueID=23232342434          
-          # str << %Q{-MWG:Keywords-=#{o}\n}
-          # str << %Q{-MWG:Keywords+=#{o}\n}
-        end
+        str << %Q{-ImageUniqueID=#{@value}\n} unless @value.empty?
         str
       end
 
@@ -29,9 +25,9 @@ module ExifTagger
       def validate
         bsize = @value.bytesize
         if bsize > MAX_BYTESIZE
-          @errors << %{#{tag_name}: '#{v}' } +
+          @errors << %{#{tag_name}: '#{@value}' } +
                      %{is #{bsize - MAX_BYTESIZE} bytes longer than allowed #{MAX_BYTESIZE}}
-          @value_invalid << v
+          @value_invalid << @value
           @value = ''
         end
       end

@@ -50,5 +50,6 @@ describe ExifTagger::Tag::City do
     its(:value_invalid) { should_not be_empty }
     its(:value_invalid) { should match_array([val_nok]) }
     its('errors.inspect') { should include("'#{val_nok.to_s}'") }
+    its(:to_write_script) { should be_empty }
   end
 end

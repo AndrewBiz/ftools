@@ -40,16 +40,52 @@ describe ExifTagger::Tag::GpsCreated do
     expect { tag.errors << 'new error' }.to raise_error(RuntimeError)
   end
 
-  # context 'when gets invalid values' do
-  #   val_nok = {coll_name_wrong: 'xyz', coll_uri_wrong: 'xyz'}
-  #   subject { ExifTagger::Tag::GpsCreated.new(val_nok) }
-  #   its(:value) { should be_empty }
-  #   it { should_not be_valid }
-  #   its(:value_invalid) { should_not be_empty }
-  #   its(:value_invalid) { should eql([val_nok]) }
-
-  #   val_nok.each do |k,v|
-  #     its('errors.inspect') { should include("'#{k.to_s}'") }
-  #   end
-  # end
+  context 'when gets invalid input' do
+    context 'with unknown key' do
+      val_nok = { gps_latitude: '55 36 31.49',
+                  gps_unknown: 'N',
+                  gps_longitude: '37 43 28.27',
+                  gps_longitude_ref: 'E',
+                  gps_altitude: '170.0',
+                  gps_altitude_ref: 'Above Sea Level' }
+      subject { ExifTagger::Tag::GpsCreated.new(val_nok) }
+      its(:value) { should be_empty }
+      it { should_not be_valid }
+      its(:value_invalid) { should_not be_empty }
+      its(:value_invalid) { should eql([val_nok]) }
+      its('errors.inspect') { should include("'gps_unknown' is unknown") }
+      its(:to_write_script) { should be_empty }
+    end
+    context 'when mandatory keys are missed' do
+      val_nok = { gps_latitude: '55 36 31.49',
+                  gps_longitude: '37 43 28.27',
+                  gps_altitude: '170.0',
+                  gps_altitude_ref: 'Above Sea Level' }
+      subject { ExifTagger::Tag::GpsCreated.new(val_nok) }
+      its(:value) { should be_empty }
+      it { should_not be_valid }
+      its(:value_invalid) { should_not be_empty }
+      its(:value_invalid) { should eql([val_nok]) }
+      its('errors.inspect') { should include("'gps_latitude_ref' is missed") }
+      its('errors.inspect') { should include("'gps_longitude_ref' is missed") }
+      its(:to_write_script) { should be_empty }
+    end
+    context 'with wrong key values' do
+      val_nok = { gps_latitude: '55 36 31.49',
+                  gps_latitude_ref: 'X',
+                  gps_longitude: '37 43 28.27',
+                  gps_longitude_ref: 'Y',
+                  gps_altitude: '170.0',
+                  gps_altitude_ref: 'Tralala' }
+      subject { ExifTagger::Tag::GpsCreated.new(val_nok) }
+      its(:value) { should be_empty }
+      it { should_not be_valid }
+      its(:value_invalid) { should_not be_empty }
+      its(:value_invalid) { should eql([val_nok]) }
+      its('errors.inspect') { should include("'gps_latitude_ref' should be") }
+      its('errors.inspect') { should include("'gps_longitude_ref' should be") }
+      its('errors.inspect') { should include("'gps_altitude_ref' should be") }
+      its(:to_write_script) { should be_empty }
+    end
+  end
 end

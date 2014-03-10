@@ -16,7 +16,8 @@ module ExifTagger
 
       def to_write_script
         str = ''
-        str << %Q{-IPTC:CodedCharacterSet=UTF8\n}
+        str << %Q{-IPTC:CodedCharacterSet=#{@value}\n} unless @value.empty?
+        str
       end
 
       private

@@ -3,4 +3,4 @@
 # (c) ANB Andrew Bizyaev
 
 require_relative 'tag_collection'
-# require_relative 'writer'
+require_relative 'writer'

@@ -8,4 +8,5 @@ require 'nesty'
 module ExifTagger
   class Error < Nesty::NestedStandardError; end
   class UnknownTag < Error; end
+  class WriteTag < Error; end
 end

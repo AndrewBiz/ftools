@@ -4,8 +4,9 @@
 
 require_relative 'error'
 require 'date'
+require_relative 'tag_collection'
 
-# Foto tools
+# Exif tagger
 module ExifTagger
   # batch EXIF tags setter
   class Writer
@@ -16,29 +17,13 @@ module ExifTagger
       create_script(memo)
     end
 
-    def create_script(memo)
-      @script = File.open(@script_name, 'w+:utf-8')
-      @script.puts '# exiftool script for batch tag operations'
-      @script.puts "# usage: exiftool -@ #{@script_name}"
-      @script.puts "# #{memo}"
-    rescue => e
-      raise ExiftoolTagger, "creating exiftool script - #{e.message}"
-    end
-
     def add_to_script(ftfile: '', tags: {}, options: [])
-      # MWG:Keywords = IPTC:Keywords, XMP-dc:Subject
-      tags[:keywords].each do |o|
-        @script.puts %Q{-MWG:Keywords-=#{o}}
-        @script.puts %Q{-MWG:Keywords+=#{o}}
+      @script.puts "# ***** Processing file: #{ftfile} *****"
+      # tags
+      tags.each do |k|
+        @script.puts tags.item(k).to_write_script
       end
-      # collection_name and XPSubject
-      @script.puts %Q{-XMP:CollectionName-=#{tags[:collection_name]}}
-      @script.puts %Q{-XMP:CollectionName+=#{tags[:collection_name]}}
-      # collection_uri
-      @script.puts %Q{-XMP:CollectionURI-=#{tags[:collection_uri]}}
-      @script.puts %Q{-XMP:CollectionURI+=#{tags[:collection_uri]}}
-      @script.puts %Q{-IPTC:CodedCharacterSet=#{tags[:coded_character_set]}}
-      @script.puts %Q{-EXIF:ModifyDate=#{tags[:modify_date]}}
+      # file to be altered
       @script.puts %Q{#{ftfile}}
       # General options
       options.each { |o| @script.puts "#{o}" }
@@ -46,13 +31,24 @@ module ExifTagger
       @script.puts
 
     rescue => e
-      raise ExiftoolTagger, "adding instructions to exiftool script - #{e.message}"
+      raise ExifTagger::WriteTag, "adding item to exiftool script - #{e.message}"
     end
 
     def close_script
       @script.close
     rescue => e
-      raise ExiftoolTagger, "closing exiftool script - #{e.message}"
+      raise ExifTagger::WriteTag, "closing exiftool script - #{e.message}"
+    end
+
+    private
+
+    def create_script(memo)
+      @script = File.open(@script_name, 'w+:utf-8')
+      @script.puts '# exiftool script for batch tag operations'
+      @script.puts "# #{memo}"
+      @script.puts "# usage: exiftool -@ #{@script_name}"
+    rescue => e
+      raise ExifTagger::WriteTag, "creating exiftool script - #{e.message}"
     end
   end
 end

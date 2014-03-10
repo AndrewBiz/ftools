@@ -53,7 +53,7 @@ describe ExifTagger::TagCollection do
     expect { mytags[:unknown_tag] = val }.to raise_error(ExifTagger::UnknownTag)
   end
 
-  it 'works with basic exif tags' do
+  it 'saves basic exif tags when they set one-by-one' do
     mytags = ExifTagger::TagCollection.new
     mytags[:creator] = %w{Andrey\ Bizyaev Matz}
     mytags[:copyright] = %{2014 (c) Andrey Bizyaev. All Rights Reserved.}
@@ -87,6 +87,48 @@ describe ExifTagger::TagCollection do
     expect(mytags[:location]).to include(%{Pushkin street 1})
     expect(mytags[:gps_created]).to eql(gps)
     expect(mytags[:collections]).to eql(coll)
+    expect(mytags[:image_unique_id]).to include('20140223-003748-0123')
+    expect(mytags[:coded_character_set]).to include('UTF8')
+    expect(mytags[:modify_date]).to include('now')
+  end
+  it 'saves basic exif tags when they set via initial hash' do
+    mytags = ExifTagger::TagCollection.new(
+      creator: %w{Andrey\ Bizyaev Matz},
+      copyright: %{2014 (c) Andrey Bizyaev},
+      keywords: %w{keyword1 keyword2},
+      world_region: %{Europe},
+      country: %{Russia},
+      state: %{State},
+      city: %{Moscow},
+      location: %{Pushkin street 1},
+      gps_created: { gps_latitude: '55 36 31.49',
+                     gps_latitude_ref: 'N',
+                     gps_longitude: '37 43 28.27',
+                     gps_longitude_ref: 'E',
+                     gps_altitude: '170.0',
+                     gps_altitude_ref: 'Above Sea Level' },
+      collections: { collection_name: 'Collection Name',
+                     collection_uri: 'www.site.com' },
+      image_unique_id: '20140223-003748-0123',
+      coded_character_set: 'UTF8',
+      modify_date: 'now')
+
+    expect(mytags[:creator]).to match_array(%w{Andrey\ Bizyaev Matz})
+    expect(mytags[:copyright]).to include(%{2014 (c) Andrey Bizyaev})
+    expect(mytags[:keywords]).to match_array(%w{keyword1 keyword2})
+    expect(mytags[:world_region]).to include(%{Europe})
+    expect(mytags[:country]).to include(%{Russia})
+    expect(mytags[:state]).to include(%{State})
+    expect(mytags[:city]).to include(%{Moscow})
+    expect(mytags[:location]).to include(%{Pushkin street 1})
+    expect(mytags[:gps_created]).to eql(gps_latitude: '55 36 31.49',
+                                        gps_latitude_ref: 'N',
+                                        gps_longitude: '37 43 28.27',
+                                        gps_longitude_ref: 'E',
+                                        gps_altitude: '170.0',
+                                        gps_altitude_ref: 'Above Sea Level')
+    expect(mytags[:collections]).to eql(collection_name: 'Collection Name',
+                                        collection_uri: 'www.site.com')
     expect(mytags[:image_unique_id]).to include('20140223-003748-0123')
     expect(mytags[:coded_character_set]).to include('UTF8')
     expect(mytags[:modify_date]).to include('now')
