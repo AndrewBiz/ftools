@@ -47,7 +47,7 @@ describe ExifTagger::TagCollection do
     expect(mytags.item(:keywords)).to be_nil
   end
 
-  it 'fails in unknown tag is used' do
+  it 'fails if unknown tag is used' do
     mytags = ExifTagger::TagCollection.new
     val = 'hahaha'
     expect { mytags[:unknown_tag] = val }.to raise_error(ExifTagger::UnknownTag)

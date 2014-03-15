@@ -29,7 +29,7 @@ module FTools
                    "#{VERSION} (core #{VERSION_CORE})")
       @file_type = file_type
       FTools.debug = true if @options_cli['--debug']
-      FTools.puts_error "OPTIONS = #{@options_cli.to_s}" if FTools.debug
+      FTools.puts_error "OPTIONS = #{@options_cli}" if FTools.debug
 
       validate_options
 

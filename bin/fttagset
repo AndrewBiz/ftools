@@ -7,7 +7,7 @@ module FTools
   tool_name = File.basename(__FILE__)
   require_relative "../lib/ftools/#{tool_name}"
 
-  VERSION = '0.1.0'
+  VERSION = '0.2.0'
   # TODO: only supported types - to check
   file_type = FILE_TYPE_IMAGE + FILE_TYPE_VIDEO + FILE_TYPE_AUDIO
   usage = <<DOCOPT
@@ -15,7 +15,7 @@ module FTools
 ftools - *Keep Your Photos In Order* (c) ANB
 ***************************************************
 #{tool_name}, version #{VERSION}, writes EXIF tags into given file(s) using EVENT
-description (event.yml file) and CREATORs and PLACEs database.
+description (event.yml file) and CREATORs and PLACEs directories.
 #{tool_name} can only process files: #{file_type * ','}
 
 Optimized to be used with other *ftools* via pipes.
@@ -28,9 +28,9 @@ Usage:
 
 Options:
   -e EVT --event=EVT     Event profile to use [default: ./event.yml]
-  -c CRT --creators=CRT  CREATORs (authors) database,
+  -c CRT --creators=CRT  CREATORs (authors) directory,
                          yaml format [default: ~/ftools/creators.yml]
-  -p PLC --paces=PLC     PLACESs database,
+  -p PLC --paces=PLC     PLACEs directory,
                          yaml format [default: ~/ftools/places.yml]
   -D --debug    Turn on debugging (verbose) mode
   -h --help     Show this screen.

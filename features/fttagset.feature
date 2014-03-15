@@ -6,8 +6,6 @@ Feature: Set EXIF tags in photo and video files
   As a photographer
   I want to get the given files to be saved with given event tags inside
 
-  # TODO: only supported for tag write files!
-
   #@announce
   Scenario: 00 Default output with -h produces usage information 
     When I successfully run `fttagset -h`
@@ -21,6 +19,10 @@ Feature: Set EXIF tags in photo and video files
     | -h --help                 |
     | --version                 |
     | -v                        |
+    | -e EVT --event=EVT        |
+    | -c CRT --creators=CRT     |
+    | -p PLC --paces=PLC        |
+
 
   #@announce
   Scenario: 01 Output with -v produces version information 
@@ -51,20 +53,55 @@ Feature: Set EXIF tags in photo and video files
 # ImageUniqueID                   : 20130112-O7LS5
 # CodedCharacterSet               : UTF8
 
-  @announce
-  Scenario: 10 The jpg file is saved with core tags set (ASCII charset)
+  # @announce
+  Scenario: 10 Fails with incorrect creators.yml
     Given a directory named "2settag"
     And example file "features/media/events/event.yml" copied to "2settag"
+    And example file "features/media/directories/creators_wrong.yml" copied to file "2settag/creators.yml"
+    And example files from "features/media/renamed" copied to "2settag" named:
+    | 20130103-103254_ANB DSC03313.JPG |
+
+    When I cd to "2settag"
+    And I run `ftls_fttagset`
+
+    Then the exit status should not be 0
+    And the stderr should contain each of:
+    | uuu: :creator:   |
+    | uuu: :copyright: |
+    | cr1: :creator:   |
+    | cr2: :creator:   |
+    | cr3: :creator:   |
+    | cr4: :creator:   |
+    | co1: :copyright: |
+    | co2: :copyright: |
+    And the stderr should not contain any of:
+    | anb: :creator:   |
+    | anb: :copyright: |
+    | cr1: :copyright: |
+    | cr2: :copyright: |
+    | cr3: :copyright: |
+    | cr4: :copyright: |
+    | co1: :creator:   |
+    | co2: :creator:   |
+
+  # @announce
+  Scenario: 20 The jpg file is saved with core tags set (ASCII charset)
+    Given a directory named "2settag"
+    And example file "features/media/events/event.yml" copied to "2settag"
+    And example file "features/media/directories/creators.yml" copied to "2settag"
     And example files from "features/media/renamed" copied to "2settag" named:
     | 20130103-103254_ANB DSC03313.JPG |
 
     When I cd to "2settag"
     And I successfully run `fttags '20130103-103254_ANB DSC03313.JPG'`
-    
+
     Then the stdout from "fttags '20130103-103254_ANB DSC03313.JPG'" should not contain any of:
+    | Creator        |
+    | Copyright      |
     | Keywords       |
     | CollectionName |
     | CollectionURI  |
+
 
     When I successfully run `ftls_fttagset`
 
@@ -72,15 +109,20 @@ Feature: Set EXIF tags in photo and video files
 
     When I successfully run `fttags '20130103-103254_ANB DSC03313.JPG'`
     Then the stdout from "fttags '20130103-103254_ANB DSC03313.JPG'" should contain each of:
-    | CollectionName |
-    | Baltica Travel |
-    | CollectionURI  |
-    | anblab.net     |
-    | Keywords       |
-    | what-travel    |
-    | who-Andrew     |
-    | where-Baltic   |
-    | why-vacation   |
-    | how-fine       |
-    | method-digicam |
+    | Creator                                      |
+    | Andrey Bizyaev (photographer)                |
+    | Andrey Bizyaev (camera owner)                |
+    | Copyright                                    |
+    | 2013 (c) Andrey Bizyaev. All Rights Reserved |
+    | CollectionName                               |
+    | Baltica Travel                               |
+    | CollectionURI                                |
+    | anblab.net                                   |
+    | Keywords                                     |
+    | what-travel                                  |
+    | who-Andrew                                   |
+    | where-Baltic                                 |
+    | why-vacation                                 |
+    | how-fine                                     |
+    | method-digicam                               |
 
