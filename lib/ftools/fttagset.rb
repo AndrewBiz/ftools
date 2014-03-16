@@ -15,9 +15,16 @@ module FTools
 
     def validate_options
       @event = Event.new(@options_cli['--event'])
+
       @creators = ExifTagger::CreatorsDir.new(@options_cli['--creators'])
       fail FTools::Error, @creators.error_message unless @creators.valid?
-      # TODO: validate default tags
+      @places = ExifTagger::PlacesDir.new(@options_cli['--places'])
+      fail FTools::Error, @places.error_message unless @places.valid?
+
+      @place_created = @places[@event.alias_place_created]
+      fail FTools::Error, "Place '#{@event.alias_place_created}' is not found in #{@places.filename}" if @place_created.empty?
+      # TODO: generate default tag_collection
+      # TODO: fail if default tags have errors
     end
 
     def process_before
@@ -46,31 +53,28 @@ module FTools
 
       # initializing tags for the given file
       tags_to_write = ExifTagger::TagCollection.new
-      # TODO: to che if the author exist in creators
-      tags_to_write[:creator] = @creators[ftfile_out.author][:creator]
-      tags_to_write[:copyright] = "#{ftfile_out.date_time.year} #{@creators[ftfile_out.author][:copyright]}"
+
+      author = ftfile_out.author
+      fail "Author '#{author}' is not found in #{@creators.filename}" if @creators[author].empty?
+      tags_to_write[:creator] = @creators[author][:creator]
+      tags_to_write[:copyright] = "#{ftfile_out.date_time.year} #{@creators[author][:copyright]}"
+
       tags_to_write[:keywords] = @event.keywords
-      # tags_to_write[:world_region] = %{Europe}
-      # tags_to_write[:country] = %{Russia}
-      # tags_to_write[:state] = %{State}
-      # tags_to_write[:city] = %{Moscow}
-      # tags_to_write[:location] = %{Pushkin street 1}
-      # gps = { gps_latitude: '55 36 31.49',
-      #  gps_latitude_ref: 'N',
-      #  gps_longitude: '37 43 28.27',
-      #  gps_longitude_ref: 'E',
-      #  gps_altitude: '170.0',
-      #  gps_altitude_ref: 'Above Sea Level' }
-      # tags_to_write[:gps_created] = gps
+      tags_to_write[:world_region] = @place_created[:world_region]
+      tags_to_write[:country] = @place_created[:country]
+      tags_to_write[:country_code] = @place_created[:country_code]
+      tags_to_write[:state] = @place_created[:state]
+      tags_to_write[:city] = @place_created[:city]
+      tags_to_write[:location] = @place_created[:location]
+      tags_to_write[:gps_created] = @place_created[:gps_created]
       tags_to_write[:collections] = { collection_name: @event.title,
                                       collection_uri: @event.uri }
       # tags_to_write[:image_unique_id] = '20140223-003748-0123'
       tags_to_write[:coded_character_set] = 'UTF8'
       tags_to_write[:modify_date] = 'now'
 
-      @writer.add_to_script(ftfile: ftfile_out,
-                            tags: tags_to_write,
-                            options: %w{-v0 -P -overwrite_original -ignoreMinorErrors})
+      @writer.add_to_script(ftfile: ftfile_out, tags: tags_to_write)
+
       ftfile_out
     rescue  => e
       raise FTools::Error, e.message

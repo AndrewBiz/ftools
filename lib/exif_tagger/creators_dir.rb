@@ -26,9 +26,7 @@ module ExifTagger
         raise CreatorsDirectory, "reading '#{@filename}' - #{e.message}"
       end
       validate
-      @filename.freeze
-      @collection.freeze
-      @errors.freeze
+      freeze
     end
 
     def each(&block)
@@ -107,5 +105,15 @@ module ExifTagger
         end
       end
     end
+
+    def freeze
+      @filename.freeze
+      @collection.freeze
+      @collection.each do |key, subkey|
+        subkey.freeze
+        subkey.each { |k, v| v.freeze }
+      end  
+      @errors.freeze
+    end      
   end
 end

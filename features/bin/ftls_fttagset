@@ -1,2 +1,2 @@
 #!/usr/bin/env bash
-ftls|fttagset --creators=./creators.yml
+ftls|fttagset --creators=./creators.yml --places=./places.yml

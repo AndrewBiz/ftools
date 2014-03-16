@@ -41,6 +41,13 @@ describe ExifTagger::CreatorsDir do
       expect(creators['XXX'][:creator]).to be_nil
       expect(creators['xxx'][:copyright]).to be_nil
     end
+
+    it 'prevents its properties to be altered from outside' do
+      expect { creators[:anb][:xxx_tag] = 'new' }.to raise_error(RuntimeError)
+      expect { creators[:anb][:creator] << 'new' }.to raise_error(RuntimeError)
+      expect { creators.filename[0] = 'X' }.to raise_error(RuntimeError)
+      expect { creators.errors << 'new error' }.to raise_error(RuntimeError)
+    end
   end
 
   context 'when gets incorrect yml' do
@@ -65,18 +72,18 @@ describe ExifTagger::CreatorsDir do
       expect(creators.errors).to include(%(cam: :copyright: is MISSED))
     end
 
-     it 'checks creator: value to be valid' do
-       expect(creators).not_to be_valid
-       expect(creators.errors).to include(%(anb: :creator: is WRONG TYPE, expected Array of strings, e.g. ["Creator1", "Creator2"]))
-       expect(creators.errors).to include(%(put: :creator: is EMPTY, expected Array of strings, e.g. ["Creator1", "Creator2"]))
-       expect(creators.errors).to include(%(oba: :creator: has EMPTY parts, expected Array of strings, e.g. ["Creator1", "Creator2"]))
-       expect(creators.errors).to include(%(oba: :creator: has NON-STRING parts, expected Array of strings, e.g. ["Creator1", "Creator2"]))
-     end
+    it 'checks creator: value to be valid' do
+      expect(creators).not_to be_valid
+      expect(creators.errors).to include(%(anb: :creator: is WRONG TYPE, expected Array of strings, e.g. ["Creator1", "Creator2"]))
+      expect(creators.errors).to include(%(put: :creator: is EMPTY, expected Array of strings, e.g. ["Creator1", "Creator2"]))
+      expect(creators.errors).to include(%(oba: :creator: has EMPTY parts, expected Array of strings, e.g. ["Creator1", "Creator2"]))
+      expect(creators.errors).to include(%(oba: :creator: has NON-STRING parts, expected Array of strings, e.g. ["Creator1", "Creator2"]))
+    end
 
     it 'checks copyright: value to be valid' do
-       expect(creators).not_to be_valid
-       expect(creators.errors).to include(%(anb: :copyright: is WRONG TYPE, expected String, e.g. "2014 Copyright"))
-       expect(creators.errors).to include(%(oba: :copyright: is EMPTY, expected String, e.g. "2014 Copyright"))
-     end
+      expect(creators).not_to be_valid
+      expect(creators.errors).to include(%(anb: :copyright: is WRONG TYPE, expected String, e.g. "2014 Copyright"))
+      expect(creators.errors).to include(%(oba: :copyright: is EMPTY, expected String, e.g. "2014 Copyright"))
+    end
   end
 end

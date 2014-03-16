@@ -32,8 +32,10 @@ module ExifTagger
     end
 
     def []=(tag, value)
-      delete(tag)
-      @collection << produce_tag(tag, value.dup)
+      unless value.nil?
+        delete(tag)
+        @collection << produce_tag(tag, value.dup)
+      end
     end
 
     def [](tag)

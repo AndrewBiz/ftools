@@ -21,43 +21,19 @@ Feature: Set EXIF tags in photo and video files
     | -v                        |
     | -e EVT --event=EVT        |
     | -c CRT --creators=CRT     |
-    | -p PLC --paces=PLC        |
-
+    | -p PLC --places=PLC       |
 
   #@announce
   Scenario: 01 Output with -v produces version information 
     When I successfully run `fttagset -v`
     Then the output should match /[0-9]+\.[0-9]+\.[0-9]+ \(core [0-9]+\.[0-9]+\.[0-9]+\)/
 
-
-# DateTimeOriginal                : 2013-01-03 10:32:20
-# CreateDate                      : 2013-01-03 10:32:20
-# ModifyDate                      : 2013-01-12 16:09:06
-# Creator                         : Andrey Bizyaev (photographer), Andrey Bizyaev (camera owner)
-# Copyright                       : 2013 (c) Andrey Bizyaev. All Rights Reserved.
-# +Keywords                        : круиз, путешествие
-# LocationCreatedWorldRegion      : Europe
-# Country                         : Russia
-# CountryCode                     : RU
-# State                           : Санкт-Петербург
-# City                            : Санкт-Петербург
-# Location                        : Дворцовая площадь
-# GPSLatitude                     : 59 56 21.06900000 N
-# GPSLatitudeRef                  : North
-# GPSLongitude                    : 30 18 50.06700000 E
-# GPSLongitudeRef                 : East
-# GPSAltitude                     : 0.5 m Above Sea Level
-# GPSAltitudeRef                  : Above Sea Level
-# +CollectionName                  : Круиз Балтика - Питер
-# -CollectionURI                   : anblab.net/
-# ImageUniqueID                   : 20130112-O7LS5
-# CodedCharacterSet               : UTF8
-
-  # @announce
+  #@announce
   Scenario: 10 Fails with incorrect creators.yml
     Given a directory named "2settag"
     And example file "features/media/events/event.yml" copied to "2settag"
     And example file "features/media/directories/creators_wrong.yml" copied to file "2settag/creators.yml"
+    And example file "features/media/directories/places.yml" copied to "2settag"
     And example files from "features/media/renamed" copied to "2settag" named:
     | 20130103-103254_ANB DSC03313.JPG |
 
@@ -85,10 +61,41 @@ Feature: Set EXIF tags in photo and video files
     | co2: :creator:   |
 
   # @announce
-  Scenario: 20 The jpg file is saved with core tags set (ASCII charset)
+  Scenario: 15 Fails if the PLACE is unknown
+    Given a directory named "2settag"
+    And example file "features/media/events/event.yml" copied to "2settag"
+    And example file "features/media/directories/creators.yml" copied to file "2settag/creators.yml"
+    And example file "features/media/directories/places_wrong.yml" copied to file "2settag/places.yml"
+    And example file "features/media/renamed/20130103-103254_ANB DSC03313.JPG" copied to file "2settag/20130103-103254_ANB DSC03313.JPG"
+
+    When I cd to "2settag"
+    And I run `ftls_fttagset`
+
+    Then the exit status should not be 0
+    Then the stderr should contain each of:
+    | Place 'peterburg' is not found   |
+
+  #@announce
+  Scenario: 20 Rejects update the file if the AUTHOR is unknown
     Given a directory named "2settag"
     And example file "features/media/events/event.yml" copied to "2settag"
     And example file "features/media/directories/creators.yml" copied to "2settag"
+    And example file "features/media/directories/places.yml" copied to "2settag"
+    And example file "features/media/renamed/20130103-103254_ANB DSC03313.JPG" copied to file "2settag/20130103-103254_XXX DSC03313.JPG"
+
+    When I cd to "2settag"
+    And I successfully run `ftls_fttagset`
+
+    Then the stderr should contain each of:
+    | 20130103-103254_XXX DSC03313.JPG |
+    | Author 'XXX' is not found        |
+
+   @announce
+  Scenario: 30 The jpg file is saved with core tags set (ASCII charset)
+    Given a directory named "2settag"
+    And example file "features/media/events/event.yml" copied to "2settag"
+    And example file "features/media/directories/creators.yml" copied to "2settag"
+    And example file "features/media/directories/places.yml" copied to "2settag"
     And example files from "features/media/renamed" copied to "2settag" named:
     | 20130103-103254_ANB DSC03313.JPG |
 
@@ -96,12 +103,25 @@ Feature: Set EXIF tags in photo and video files
     And I successfully run `fttags '20130103-103254_ANB DSC03313.JPG'`
 
     Then the stdout from "fttags '20130103-103254_ANB DSC03313.JPG'" should not contain any of:
-    | Creator        |
-    | Copyright      |
-    | Keywords       |
-    | CollectionName |
-    | CollectionURI  |
-
+    | Creator                  |
+    | Copyright                |
+    | Keywords                 |
+    | CollectionName           |
+    | CollectionURI            |
+    | LocationShownWorldRegion |
+    | Country                  |
+    | CountryCode              |
+    | State                    |
+    | City                     |
+    | Location                 |
+    | GPSLatitude              |
+    | GPSLatitudeRef           |
+    | GPSLongitude             |
+    | GPSLongitudeRef          |
+    | GPSAltitude              |
+    | GPSAltitudeRef           |
+    | CodedCharacterSet        |
+    | UTF8                     |
 
     When I successfully run `ftls_fttagset`
 
@@ -114,10 +134,6 @@ Feature: Set EXIF tags in photo and video files
     | Andrey Bizyaev (camera owner)                |
     | Copyright                                    |
     | 2013 (c) Andrey Bizyaev. All Rights Reserved |
-    | CollectionName                               |
-    | Baltica Travel                               |
-    | CollectionURI                                |
-    | anblab.net                                   |
     | Keywords                                     |
     | what-travel                                  |
     | who-Andrew                                   |
@@ -125,4 +141,56 @@ Feature: Set EXIF tags in photo and video files
     | why-vacation                                 |
     | how-fine                                     |
     | method-digicam                               |
+    | LocationShownWorldRegion                     |
+    | Europe                                       |
+    | Country                                      |
+    | Russia                                       |
+    | LocationShownCountryCode                     |
+    | RU                                           |
+    | State                                        |
+    | Peterburg region                             |
+    | City                                         |
+    | Peterburg                                    |
+    | Location                                     |
+    | Palace square                                |
+    | GPSLatitude                                  |
+    | 59 56 21.069                                 |
+    | GPSLatitudeRef                               |
+    | North                                        |
+    | GPSLongitude                                 |
+    | 30 18 50.067                                 |
+    | GPSLongitudeRef                              |
+    | East                                         |
+    | GPSAltitude                                  |
+    | 0.5                                          |
+    | GPSAltitudeRef                               |
+    | Above Sea Level                              |
+    | CollectionName                               |
+    | Baltica Travel                               |
+    | CollectionURI                                |
+    | anblab.net                                   |
+    | CodedCharacterSet                            |
+    | UTF8                                         |
 
+# -DateTimeOriginal                : 2013-01-03 10:32:20
+# -CreateDate                      : 2013-01-03 10:32:20
+# -ModifyDate                      : 2013-01-12 16:09:06
+# +Creator                         : Andrey Bizyaev (photographer), Andrey Bizyaev (camera owner)
+# +Copyright                       : 2013 (c) Andrey Bizyaev. All Rights Reserved.
+# +Keywords                        : круиз, путешествие
+# +LocationShownWorldRegion        : Europe
+# +Country                         : Russia
+# +LocationShownCountryCode        : RU
+# +State                           : Санкт-Петербург
+# +City                            : Санкт-Петербург
+# +Location                        : Дворцовая площадь
+# +GPSLatitude                     : 59 56 21.06900000 N
+# +GPSLatitudeRef                  : North
+# +GPSLongitude                    : 30 18 50.06700000 E
+# +GPSLongitudeRef                 : East
+# +GPSAltitude                     : 0.5 m Above Sea Level
+# +GPSAltitudeRef                  : Above Sea Level
+# +CollectionName                  : Круиз Балтика - Питер
+# +CollectionURI                   : anblab.net/
+# ImageUniqueID                   : 20130112-O7LS5
+# +CodedCharacterSet               : UTF8

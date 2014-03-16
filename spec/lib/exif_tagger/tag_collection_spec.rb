@@ -6,27 +6,24 @@ require_relative '../../../spec/spec_helper'
 require 'exif_tagger'
 
 describe ExifTagger::TagCollection do
+  let(:mytags) { ExifTagger::TagCollection.new }
 
   it 'saves the tag value' do
-    mytags = ExifTagger::TagCollection.new
-    val_array = %w{aaa bbb ааа ббб}
+    val_array = %w(aaa bbb ааа ббб)
     mytags[:keywords] = val_array
 
     expect(mytags[:keywords]).to match_array(val_array)
   end
 
   it 'could stringify the tags' do
-    mytags = ExifTagger::TagCollection.new
-    val_array = %w{aaa bbb ааа ббб}
+    val_array = %w(aaa bbb ааа ббб)
     mytags[:keywords] = val_array
-
     expect(mytags.to_s).to include(val_array.to_s)
   end
 
   it 'does not dublicate tags' do
-    mytags = ExifTagger::TagCollection.new
-    val1 = %w{aaa bbb}
-    val2 = %w{ccc ddd}
+    val1 = %w(aaa bbb)
+    val2 = %w(ccc ddd)
     mytags[:keywords] = val1
     mytags[:keywords] = val2
 
@@ -35,8 +32,7 @@ describe ExifTagger::TagCollection do
   end
 
   it 'deletes tag from collection' do
-    mytags = ExifTagger::TagCollection.new
-    val = %w{aaa bbb}
+    val = %w(aaa bbb)
     mytags[:keywords] = val
 
     expect(mytags[:keywords]).to match_array(val)
@@ -48,21 +44,25 @@ describe ExifTagger::TagCollection do
   end
 
   it 'fails if unknown tag is used' do
-    mytags = ExifTagger::TagCollection.new
     val = 'hahaha'
     expect { mytags[:unknown_tag] = val }.to raise_error(ExifTagger::UnknownTag)
   end
 
+  it 'accepts and ignores nil value of the tag' do
+    expect { mytags[:keywords] = nil }.not_to raise_error
+    expect(mytags.item(:keywords)).to be_nil
+  end
+
   it 'saves basic exif tags when they set one-by-one' do
-    mytags = ExifTagger::TagCollection.new
-    mytags[:creator] = %w{Andrey\ Bizyaev Matz}
-    mytags[:copyright] = %{2014 (c) Andrey Bizyaev. All Rights Reserved.}
-    mytags[:keywords] = %w{keyword1 keyword2}
-    mytags[:world_region] = %{Europe}
-    mytags[:country] = %{Russia}
-    mytags[:state] = %{State}
-    mytags[:city] = %{Moscow}
-    mytags[:location] = %{Pushkin street 1}
+    mytags[:creator] = %w(Andrey\ Bizyaev Matz)
+    mytags[:copyright] = %(2014 \(c\) Andrey Bizyaev)
+    mytags[:keywords] = %w(keyword1 keyword2)
+    mytags[:world_region] = %(Europe)
+    mytags[:country] = %(Russia)
+    mytags[:country_code] = 'RU'
+    mytags[:state] = %(State)
+    mytags[:city] = %(Moscow)
+    mytags[:location] = %(Pushkin street 1)
     gps = { gps_latitude: '55 36 31.49',
             gps_latitude_ref: 'N',
             gps_longitude: '37 43 28.27',
@@ -77,30 +77,33 @@ describe ExifTagger::TagCollection do
     mytags[:coded_character_set] = 'UTF8'
     mytags[:modify_date] = 'now'
 
-    expect(mytags[:creator]).to match_array(%w{Andrey\ Bizyaev Matz})
-    expect(mytags[:copyright]).to include(%{2014 (c) Andrey Bizyaev. All Rights Reserved.})
-    expect(mytags[:keywords]).to match_array(%w{keyword1 keyword2})
-    expect(mytags[:world_region]).to include(%{Europe})
-    expect(mytags[:country]).to include(%{Russia})
-    expect(mytags[:state]).to include(%{State})
-    expect(mytags[:city]).to include(%{Moscow})
-    expect(mytags[:location]).to include(%{Pushkin street 1})
+    expect(mytags[:creator]).to match_array(%w(Andrey\ Bizyaev Matz))
+    expect(mytags[:copyright]).to include(%(2014 \(c\) Andrey Bizyaev))
+    expect(mytags[:keywords]).to match_array(%w(keyword1 keyword2))
+    expect(mytags[:world_region]).to include(%(Europe))
+    expect(mytags[:country]).to include(%(Russia))
+    expect(mytags[:country_code]).to include('RU')
+    expect(mytags[:state]).to include(%(State))
+    expect(mytags[:city]).to include(%(Moscow))
+    expect(mytags[:location]).to include(%(Pushkin street 1))
     expect(mytags[:gps_created]).to eql(gps)
     expect(mytags[:collections]).to eql(coll)
     expect(mytags[:image_unique_id]).to include('20140223-003748-0123')
     expect(mytags[:coded_character_set]).to include('UTF8')
     expect(mytags[:modify_date]).to include('now')
   end
+
   it 'saves basic exif tags when they set via initial hash' do
     mytags = ExifTagger::TagCollection.new(
-      creator: %w{Andrey\ Bizyaev Matz},
-      copyright: %{2014 (c) Andrey Bizyaev},
-      keywords: %w{keyword1 keyword2},
-      world_region: %{Europe},
-      country: %{Russia},
-      state: %{State},
-      city: %{Moscow},
-      location: %{Pushkin street 1},
+      creator: %w(Andrey\ Bizyaev Matz),
+      copyright: %(2014 \(c\) Andrey Bizyaev),
+      keywords: %w(keyword1 keyword2),
+      world_region: %(Europe),
+      country: %(Russia),
+      country_code: 'RU',
+      state: %(State),
+      city: %(Moscow),
+      location: %(Pushkin street 1),
       gps_created: { gps_latitude: '55 36 31.49',
                      gps_latitude_ref: 'N',
                      gps_longitude: '37 43 28.27',
@@ -113,14 +116,15 @@ describe ExifTagger::TagCollection do
       coded_character_set: 'UTF8',
       modify_date: 'now')
 
-    expect(mytags[:creator]).to match_array(%w{Andrey\ Bizyaev Matz})
-    expect(mytags[:copyright]).to include(%{2014 (c) Andrey Bizyaev})
-    expect(mytags[:keywords]).to match_array(%w{keyword1 keyword2})
-    expect(mytags[:world_region]).to include(%{Europe})
-    expect(mytags[:country]).to include(%{Russia})
-    expect(mytags[:state]).to include(%{State})
-    expect(mytags[:city]).to include(%{Moscow})
-    expect(mytags[:location]).to include(%{Pushkin street 1})
+    expect(mytags[:creator]).to match_array(%w(Andrey\ Bizyaev Matz))
+    expect(mytags[:copyright]).to include(%(2014 (c) Andrey Bizyaev))
+    expect(mytags[:keywords]).to match_array(%w(keyword1 keyword2))
+    expect(mytags[:world_region]).to include(%(Europe))
+    expect(mytags[:country]).to include(%(Russia))
+    expect(mytags[:country_code]).to include('RU')
+    expect(mytags[:state]).to include(%(State))
+    expect(mytags[:city]).to include(%(Moscow))
+    expect(mytags[:location]).to include(%(Pushkin street 1))
     expect(mytags[:gps_created]).to eql(gps_latitude: '55 36 31.49',
                                         gps_latitude_ref: 'N',
                                         gps_longitude: '37 43 28.27',
@@ -141,9 +145,9 @@ end
 # Creator                         : Andrey Bizyaev (photographer), Andrey Bizyaev (camera owner)
 # Copyright                       : 2013 (c) Andrey Bizyaev. All Rights Reserved.
 # Keywords                        : работа, корпоратив, 8 марта,
-# LocationCreatedWorldRegion      : Europe
+# LocationShownWorldRegion      : Europe
 # Country                         : Russia
-# CountryCode                     : RU
+# LocationShownCountryCode        : RU
 # State                           : Москва
 # City                            : Москва
 # Location                        : Вавилова 23
