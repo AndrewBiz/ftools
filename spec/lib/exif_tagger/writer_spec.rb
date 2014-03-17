@@ -11,6 +11,7 @@ describe ExifTagger::Writer do
 
   before :each do
     allow(File).to receive(:open).and_return(mfile)
+    allow(File).to receive(:close).and_return true
   end
 
   it 'knows the exiftool command to be run' do
@@ -22,6 +23,10 @@ describe ExifTagger::Writer do
     expect(mfile.string).to include('exiftool script')
     expect(mfile.string).to include('usage: exiftool -@')
     expect(mfile.string).to include('automatically generated')
+  end
+
+  it 'starts with counter (number of added files) == 0' do
+    expect(writer.counter).to eql 0
   end
 
   it 'adds instructions into script' do
@@ -83,5 +88,46 @@ describe ExifTagger::Writer do
     expect(mfile.string).to include('-overwrite_original')
     expect(mfile.string).to include('-overwrite_original')
     expect(mfile.string).to include('-execute')
+  end
+
+  it 'increments :counter after :add_to_script' do
+    tags2write = ExifTagger::TagCollection.new(
+      creator: %w(Andrey),
+      copyright: %(Andrey Bizyaev),
+      modify_date: 'now')
+
+    writer.add_to_script(ftfile: 'test.jpg', tags: tags2write)
+    expect(writer.counter).to eql 1
+    expect(mfile.string).to include('# **(1)**')
+    writer.add_to_script(ftfile: 'test.jpg', tags: tags2write)
+    expect(writer.counter).to eql 2
+    writer.add_to_script(ftfile: 'test.jpg', tags: tags2write)
+    writer.add_to_script(ftfile: 'test.jpg', tags: tags2write)
+    writer.add_to_script(ftfile: 'test.jpg', tags: tags2write)
+    expect(writer.counter).to eql 5
+    expect(mfile.string).to include('# **(2)**')
+    expect(mfile.string).to include('# **(3)**')
+    expect(mfile.string).to include('# **(4)**')
+    expect(mfile.string).to include('# **(5)**')
+  end
+
+  it 'runs the exiftool script' do
+    tags2write = ExifTagger::TagCollection.new(
+      creator: %w(Andrey),
+      copyright: %(Andrey Bizyaev),
+      modify_date: 'now')
+
+    allow(writer).to receive(:system) { true }
+    writer.add_to_script(ftfile: 'test.jpg', tags: tags2write)
+    expect(writer.counter).to eql 1
+    expect(writer).to receive(:system).once
+    writer.run!
+  end
+
+  it 'does not run the exiftool script if no files were added' do
+    allow(writer).to receive(:system) { true }
+    expect(writer.counter).to eql 0
+    expect(writer).not_to receive(:system)
+    writer.run!
   end
 end
