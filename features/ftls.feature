@@ -133,7 +133,7 @@ Feature: Generate a list of ftools-friendly-files
     | ./capitalized/foto.TIF  |
     | ./capitalized/video.DV  |
     | ./capitalized/video.MOV |
-    When I successfully run `ftls foto_cap.jpg capitalized`
+    When I successfully run `ftls foto_cap.JPG capitalized`
     Then the stdout should contain each of:
     | foto_cap. |
     | foto.TIF  |
