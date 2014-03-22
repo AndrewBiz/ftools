@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby -U
+#!/usr/bin/env ruby
 # encoding: UTF-8
 # (c) ANB Andrew Bizyaev
 require_relative 'os'

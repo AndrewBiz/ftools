@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby -w -U
+#!/usr/bin/env ruby
 # encoding: UTF-8
 # (c) ANB Andrew Bizyaev
 
