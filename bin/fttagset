@@ -29,9 +29,9 @@ Usage:
 Options:
   -e EVT --event=EVT     Event profile to use [default: ./event.yml]
   -c CRT --creators=CRT  CREATORs (authors) directory,
-                         yaml format [default: ~/ftools/creators.yml]
+                         yaml format [default: #{ENV['HOME']}/ftools/creators.yml]
   -p PLC --places=PLC    PLACEs directory,
-                         yaml format [default: ~/ftools/places.yml]
+                         yaml format [default: #{ENV['HOME']}/ftools/places.yml]
   -D --debug    Turn on debugging (verbose) mode
   -h --help     Show this screen.
   -v --version  Show version.
