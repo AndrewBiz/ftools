@@ -91,6 +91,8 @@ describe ExifTagger::TagCollection do
     expect(mytags[:image_unique_id]).to include('20140223-003748-0123')
     expect(mytags[:coded_character_set]).to include('UTF8')
     expect(mytags[:modify_date]).to include('now')
+    expect(mytags).to be_valid
+    expect(mytags.error_message).to be_empty
   end
 
   it 'saves basic exif tags when they set via initial hash' do
@@ -136,6 +138,22 @@ describe ExifTagger::TagCollection do
     expect(mytags[:image_unique_id]).to include('20140223-003748-0123')
     expect(mytags[:coded_character_set]).to include('UTF8')
     expect(mytags[:modify_date]).to include('now')
+    expect(mytags).to be_valid
+    expect(mytags.error_message).to be_empty
+  end
+
+  context 'when receives wrong tag values' do
+    subject do
+      ExifTagger::TagCollection.new(
+        world_region: %(Europe),
+        country: %(Russia),
+        state: %(State),
+        city: %(Very_very_long_name_of_the_supur_puper_city),
+        location: %(Location_too_long123123456789012345))
+    end
+    it { should_not be_valid }
+    its(:error_message) { should include('Very_very_long_name_of_the_supur_puper_city') }
+    its(:error_message) { should include('Location_too_long123123456789012345') }
   end
 end
 

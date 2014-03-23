@@ -52,6 +52,23 @@ module ExifTagger
       @collection.delete(tag)
     end
 
+    def valid?
+      ok = true
+      @collection.each { |i| ok &&= i.valid? }
+      ok
+    end
+
+    def error_message
+      str = ''
+      unless valid?
+        str = "Tags are NOT VALID:\n"
+        @collection.each do |item|
+          item.errors.each { |e| str << '    ' + e + "\n" }
+        end
+      end
+      str
+    end
+
     private
 
     def produce_tag(tag, value)

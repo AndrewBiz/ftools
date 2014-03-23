@@ -72,4 +72,20 @@ describe ExifTagger::Tag::Creator do
       its(:to_write_script) { should include("#{i.to_s}") }
     end
   end
+
+  context 'when gets invalid values in cyrilic' do
+    subject do
+      ExifTagger::Tag::Creator.new([
+        'good',
+        'Бизяев Андрей Николаевич'])
+    end
+    its(:value) { should match_array(['good']) }
+    it { should_not be_valid }
+    its(:value_invalid) { should_not be_empty }
+    its(:value_invalid) { should match_array(['Бизяев Андрей Николаевич']) }
+    its('errors.inspect') { should include("'Бизяев Андрей Николаевич'") }
+    its('errors.inspect') { should_not include("'good'") }
+    its(:to_write_script) { should include('good') }
+    its(:to_write_script) { should_not include('Бизяев Андрей Николаевич') }
+  end
 end

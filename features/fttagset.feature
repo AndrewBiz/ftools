@@ -75,6 +75,22 @@ Feature: Set EXIF tags in photo and video files
     Then the stderr should contain each of:
     | Place 'peterburg' is not found   |
 
+  # @announce
+  Scenario: 17 Fails if the default tags are not valid
+    Given a directory named "2settag"
+    And example file "features/media/events/event-RU-wrong.yml" copied to file "2settag/event.yml"
+    And example file "features/media/directories/creators.yml" copied to file "2settag/creators.yml"
+    And example file "features/media/directories/places-RU-wrong.yml" copied to file "2settag/places.yml"
+    And example file "features/media/renamed/20130103-103254_ANB DSC03313.JPG" copied to file "2settag/20130103-103254_ANB DSC03313.JPG"
+
+    When I cd to "2settag"
+    And I run `ftls_fttagset`
+
+    Then the exit status should not be 0
+    Then the stderr should contain each of:
+    | Балтийское море - очень неспокойное осенью |
+    | Дворцовая площадь дом 1                    |
+
   #@announce
   Scenario: 20 Rejects update the file if the AUTHOR is unknown
     Given a directory named "2settag"
@@ -90,7 +106,22 @@ Feature: Set EXIF tags in photo and video files
     | 20130103-103254_XXX DSC03313.JPG |
     | Author 'XXX' is not found        |
 
-   @announce
+  # @announce
+  Scenario: 22 Rejects update the file if the AUTHOR is invalid
+    Given a directory named "2settag"
+    And example file "features/media/events/event.yml" copied to "2settag"
+    And example file "features/media/directories/creators-RU-wrong.yml" copied to file "2settag/creators.yml"
+    And example file "features/media/directories/places.yml" copied to "2settag"
+    And example file "features/media/renamed/20130103-103254_ANB DSC03313.JPG" copied to "2settag"
+
+    When I cd to "2settag"
+    And I successfully run `ftls_fttagset`
+
+    Then the stderr should contain each of:
+    | 20130103-103254_ANB DSC03313.JPG |
+    | Андрей Николаевич Бизяев         |
+
+  # @announce
   Scenario: 30 The jpg file is saved with core tags set (ASCII charset)
     Given a directory named "2settag"
     And example file "features/media/events/event.yml" copied to "2settag"
@@ -171,6 +202,7 @@ Feature: Set EXIF tags in photo and video files
     | anblab.net                                   |
     | CodedCharacterSet                            |
     | UTF8                                         |
+    And the output should match /^ImageUniqueID *: (\d{8}-\S+)/
 
 # -DateTimeOriginal                : 2013-01-03 10:32:20
 # -CreateDate                      : 2013-01-03 10:32:20
