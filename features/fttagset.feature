@@ -34,8 +34,7 @@ Feature: Set EXIF tags in photo and video files
     And example file "features/media/events/event.yml" copied to "2settag"
     And example file "features/media/directories/creators_wrong.yml" copied to file "2settag/creators.yml"
     And example file "features/media/directories/places.yml" copied to "2settag"
-    And example files from "features/media/renamed" copied to "2settag" named:
-    | 20130103-103254_ANB DSC03313.JPG |
+    And example file "features/media/renamed/20130103-103254_ANB DSC03313_notagset.JPG" copied to file "2settag/20130103-103254_ANB DSC03313.JPG"
 
     When I cd to "2settag"
     And I run `ftls_fttagset`
@@ -66,7 +65,7 @@ Feature: Set EXIF tags in photo and video files
     And example file "features/media/events/event.yml" copied to "2settag"
     And example file "features/media/directories/creators.yml" copied to file "2settag/creators.yml"
     And example file "features/media/directories/places_wrong.yml" copied to file "2settag/places.yml"
-    And example file "features/media/renamed/20130103-103254_ANB DSC03313.JPG" copied to file "2settag/20130103-103254_ANB DSC03313.JPG"
+    And example file "features/media/renamed/20130103-103254_ANB DSC03313_notagset.JPG" copied to file "2settag/20130103-103254_ANB DSC03313.JPG"
 
     When I cd to "2settag"
     And I run `ftls_fttagset`
@@ -81,7 +80,7 @@ Feature: Set EXIF tags in photo and video files
     And example file "features/media/events/event-RU-wrong.yml" copied to file "2settag/event.yml"
     And example file "features/media/directories/creators.yml" copied to file "2settag/creators.yml"
     And example file "features/media/directories/places-RU-wrong.yml" copied to file "2settag/places.yml"
-    And example file "features/media/renamed/20130103-103254_ANB DSC03313.JPG" copied to file "2settag/20130103-103254_ANB DSC03313.JPG"
+    And example file "features/media/renamed/20130103-103254_ANB DSC03313_notagset.JPG" copied to file "2settag/20130103-103254_ANB DSC03313.JPG"
 
     When I cd to "2settag"
     And I run `ftls_fttagset`
@@ -97,7 +96,7 @@ Feature: Set EXIF tags in photo and video files
     And example file "features/media/events/event.yml" copied to "2settag"
     And example file "features/media/directories/creators.yml" copied to "2settag"
     And example file "features/media/directories/places.yml" copied to "2settag"
-    And example file "features/media/renamed/20130103-103254_ANB DSC03313.JPG" copied to file "2settag/20130103-103254_XXX DSC03313.JPG"
+    And example file "features/media/renamed/20130103-103254_ANB DSC03313_notagset.JPG" copied to file "2settag/20130103-103254_XXX DSC03313.JPG"
 
     When I cd to "2settag"
     And I successfully run `ftls_fttagset`
@@ -112,7 +111,7 @@ Feature: Set EXIF tags in photo and video files
     And example file "features/media/events/event.yml" copied to "2settag"
     And example file "features/media/directories/creators-RU-wrong.yml" copied to file "2settag/creators.yml"
     And example file "features/media/directories/places.yml" copied to "2settag"
-    And example file "features/media/renamed/20130103-103254_ANB DSC03313.JPG" copied to "2settag"
+    And example file "features/media/renamed/20130103-103254_ANB DSC03313_notagset.JPG" copied to file "2settag/20130103-103254_ANB DSC03313.JPG"
 
     When I cd to "2settag"
     And I successfully run `ftls_fttagset`
@@ -127,8 +126,7 @@ Feature: Set EXIF tags in photo and video files
     And example file "features/media/events/event.yml" copied to "2settag"
     And example file "features/media/directories/creators.yml" copied to "2settag"
     And example file "features/media/directories/places.yml" copied to "2settag"
-    And example files from "features/media/renamed" copied to "2settag" named:
-    | 20130103-103254_ANB DSC03313.JPG |
+    And example file "features/media/renamed/20130103-103254_ANB DSC03313_notagset.JPG" copied to file "2settag/20130103-103254_ANB DSC03313.JPG"
 
     When I cd to "2settag"
     And I successfully run `fttags '20130103-103254_ANB DSC03313.JPG'`
@@ -203,6 +201,139 @@ Feature: Set EXIF tags in photo and video files
     | CodedCharacterSet                            |
     | UTF8                                         |
     And the output should match /^ImageUniqueID *: (\d{8}-\S+)/
+
+  @announce
+  Scenario: 40 The existing tags in the JPG file will not be owerwritten
+
+    Given a directory named "2settag"
+    And example file "features/media/events/event-overwrite.yml" copied to file "2settag/event.yml"
+    And example file "features/media/directories/creators-overwrite.yml" copied to file "2settag/creators.yml"
+    And example file "features/media/directories/places-overwrite.yml" copied to file "2settag/places.yml"
+    And example file "features/media/renamed/20130103-153908_ANB DSC03403_alltagset.JPG" copied to file "2settag/20130103-153908_ANB DSC03403.JPG"
+
+    When I cd to "2settag"
+    And I successfully run `fttags '20130103-153908_ANB DSC03403.JPG'`
+
+    Then the stdout from "fttags '20130103-153908_ANB DSC03403.JPG'" should contain each of:
+    | Creator                                       |
+    | Andrey Bizyaev (photographer)                 |
+    | Andrey Bizyaev (camera owner)                 |
+    | Copyright                                     |
+    | 2013 (c) Andrey Bizyaev. All Rights Reserved. |
+    | Keywords                                      |
+    | before-what-travel                            |
+    | before-who-Andrew                             |
+    | before-where-Baltic                           |
+    | before-when-day                               |
+    | before-why-vacation                           |
+    | before-how-fine                               |
+    | before-method-digicam                         |
+    | LocationShownWorldRegion                      |
+    | Europe                                        |
+    | Country                                       |
+    | Russia                                        |
+    | LocationShownCountryCode                      |
+    | RU                                            |
+    | State                                         |
+    | Санкт-Петербург                               |
+    | City                                          |
+    | Санкт-Петербург                               |
+    | Location                                      |
+    | Дворцовая пл.                                 |
+    | GPSLatitude                                   |
+    | 60 0 0.00000000                               |
+    | GPSLatitudeRef                                |
+    | North                                         |
+    | GPSLongitude                                  |
+    | 25 0 0.00000000                               |
+    | GPSLongitudeRef                               |
+    | East                                          |
+    | GPSAltitude                                   |
+    | 0.5 m                                         |
+    | GPSAltitudeRef                                |
+    | Above Sea Level                               |
+    | CollectionName                                |
+    | S-Peterburg Travel                            |
+    | CollectionURI                                 |
+    | anblab.net                                    |
+    | ImageUniqueID                                 |
+    | 20140402-205030-0001                          |
+    | CodedCharacterSet                             |
+    | UTF8                                          |
+
+    When I successfully run `ftls_fttagset`
+
+    Then the stdout from "ftls_fttagset" should contain "20130103-153908_ANB DSC03403.JPG"
+
+    When I successfully run `fttags '20130103-153908_ANB DSC03403.JPG'`
+    Then the stdout from "fttags '20130103-153908_ANB DSC03403.JPG'" should contain each of:
+    | Creator                                       |
+    | Andrey Bizyaev (photographer)                 |
+    | Andrey Bizyaev (camera owner)                 |
+    | Copyright                                     |
+    | 2013 (c) Andrey Bizyaev. All Rights Reserved. |
+    | Keywords                                      |
+    | before-what-travel                            |
+    | before-who-Andrew                             |
+    | before-where-Baltic                           |
+    | before-when-day                               |
+    | before-why-vacation                           |
+    | before-how-fine                               |
+    | before-method-digicam                         |
+    | what-to_be_added                              |
+    | who-to_be_added                               |
+    | where-to_be_added                             |
+    | when-to_be_added                              |
+    | why-to_be_added                               |
+    | how-to_be_added                               |
+    | method-to_be_added                            |
+    | LocationShownWorldRegion                      |
+    | Europe                                        |
+    | Country                                       |
+    | Russia                                        |
+    | LocationShownCountryCode                      |
+    | RU                                            |
+    | State                                         |
+    | Санкт-Петербург                               |
+    | City                                          |
+    | Санкт-Петербург                               |
+    | Location                                      |
+    | Дворцовая пл.                                 |
+    | GPSLatitude                                   |
+    | 60 0 0.00000000                               |
+    | GPSLatitudeRef                                |
+    | North                                         |
+    | GPSLongitude                                  |
+    | 25 0 0.00000000                               |
+    | GPSLongitudeRef                               |
+    | East                                          |
+    | GPSAltitude                                   |
+    | 0.5 m                                         |
+    | GPSAltitudeRef                                |
+    | Above Sea Level                               |
+    | CollectionName                                |
+    | S-Peterburg Travel                            |
+    | CollectionURI                                 |
+    | anblab.net                                    |
+    | ImageUniqueID                                 |
+    | 20140402-205030-0001                          |
+    | CodedCharacterSet                             |
+    | UTF8                                          |
+
+    And the stdout from "fttags '20130103-153908_ANB DSC03403.JPG'" should not contain any of:
+    | Arnold Schwarzenegger   |
+    | (c) Arny                |
+    | Asiopa                  |
+    | Xland                   |
+    | XX                      |
+    | Xxxsheer                |
+    | Nsk                     |
+    | Far market              |
+    | 19 19 00                |
+    | 20 20 00                |
+    | 888                     |
+    | title_to_be_overwritten |
+    | uri_to_be_overwritten   |
 
 # -DateTimeOriginal                : 2013-01-03 10:32:20
 # -CreateDate                      : 2013-01-03 10:32:20

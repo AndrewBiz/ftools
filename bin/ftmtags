@@ -1,0 +1,33 @@
+#!/usr/bin/env ruby
+# encoding: UTF-8
+# (c) ANB Andrew Bizyaev
+
+# Foto processing tools
+module FTools
+  tool_name = File.basename(__FILE__)
+  require_relative "../lib/ftools/#{tool_name}"
+
+  VERSION = '0.1.0'
+
+  file_type = FILE_TYPE_IMAGE + FILE_TYPE_VIDEO + FILE_TYPE_AUDIO
+  usage = <<DOCOPT
+***************************************************
+ftools - *Keep Your Photos In Order* (c) ANB
+***************************************************
+#{tool_name}, version #{VERSION}, shows EXIF tag values
+Optimized to be used with other *ftools* via pipes.
+Example: ftls | #{tool_name}
+
+Usage:
+  #{tool_name} [-D]
+  #{tool_name} -h | --help
+  #{tool_name} -v | --version
+
+Options:
+  -D --debug           Turn on debugging (verbose) mode
+  -h --help            Show this screen.
+  -v --version         Show version.
+DOCOPT
+
+  FTools.const_get(tool_name.capitalize).new(usage, file_type).run!
+end

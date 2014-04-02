@@ -66,8 +66,8 @@ Feature: Pack files to events
     Given a directory named "2event"
     And example file "features/media/events/event.yml" copied to "2event"
     And example files from "features/media/renamed" copied to "2event" named:
-    | 20130103-103254_ANB DSC03313.JPG |
-    | 20130103-153908_ANB DSC03403.JPG |
+    | 20130103-103254_ANB DSC03313_notagset.JPG |
+    | 20130103-153908_ANB DSC03403_alltagset.JPG |
     | 20130104-120745_ANB DSC03499.JPG |
     | 20130105-150446_ANB DSC03802.JPG |
     | 20130107-115201_ANB DSC04032.JPG |
@@ -77,20 +77,20 @@ Feature: Pack files to events
     Then a directory named "20130102-08_01 Baltica Travel" should exist
     And a file named "20130102-08_01 Baltica Travel/event.yml" should exist 
     And the stdout should contain each of:
-    | 20130103-103254_ANB DSC03313.JPG |
-    | 20130103-153908_ANB DSC03403.JPG |
+    | 20130103-103254_ANB DSC03313_notagset.JPG |
+    | 20130103-153908_ANB DSC03403_alltagset.JPG |
     | 20130104-120745_ANB DSC03499.JPG |
     | 20130105-150446_ANB DSC03802.JPG |
     | 20130107-115201_ANB DSC04032.JPG |
     And the following files should not exist:
-    | ./20130103-103254_ANB DSC03313.JPG |
-    | ./20130103-153908_ANB DSC03403.JPG |
+    | ./20130103-103254_ANB DSC03313_notagset.JPG |
+    | ./20130103-153908_ANB DSC03403_alltagset.JPG |
     | ./20130104-120745_ANB DSC03499.JPG |
     | ./20130105-150446_ANB DSC03802.JPG |
     | ./20130107-115201_ANB DSC04032.JPG |
     And the following files should exist:
-    | ./20130102-08_01 Baltica Travel/20130103-103254_ANB DSC03313.JPG |
-    | ./20130102-08_01 Baltica Travel/20130103-153908_ANB DSC03403.JPG |
+    | ./20130102-08_01 Baltica Travel/20130103-103254_ANB DSC03313_notagset.JPG |
+    | ./20130102-08_01 Baltica Travel/20130103-153908_ANB DSC03403_alltagset.JPG |
     | ./20130102-08_01 Baltica Travel/20130104-120745_ANB DSC03499.JPG |
     | ./20130102-08_01 Baltica Travel/20130105-150446_ANB DSC03802.JPG |
     | ./20130102-08_01 Baltica Travel/20130107-115201_ANB DSC04032.JPG |
@@ -100,8 +100,8 @@ Feature: Pack files to events
     Given a directory named "2event"
     And example file "features/media/events/event.yml" copied to "2event"
     And example files from "features/media/renamed" copied to "2event" named:
-    | 20130103-103254_ANB DSC03313.JPG |
-    | 20130103-153908_ANB DSC03403.JPG |
+    | 20130103-103254_ANB DSC03313_notagset.JPG |
+    | 20130103-153908_ANB DSC03403_alltagset.JPG |
     | 20130104-120745_ANB DSC03499.JPG |
     | 20130105-150446_ANB DSC03802.JPG |
     | 20130107-115201_ANB DSC04032.JPG |
@@ -112,20 +112,20 @@ Feature: Pack files to events
     Then a directory named "parent/20130102-08_01 Baltica Travel" should exist
     And a file named "parent/20130102-08_01 Baltica Travel/event.yml" should exist 
     And the stdout should contain each of:
-    | 20130103-103254_ANB DSC03313.JPG |
-    | 20130103-153908_ANB DSC03403.JPG |
+    | 20130103-103254_ANB DSC03313_notagset.JPG |
+    | 20130103-153908_ANB DSC03403_alltagset.JPG |
     | 20130104-120745_ANB DSC03499.JPG |
     | 20130105-150446_ANB DSC03802.JPG |
     | 20130107-115201_ANB DSC04032.JPG |
     And the following files should not exist:
-    | ./20130103-103254_ANB DSC03313.JPG |
-    | ./20130103-153908_ANB DSC03403.JPG |
+    | ./20130103-103254_ANB DSC03313_notagset.JPG |
+    | ./20130103-153908_ANB DSC03403_alltagset.JPG |
     | ./20130104-120745_ANB DSC03499.JPG |
     | ./20130105-150446_ANB DSC03802.JPG |
     | ./20130107-115201_ANB DSC04032.JPG |
     And the following files should exist:
-    | parent/20130102-08_01 Baltica Travel/20130103-103254_ANB DSC03313.JPG   |
-    | parent/20130102-08_01 Baltica Travel/20130103-153908_ANB DSC03403.JPG   |
+    | parent/20130102-08_01 Baltica Travel/20130103-103254_ANB DSC03313_notagset.JPG   |
+    | parent/20130102-08_01 Baltica Travel/20130103-153908_ANB DSC03403_alltagset.JPG   |
     | parent/20130102-08_01 Baltica Travel/20130104-120745_ANB DSC03499.JPG   |
     | parent/20130102-08_01 Baltica Travel/20130105-150446_ANB DSC03802.JPG   |
     | parent/20130102-08_01 Baltica Travel/20130107-115201_ANB DSC04032.JPG   |
@@ -135,7 +135,7 @@ Feature: Pack files to events
     Given a directory named "2event"
     And example file "features/media/events/20130104-event.yml" copied to "2event"
     And example files from "features/media/renamed" copied to "2event" named:
-    | 20130103-153908_ANB DSC03403.JPG |
+    | 20130103-153908_ANB DSC03403_alltagset.JPG |
     | 20130104-120745_ANB DSC03499.JPG |
     | 20130105-150446_ANB DSC03802.JPG |
     | 20130107-115201_ANB DSC04032.JPG |
@@ -147,25 +147,25 @@ Feature: Pack files to events
     And the stdout should contain each of:
     | 20130104-120745_ANB DSC03499.JPG |
     And the stdout should not contain any of:
-    | 20130103-153908_ANB DSC03403.JPG |
+    | 20130103-153908_ANB DSC03403_alltagset.JPG |
     | 20130105-150446_ANB DSC03802.JPG |
     | 20130107-115201_ANB DSC04032.JPG |
     And the stderr should not contain any of:
     | 20130104-120745_ANB DSC03499.JPG |
     And the stderr should contain each of:
-    | 20130103-153908_ANB DSC03403.JPG |
+    | 20130103-153908_ANB DSC03403_alltagset.JPG |
     | 20130105-150446_ANB DSC03802.JPG |
     | 20130107-115201_ANB DSC04032.JPG |
     And the following files should not exist:
     | ./20130104-120745_ANB DSC03499.JPG |
     And the following files should exist:
-    | ./20130103-153908_ANB DSC03403.JPG |
+    | ./20130103-153908_ANB DSC03403_alltagset.JPG |
     | ./20130105-150446_ANB DSC03802.JPG |
     | ./20130107-115201_ANB DSC04032.JPG |
     And the following files should exist:
     | ./20130104 Baltica Travel/20130104-120745_ANB DSC03499.JPG |
     And the following files should not exist:
-    | ./20130104 Baltica Travel/20130103-153908_ANB DSC03403.JPG |
+    | ./20130104 Baltica Travel/20130103-153908_ANB DSC03403_alltagset.JPG |
     | ./20130104 Baltica Travel/20130105-150446_ANB DSC03802.JPG |
     | ./20130104 Baltica Travel/20130107-115201_ANB DSC04032.JPG |
  

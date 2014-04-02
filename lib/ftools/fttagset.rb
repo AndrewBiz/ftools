@@ -54,13 +54,58 @@ module FTools
       ftfile_out = ftfile.clone
 
       begin
-        tags_original = MiniExiftool.new(ftfile.filename, replace_invalid_chars: true,
-                                       composite: true,
-                                       timestamps: DateTime)
+        tags_original = MiniExiftool.new(ftfile.filename,
+                                         replace_invalid_chars: true,
+                                         composite: true,
+                                         timestamps: DateTime)
+        # tags_original.values.each { |k, v| puts "#{k}=#{v}" }
       rescue
         raise FTools::Error, "EXIF tags reading - #{e.message}"
       end
 
+      # artist=Andrey Bizyaev (photographer); Andrey Bizyaev (camera owner)
+      # creator=["Andrey Bizyaev (photographer)", "Andrey Bizyaev (camera owner)"]
+      # byline=["Andrey Bizyaev (photographer)", "Andrey Bizyaev (camera owner)"]
+
+      # copyright=2013 (c) Andrey Bizyaev. All Rights Reserved.
+      # rights=2013 (c) Andrey Bizyaev. All Rights Reserved.
+      # copyrightnotice=2013 (c) Andrey Bizyaev. All Rights Reserved.
+
+      # subject=["before-what-travel", "before-who-Andrew", "before-where-Baltic", "before-when-day", "before-why-vacation", "before-how-fine", "before-method-digicam"]
+      # keywords=["before-what-travel", "before-who-Andrew", "before-where-Baltic", "before-when-day", "before-why-vacation", "before-how-fine", "before-method-digicam"]
+
+      # gpsposition=60 deg 0' 0.00" N, 25 deg 0' 0.00" E
+      # gpslatitude=60 deg 0' 0.00" N
+      # gpslatituderef=North
+      # gpslongitude=25 deg 0' 0.00" E
+      # gpslongituderef=East
+      # gpsaltitude=0.5 m Above Sea Level
+      # gpsaltituderef=Above Sea Level
+
+      # locationshownworldregion=Europe
+
+      # locationshowncountryname=Russia
+      # countryprimarylocationname=Russia
+      # country=Russia
+
+      # locationshowncountrycode=RU
+
+      # locationshownprovincestate=Санкт-Петербург
+      # state=Санкт-Петербург
+      # provincestate=Санкт-Петербург
+
+      # locationshowncity=Санкт-Петербург
+      # city=Санкт-Петербург
+
+      # location=Дворцовая пл.
+      # locationshownsublocation=Дворцовая пл.
+      # sublocation=Дворцовая пл.
+
+      # collectionname=S-Peterburg Travel
+      # collectionuri=anblab.net
+
+      # imageuniqueid=20140402-205030-0001
+      # codedcharacterset=UTF8
 
       # initializing tags for the given file
       tags_to_write = ExifTagger::TagCollection.new
