@@ -6,6 +6,11 @@ require_relative '../../../../spec/spec_helper'
 require 'tag/city'
 
 describe ExifTagger::Tag::City do
+
+  it 'knows the names of exiftool tags' do
+    expect(ExifTagger::Tag::City::EXIFTOOL_TAGS).not_to be_empty
+  end
+
   val1 = %{Moscow}
   context "when saves the #{val1}" do
     subject { ExifTagger::Tag::City.new(val1) }

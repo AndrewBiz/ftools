@@ -6,6 +6,9 @@ require_relative '../../../../spec/spec_helper'
 require 'tag/copyright'
 
 describe ExifTagger::Tag::Copyright do
+  it 'knows the names of exiftool tags' do
+    expect(ExifTagger::Tag::Copyright::EXIFTOOL_TAGS).not_to be_empty
+  end
   val1 = %{2014 (c) Andrew Bizyaev}
   context "when saves the #{val1}" do
     subject { ExifTagger::Tag::Copyright.new(val1) }

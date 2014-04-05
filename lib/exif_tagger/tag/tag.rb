@@ -12,6 +12,8 @@ module ExifTagger
 
       attr_reader :errors, :value, :value_invalid
 
+      EXIFTOOL_TAGS = []
+
       def initialize(value_norm)
         @value = value_norm
         @errors = []

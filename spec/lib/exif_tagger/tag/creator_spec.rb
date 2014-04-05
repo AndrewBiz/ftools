@@ -6,6 +6,9 @@ require_relative '../../../../spec/spec_helper'
 require 'tag/creator'
 
 describe ExifTagger::Tag::Creator do
+  it 'knows the names of exiftool tags' do
+    expect(ExifTagger::Tag::Creator::EXIFTOOL_TAGS).not_to be_empty
+  end
   val1 = %w{Andrew Natalia}
   context "when saves the #{val1}" do
     subject { ExifTagger::Tag::Creator.new(val1) }

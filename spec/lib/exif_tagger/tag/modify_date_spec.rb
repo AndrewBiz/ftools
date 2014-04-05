@@ -6,6 +6,9 @@ require_relative '../../../../spec/spec_helper'
 require 'tag/modify_date'
 
 describe ExifTagger::Tag::ModifyDate do
+  it 'knows the names of exiftool tags' do
+    expect(ExifTagger::Tag::ModifyDate::EXIFTOOL_TAGS).not_to be_empty
+  end
   val1 = 'now'
   context "when saves the #{val1}" do
     subject { ExifTagger::Tag::ModifyDate.new(val1) }

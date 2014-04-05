@@ -58,77 +58,31 @@ module FTools
                                          replace_invalid_chars: true,
                                          composite: true,
                                          timestamps: DateTime)
-        # tags_original.values.each { |k, v| puts "#{k}=#{v}" }
       rescue
         raise FTools::Error, "EXIF tags reading - #{e.message}"
       end
 
-      # artist=Andrey Bizyaev (photographer); Andrey Bizyaev (camera owner)
-      # creator=["Andrey Bizyaev (photographer)", "Andrey Bizyaev (camera owner)"]
-      # byline=["Andrey Bizyaev (photographer)", "Andrey Bizyaev (camera owner)"]
-
-      # copyright=2013 (c) Andrey Bizyaev. All Rights Reserved.
-      # rights=2013 (c) Andrey Bizyaev. All Rights Reserved.
-      # copyrightnotice=2013 (c) Andrey Bizyaev. All Rights Reserved.
-
-      # subject=["before-what-travel", "before-who-Andrew", "before-where-Baltic", "before-when-day", "before-why-vacation", "before-how-fine", "before-method-digicam"]
-      # keywords=["before-what-travel", "before-who-Andrew", "before-where-Baltic", "before-when-day", "before-why-vacation", "before-how-fine", "before-method-digicam"]
-
-      # gpsposition=60 deg 0' 0.00" N, 25 deg 0' 0.00" E
-      # gpslatitude=60 deg 0' 0.00" N
-      # gpslatituderef=North
-      # gpslongitude=25 deg 0' 0.00" E
-      # gpslongituderef=East
-      # gpsaltitude=0.5 m Above Sea Level
-      # gpsaltituderef=Above Sea Level
-
-      # locationshownworldregion=Europe
-
-      # locationshowncountryname=Russia
-      # countryprimarylocationname=Russia
-      # country=Russia
-
-      # locationshowncountrycode=RU
-
-      # locationshownprovincestate=Санкт-Петербург
-      # state=Санкт-Петербург
-      # provincestate=Санкт-Петербург
-
-      # locationshowncity=Санкт-Петербург
-      # city=Санкт-Петербург
-
-      # location=Дворцовая пл.
-      # locationshownsublocation=Дворцовая пл.
-      # sublocation=Дворцовая пл.
-
-      # collectionname=S-Peterburg Travel
-      # collectionuri=anblab.net
-
-      # imageuniqueid=20140402-205030-0001
-      # codedcharacterset=UTF8
-
       # initializing tags for the given file
       tags_to_write = ExifTagger::TagCollection.new
 
-      # TODO: check to not owerwrite existing tags e.g. gps
+      # TODO: use tag_default to initialize tags_to_write
       author = ftfile_out.author
       fail "Author '#{author}' is not found in #{@creators.filename}" if @creators[author].empty?
-      tags_to_write[:creator] = @creators[author][:creator]
-      tags_to_write[:copyright] = "#{ftfile_out.date_time.year} #{@creators[author][:copyright]}"
-
+      tags_to_write[:creator] = @creators[author][:creator] if tags_original[:creator].nil?
+      tags_to_write[:copyright] = "#{ftfile_out.date_time.year} #{@creators[author][:copyright]}" if tags_original[:copyright].nil?
       tags_to_write[:keywords] = @event.keywords
-      tags_to_write[:world_region] = @place_created[:world_region]
-      tags_to_write[:country] = @place_created[:country]
-      tags_to_write[:country_code] = @place_created[:country_code]
-      tags_to_write[:state] = @place_created[:state]
-      tags_to_write[:city] = @place_created[:city]
-      tags_to_write[:location] = @place_created[:location]
-      tags_to_write[:gps_created] = @place_created[:gps_created]
-      tags_to_write[:collections] = { collection_name: @event.title,
-                                      collection_uri: @event.uri }
-      tags_to_write[:image_unique_id] = @tags_default[:image_unique_id] +
-        format('%04d', @writer.added_files_count + 1)
+      tags_to_write[:world_region] = @place_created[:world_region] if tags_original[:locationshownworldregion].nil?
+      tags_to_write[:country] = @place_created[:country] if tags_original[:country].nil?
+      tags_to_write[:country_code] = @place_created[:country_code] if tags_original[:locationshowncountrycode].nil?
+      tags_to_write[:state] = @place_created[:state] if tags_original[:state].nil?
+      tags_to_write[:city] = @place_created[:city] if tags_original[:city].nil?
+      tags_to_write[:location] = @place_created[:location] if tags_original[:location].nil?
+      tags_to_write[:gps_created] = @place_created[:gps_created] if tags_original[:GPSPosition].nil?
+      tags_to_write[:collections] = { collection_name: @event.title, collection_uri: @event.uri } if tags_original[:CollectionName].nil?
 
+      unless tags_original[:image_unique_id] =~ /(\d{8}-\S+)/
+        tags_to_write[:image_unique_id] = @tags_default[:image_unique_id] + format('%04d', @writer.added_files_count + 1)
+      end
       tags_to_write[:coded_character_set] = 'UTF8'
       tags_to_write[:modify_date] = 'now'
 

@@ -10,6 +10,7 @@ module ExifTagger
     #   = IPTC:Keywords, XMP-dc:Subject
     class Keywords < Tag
       MAX_BYTESIZE = 64
+      EXIFTOOL_TAGS = %w(Keywords Subject)
 
       def initialize(value_raw = [])
         super(Array(value_raw).flatten.map { |i| i.to_s })

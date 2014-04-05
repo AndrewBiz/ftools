@@ -6,6 +6,10 @@ require_relative '../../../../spec/spec_helper'
 require 'tag/collections'
 
 describe ExifTagger::Tag::Collections do
+  it 'knows the names of exiftool tags' do
+    expect(ExifTagger::Tag::Collections::EXIFTOOL_TAGS).not_to be_empty
+  end
+
   val1 = { collection_name: 'Collection Name', collection_uri: 'www.abc.net' }
   context "when saves the #{val1}" do
     subject { ExifTagger::Tag::Collections.new(val1) }

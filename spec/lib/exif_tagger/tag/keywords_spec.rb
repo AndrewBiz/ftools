@@ -6,6 +6,9 @@ require_relative '../../../../spec/spec_helper'
 require 'tag/keywords'
 
 describe ExifTagger::Tag::Keywords do
+  it 'knows the names of exiftool tags' do
+    expect(ExifTagger::Tag::Keywords::EXIFTOOL_TAGS).not_to be_empty
+  end
   val1 = %w{aaa bbb ййй ццц}
   context "when saves the #{val1}" do
     subject { ExifTagger::Tag::Keywords.new(val1) }

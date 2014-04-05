@@ -3,7 +3,7 @@
 # (c) ANB Andrew Bizyaev
 
 require_relative '../../../spec/spec_helper'
-require 'writer'
+require 'exif_tagger'
 
 describe ExifTagger::Writer do
   let(:output) { double('output').as_null_object }

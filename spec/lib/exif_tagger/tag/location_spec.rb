@@ -6,6 +6,9 @@ require_relative '../../../../spec/spec_helper'
 require 'tag/location'
 
 describe ExifTagger::Tag::Location do
+  it 'knows the names of exiftool tags' do
+    expect(ExifTagger::Tag::Location::EXIFTOOL_TAGS).not_to be_empty
+  end
   val1 = %{Orekhovo-Borisovo}
   context "when saves the #{val1}" do
     subject { ExifTagger::Tag::Location.new(val1) }

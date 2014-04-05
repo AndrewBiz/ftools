@@ -2,9 +2,7 @@
 # encoding: UTF-8
 # (c) ANB Andrew Bizyaev
 
-require_relative 'error'
 require 'date'
-require_relative 'tag_collection'
 
 # Exif tagger
 module ExifTagger

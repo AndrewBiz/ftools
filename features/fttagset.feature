@@ -202,7 +202,7 @@ Feature: Set EXIF tags in photo and video files
     | UTF8                                         |
     And the output should match /^ImageUniqueID *: (\d{8}-\S+)/
 
-  @announce
+  # @announce
   Scenario: 40 The existing tags in the JPG file will not be owerwritten
 
     Given a directory named "2settag"

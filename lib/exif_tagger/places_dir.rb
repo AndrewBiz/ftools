@@ -2,7 +2,6 @@
 # encoding: UTF-8
 # (c) ANB Andrew Bizyaev
 
-require_relative 'error'
 require 'yaml'
 require 'date'
 

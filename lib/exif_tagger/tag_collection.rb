@@ -2,13 +2,6 @@
 # encoding: UTF-8
 # (c) ANB Andrew Bizyaev
 
-require_relative 'error'
-require 'active_support/core_ext'
-
-# loading exif tag classes
-lib_dir = File.join(__dir__, 'tag', '*.rb')
-Dir.glob(lib_dir).each { |file| require_relative file }
-
 module ExifTagger
   # EXIF tags collection
   class TagCollection

@@ -9,6 +9,7 @@ module ExifTagger
     # ImageUniqueID, String
     class ImageUniqueId < Tag
       MAX_BYTESIZE = 32 # no limit in EXIF spec
+      EXIFTOOL_TAGS = %w(ImageUniqueID)
 
       def initialize(value_raw = [])
         super(value_raw.to_s)

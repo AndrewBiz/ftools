@@ -6,6 +6,9 @@ require_relative '../../../../spec/spec_helper'
 require 'tag/image_unique_id'
 
 describe ExifTagger::Tag::ImageUniqueId do
+  it 'knows the names of exiftool tags' do
+    expect(ExifTagger::Tag::ImageUniqueId::EXIFTOOL_TAGS).not_to be_empty
+  end
   val1 = %{20140310-181855-001}
   context "when saves the #{val1}" do
     subject { ExifTagger::Tag::ImageUniqueId.new(val1) }

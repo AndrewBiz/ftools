@@ -3,7 +3,7 @@
 # (c) ANB Andrew Bizyaev
 
 require_relative '../../../spec/spec_helper'
-require 'places_dir'
+require 'exif_tagger'
 
 # ExifTagger test
 module ExifTagger

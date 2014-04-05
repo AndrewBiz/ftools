@@ -6,6 +6,9 @@ require_relative '../../../../spec/spec_helper'
 require 'tag/world_region'
 
 describe ExifTagger::Tag::WorldRegion do
+  it 'knows the names of exiftool tags' do
+    expect(ExifTagger::Tag::WorldRegion::EXIFTOOL_TAGS).not_to be_empty
+  end
   val1 = %{Asia}
   context "when saves the #{val1}" do
     subject { ExifTagger::Tag::WorldRegion.new(val1) }

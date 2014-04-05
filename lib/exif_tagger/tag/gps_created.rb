@@ -16,6 +16,15 @@ module ExifTagger
     class GpsCreated < Tag
       VALID_KEYS = [:gps_latitude, :gps_latitude_ref, :gps_longitude,
                     :gps_longitude_ref, :gps_altitude, :gps_altitude_ref]
+      EXIFTOOL_TAGS = %w(
+        GPSPosition
+        GPSLatitude
+        GPSLatitudeRef
+        GPSLongitude
+        GPSLongitudeRef
+        GPSAltitude
+        GPSAltitudeRef
+      )
 
       def initialize(value_raw = {})
         # TODO: value = value_raw.each { |k, v| value_raw[k] = v.to_s }

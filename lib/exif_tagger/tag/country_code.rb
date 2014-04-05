@@ -9,6 +9,7 @@ module ExifTagger
     # XMP-iptcExt:LocationShownCountryCode, String
     class CountryCode < Tag
       MAX_BYTESIZE = 32
+      EXIFTOOL_TAGS = %w(LocationShownCountryCode)
 
       def initialize(value_raw = '')
         super(value_raw.to_s)

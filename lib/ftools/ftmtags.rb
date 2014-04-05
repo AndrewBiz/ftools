@@ -4,60 +4,12 @@
 
 require_relative 'runner.rb'
 require_relative '../mini_exiftool-2.3.0anb'
+require_relative '../exif_tagger/exif_tagger'
 
 module FTools
-  # backup files
+  # output exiftool tags
   class Ftmtags < Runner
-    FT_TAGS = %w(
-      DateTimeOriginal
-      CreateDate
-      ModifyDate
-      GPSDateTime
 
-      Artist
-      Creator
-      Byline
-
-      Copyright
-      Rights
-      CopyrightNotice
-
-      Subject
-      Keywords
-
-      GPSPosition
-      GPSLatitude
-      GPSLatitudeRef
-      GPSLongitude
-      GPSLongitudeRef
-      GPSAltitude
-      GPSAltitudeRef
-
-      LocationShownWorldRegion
-
-      LocationShownCountryName
-      CountryPrimaryLocationName
-      Country
-
-      LocationShownCountryCode
-
-      LocationShownProvinceState
-      State
-      ProvinceState
-
-      LocationShownCity
-      City
-
-      Location
-      LocationShownSublocation
-      Sublocation
-
-      CollectionName
-      CollectionURI
-
-      ImageUniqueID
-      CodedCharacterSet
-    )
     private
 
     def process_file(ftfile)
@@ -66,24 +18,33 @@ module FTools
                                 replace_invalid_chars: true,
                                 composite: true,
                                 timestamps: DateTime)
-        # tags_original.values.each { |k, v| puts "#{k}=#{v}" }
       rescue
         raise FTools::Error, "EXIF tags reading - #{e.message}"
       end
-
       puts "#{ftfile}"
-      FT_TAGS.each do |t|
-        v = tags[t]
-        if v.respond_to?(:empty?)
-          empty = v.empty? ? ' EMPTY' : ''
+
+      if @options_cli['--full_dump']
+        all_tags = tags.tags.uniq
+        all_tags.delete nil
+        all_tags.sort.each do |t|
+          v = tags[t]
+          puts format('  %-27s %-10s %s', t, "(#{v.class})", v)
         end
-        if v.nil?
-          puts "#{t}\tNIL"
-        else  
-          puts "#{t}\t#{v} (#{v.class}#{empty})"
+        # tags.values.each { |k, v| puts "#{k}=#{v}" }
+      else
+        ExifTagger::TAGS_SUPPORTED.each do |tag|
+          puts "#{tag.to_s.camelize}"
+          ExifTagger::Tag.const_get(tag.to_s.camelize).const_get('EXIFTOOL_TAGS').each do |t|
+            v = tags[t]
+            v = 'EMPTY' if v.respond_to?(:empty?) && v.empty?
+            if v.nil?
+              puts format('  %-27s %s', t, 'NIL')
+            else
+              puts format('  %-27s %-10s %s', t, "(#{v.class})", v)
+            end
+          end
         end
       end
-
       ''
     rescue => e
       raise FTools::Error, "exif tags operating: #{e.message}"

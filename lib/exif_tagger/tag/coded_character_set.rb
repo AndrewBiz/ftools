@@ -9,6 +9,7 @@ module ExifTagger
     # -IPTC:CodedCharacterSet, string[0,32]!
     class CodedCharacterSet < Tag
       MAX_BYTESIZE = 32
+      EXIFTOOL_TAGS = %w(CodedCharacterSet)
 
       def initialize(value_raw = '')
         super(value_raw.to_s)

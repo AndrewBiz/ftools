@@ -6,6 +6,10 @@ require_relative '../../../../spec/spec_helper'
 require 'tag/coded_character_set'
 
 describe ExifTagger::Tag::CodedCharacterSet do
+  it 'knows the names of exiftool tags' do
+    expect(ExifTagger::Tag::CodedCharacterSet::EXIFTOOL_TAGS).not_to be_empty
+  end
+  
   val1 = 'UTF8'
   context "when saves the #{val1}" do
     subject { ExifTagger::Tag::CodedCharacterSet.new(val1) }

@@ -11,6 +11,7 @@ module ExifTagger
     #   CollectionURI
     class Collections < Tag
       VALID_KEYS = [:collection_name, :collection_uri]
+      EXIFTOOL_TAGS = %w(CollectionName CollectionURI)
       def initialize(value_raw = {})
         super
       end

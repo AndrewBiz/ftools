@@ -10,6 +10,7 @@ module ExifTagger
     #   = EXIF:Copyright IPTC:CopyrightNotice XMP-dc:Rights
     class Copyright < Tag
       MAX_BYTESIZE = 128
+      EXIFTOOL_TAGS = %w(Copyright CopyrightNotice Rights)
 
       def initialize(value_raw = '')
         super(value_raw.to_s)

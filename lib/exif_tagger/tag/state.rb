@@ -11,6 +11,7 @@ module ExifTagger
     #   + XMP-iptcExt:LocationShownProvinceState
     class State < Tag
       MAX_BYTESIZE = 32
+      EXIFTOOL_TAGS = %w(Province-State State LocationShownProvinceState)
 
       def initialize(value_raw = [])
         super(value_raw.to_s)

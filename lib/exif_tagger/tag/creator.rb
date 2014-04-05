@@ -10,6 +10,7 @@ module ExifTagger
     #   = EXIF:Artist, IPTC:By-line, XMP-dc:Creator
     class Creator < Tag
       MAX_BYTESIZE = 32
+      EXIFTOOL_TAGS = %w(Artist By-line Creator)
 
       def initialize(value_raw = [])
         super(Array(value_raw).flatten.map { |i| i.to_s })

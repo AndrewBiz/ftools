@@ -6,6 +6,9 @@ require_relative '../../../../spec/spec_helper'
 require 'tag/gps_created'
 
 describe ExifTagger::Tag::GpsCreated do
+  it 'knows the names of exiftool tags' do
+    expect(ExifTagger::Tag::GpsCreated::EXIFTOOL_TAGS).not_to be_empty
+  end
   val1 = { gps_latitude: '55 36 31.49',
            gps_latitude_ref: 'N',
            gps_longitude: '37 43 28.27',

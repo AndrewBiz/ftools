@@ -14,16 +14,20 @@ module FTools
 ***************************************************
 ftools - *Keep Your Photos In Order* (c) ANB
 ***************************************************
-#{tool_name}, version #{VERSION}, shows EXIF tag values
+#{tool_name}, version #{VERSION}, shows EXIF tags of the input file.
+By default only tags supported by ftools are shown.
+The tags are read using mini_exiftool gem by Jan Friedrich
+(see https://github.com/janfri/mini_exiftool)
 Optimized to be used with other *ftools* via pipes.
 Example: ftls | #{tool_name}
 
 Usage:
-  #{tool_name} [-D]
+  #{tool_name} [-f] [-D]
   #{tool_name} -h | --help
   #{tool_name} -v | --version
 
 Options:
+  -f --full_dump       Print all tags
   -D --debug           Turn on debugging (verbose) mode
   -h --help            Show this screen.
   -v --version         Show version.

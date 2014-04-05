@@ -3,7 +3,7 @@
 # (c) ANB Andrew Bizyaev
 
 require_relative '../../../spec/spec_helper'
-require 'creators_dir'
+require 'exif_tagger'
 
 describe ExifTagger::CreatorsDir do
   let(:creators) { ExifTagger::CreatorsDir.new('./creators.yml') }

@@ -9,6 +9,7 @@ module ExifTagger
     # -EXIF:ModifyDate=now
     class ModifyDate < Tag
       MAX_BYTESIZE = 32 # no limit set in EXIF spec 
+      EXIFTOOL_TAGS = %w(ModifyDate)
 
       def initialize(value_raw = '')
         super(value_raw.to_s)

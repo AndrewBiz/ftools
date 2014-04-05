@@ -6,10 +6,11 @@ require_relative 'tag'
 
 module ExifTagger
   module Tag
-    # MWG:Country, String[0,32]
+    # MWG:City, String[0,32]
     #   = IPTC:City XMP-photoshop:City XMP-iptcExt:LocationShownCity 
     class City < Tag
       MAX_BYTESIZE = 32
+      EXIFTOOL_TAGS = %w(City LocationShownCity)
 
       def initialize(value_raw = '')
         super(value_raw.to_s)

@@ -11,6 +11,7 @@ module ExifTagger
     #   + XMP-iptcExt:LocationShownSublocation
     class Location < Tag
       MAX_BYTESIZE = 32
+      EXIFTOOL_TAGS = %w(Sub-location Location LocationShownSublocation)
 
       def initialize(value_raw = [])
         super(value_raw.to_s)
