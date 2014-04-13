@@ -18,11 +18,19 @@ module ExifTagger
 
       def to_write_script
         str = ''
-        @value.each do |o|
-          str << %Q{-MWG:Keywords-=#{o}\n}
-          str << %Q{-MWG:Keywords+=#{o}\n}
+        unless @value.empty?
+          str << print_warnings
+          @value.each do |o|
+            str << print_line(%Q(-MWG:Keywords-=#{o}\n))
+            str << print_line(%Q(-MWG:Keywords+=#{o}\n))
+          end
         end
         str
+      end
+
+      def validate_with_original(values)
+        @warnings = []
+        @warnings.freeze
       end
 
       private

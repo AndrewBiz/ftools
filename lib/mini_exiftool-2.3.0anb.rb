@@ -49,8 +49,7 @@ class MiniExiftool
     end
   end
 
-  attr_reader :filename, :errors,
-              :values # ANB
+  attr_reader :filename, :errors
 
   opts_accessor :numerical, :composite, :ignore_minor_errors,
     :replace_invalid_chars, :timestamps

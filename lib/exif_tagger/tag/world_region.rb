@@ -17,7 +17,10 @@ module ExifTagger
 
       def to_write_script
         str = ''
-        str << %Q{-XMP-iptcExt:LocationShownWorldRegion=#{@value}\n} unless @value.empty?
+        unless @value.empty?
+          str << print_warnings
+          str << print_line(%Q(-XMP-iptcExt:LocationShownWorldRegion=#{@value}\n))
+        end
         str
       end
 

@@ -49,43 +49,24 @@ module FTools
 
     def process_file(ftfile)
       # TODO: fail if file is not supported by exiftool
-
+      
       fail FTools::Error, 'non-standard name, use ftrename to rename' unless ftfile.basename_is_standard?
       ftfile_out = ftfile.clone
-
       begin
         tags_original = MiniExiftool.new(ftfile.filename,
                                          replace_invalid_chars: true,
                                          composite: true,
                                          timestamps: DateTime)
       rescue
-        raise FTools::Error, "EXIF tags reading - #{e.message}"
+        raise FTools::Error, "EXIF tags reading by mini_exiftool - #{e.message}"
       end
-
-      # initializing tags for the given file
-      tags_to_write = ExifTagger::TagCollection.new
-
-      # TODO: use tag_default to initialize tags_to_write
+      tags_to_write = ExifTagger::TagCollection.new(@tags_default)
       author = ftfile_out.author
       fail "Author '#{author}' is not found in #{@creators.filename}" if @creators[author].empty?
-      tags_to_write[:creator] = @creators[author][:creator] if tags_original[:creator].nil?
-      tags_to_write[:copyright] = "#{ftfile_out.date_time.year} #{@creators[author][:copyright]}" if tags_original[:copyright].nil?
-      tags_to_write[:keywords] = @event.keywords
-      tags_to_write[:world_region] = @place_created[:world_region] if tags_original[:locationshownworldregion].nil?
-      tags_to_write[:country] = @place_created[:country] if tags_original[:country].nil?
-      tags_to_write[:country_code] = @place_created[:country_code] if tags_original[:locationshowncountrycode].nil?
-      tags_to_write[:state] = @place_created[:state] if tags_original[:state].nil?
-      tags_to_write[:city] = @place_created[:city] if tags_original[:city].nil?
-      tags_to_write[:location] = @place_created[:location] if tags_original[:location].nil?
-      tags_to_write[:gps_created] = @place_created[:gps_created] if tags_original[:GPSPosition].nil?
-      tags_to_write[:collections] = { collection_name: @event.title, collection_uri: @event.uri } if tags_original[:CollectionName].nil?
-
-      unless tags_original[:image_unique_id] =~ /(\d{8}-\S+)/
-        tags_to_write[:image_unique_id] = @tags_default[:image_unique_id] + format('%04d', @writer.added_files_count + 1)
-      end
-      tags_to_write[:coded_character_set] = 'UTF8'
-      tags_to_write[:modify_date] = 'now'
-
+      tags_to_write[:creator] = @creators[author][:creator]
+      tags_to_write[:copyright] = "#{ftfile_out.date_time.year} #{@creators[author][:copyright]}"
+      tags_to_write[:image_unique_id] = @tags_default[:image_unique_id] + format('%04d', @writer.added_files_count + 1)
+      tags_to_write.validate_with_original(tags_original)
       fail FTools::Error, tags_to_write.error_message unless tags_to_write.valid?
       @writer.add_to_script(ftfile: ftfile_out, tags: tags_to_write)
 

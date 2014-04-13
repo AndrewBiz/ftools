@@ -6,7 +6,7 @@ require_relative 'tag'
 
 module ExifTagger
   module Tag
-    # MWG:Location, String[0,32] 
+    # MWG:Location, String[0,32]
     #   = IPTC:Sub-location + XMP-iptcCore:Location 
     #   + XMP-iptcExt:LocationShownSublocation
     class Location < Tag
@@ -19,7 +19,10 @@ module ExifTagger
 
       def to_write_script
         str = ''
-        str << %Q{-MWG:Location=#{@value}\n} unless @value.empty?
+        unless @value.empty?
+          str << print_warnings
+          str << print_line(%Q(-MWG:Location=#{@value}\n))
+        end
         str
       end
 

@@ -7,10 +7,19 @@ module ExifTagger
   class TagCollection
     include Enumerable
 
-    def initialize(init_values = {})
+    def initialize(init_values = nil)
       @collection = []
-      init_values.each do |k, v|
-        self[k] = v
+      unless init_values.nil?
+        case
+        when init_values.kind_of?(Hash)
+          init_values.each do |k, v|
+            self[k] = v
+          end
+        when init_values.kind_of?(ExifTagger::TagCollection)
+          init_values.each do |item|
+            self[item.tag_id] = item.value
+          end
+        end
       end
     end
 
@@ -51,12 +60,33 @@ module ExifTagger
       ok
     end
 
+    def with_warnings?
+      warn = false
+      @collection.each { |i| warn ||= i.warnings.empty? }
+      warn
+    end
+
+    def validate_with_original(tags_original)
+      @collection.each { |i| i.validate_with_original(tags_original) }
+    end
+
     def error_message
       str = ''
       unless valid?
         str = "Tags are NOT VALID:\n"
         @collection.each do |item|
           item.errors.each { |e| str << '    ' + e + "\n" }
+        end
+      end
+      str
+    end
+
+    def warning_message
+      str = ''
+      if with_warnings?
+        str = "Tags have warnings:\n"
+        @collection.each do |item|
+          item.warnings.each { |e| str << '    ' + e + "\n" }
         end
       end
       str

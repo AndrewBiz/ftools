@@ -2,43 +2,44 @@
 # encoding: UTF-8
 # (c) ANB Andrew Bizyaev
 
-require_relative '../../../../spec/spec_helper'
+require 'spec_helper'
 require 'tag/collections'
 
 describe ExifTagger::Tag::Collections do
-  it 'knows the names of exiftool tags' do
-    expect(ExifTagger::Tag::Collections::EXIFTOOL_TAGS).not_to be_empty
+  let(:val_ok) { { collection_name: 'Collection Name', collection_uri: 'www.abc.net' } }
+  let(:val_orig) { { 'CollectionName' => 'tralala', 'CollectionURI' => 'trululu' } }
+  let(:tag) { described_class.new(val_ok) }
+
+  it_behaves_like 'any tag'
+
+  it 'knows it\'s ID' do
+    expect(tag.tag_id).to be :collections
+    expect(tag.tag_name).to eq 'Collections'
   end
 
-  val1 = { collection_name: 'Collection Name', collection_uri: 'www.abc.net' }
-  context "when saves the #{val1}" do
-    subject { ExifTagger::Tag::Collections.new(val1) }
-    its(:value) { should eql (val1) }
-    its(:to_s) { should include(val1.to_s) }
-    its(:tag_id) { should be(:collections) }
-    its(:tag_name) { should eq('Collections') }
-    it { should be_valid }
-    its(:errors) { should  be_empty }
-    its(:value_invalid) { should be_empty }
+  it 'generates write_script for exiftool' do
+    expect(tag.to_write_script).to include('-XMP-mwg-coll:Collections-={CollectionName=Collection Name, CollectionURI=www.abc.net}')
+    expect(tag.to_write_script).to include('-XMP-mwg-coll:Collections+={CollectionName=Collection Name, CollectionURI=www.abc.net}')
+  end
 
-    it 'generates write_script to be used with exiftool' do
-      script = subject.to_write_script
-      expect(script).to include('-XMP-mwg-coll:Collections-={CollectionName=Collection Name, CollectionURI=www.abc.net}')
-      expect(script).to include('-XMP-mwg-coll:Collections+={CollectionName=Collection Name, CollectionURI=www.abc.net}')
+  context 'when the original value (read by mini_exiftool) exists -' do
+    it 'generates warnings' do
+      tag.validate_with_original(val_orig)
+      expect(tag.warnings).not_to be_empty
+      expect(tag.warnings.inspect).to include('has original value:')
     end
-  end
-
-  it 'prevents its properties to be altered from outside' do
-    tag = ExifTagger::Tag::Collections.new(val1)
-    expect { tag.value[:collection_name] = 'new cn' }.to raise_error(RuntimeError)
-    expect { tag.value_invalid << 'new invalid value' }.to raise_error(RuntimeError)
-    expect { tag.errors << 'new error' }.to raise_error(RuntimeError)
+    it 'generates write_script with commented lines' do
+      tag.validate_with_original(val_orig)
+      expect(tag.to_write_script).to include('# -XMP-mwg-coll:Collections-={CollectionName=Collection Name, CollectionURI=www.abc.net}')
+      expect(tag.to_write_script).to include('# -XMP-mwg-coll:Collections+={CollectionName=Collection Name, CollectionURI=www.abc.net}')
+      expect(tag.to_write_script).to match(/# WARNING: ([\w]*) has original value:/)
+    end
   end
 
   context 'when gets invalid input' do
     context 'with unknown key' do
       val_nok = { coll_name_wrong: 'xyz', collection_uri: 'www.xyz.com' }
-      subject { ExifTagger::Tag::Collections.new(val_nok) }
+      subject { described_class.new(val_nok) }
       its(:value) { should be_empty }
       it { should_not be_valid }
       its(:value_invalid) { should_not be_empty }
@@ -48,7 +49,7 @@ describe ExifTagger::Tag::Collections do
     end
     context 'when mandatory keys are missed' do
       val_nok = { collection_uri: 'www.xyz.com' }
-      subject { ExifTagger::Tag::Collections.new(val_nok) }
+      subject { described_class.new(val_nok) }
       its(:value) { should be_empty }
       it { should_not be_valid }
       its(:value_invalid) { should_not be_empty }
@@ -56,17 +57,5 @@ describe ExifTagger::Tag::Collections do
       its('errors.inspect') { should include("'collection_name' is missed") }
       its(:to_write_script) { should be_empty }
     end
-
-    # val_nok = {coll_name_wrong: 'xyz', coll_uri_wrong: 'xyz'}
-    # subject { ExifTagger::Tag::Collections.new(val_nok) }
-    # its(:value) { should be_empty }
-    # it { should_not be_valid }
-    # its(:value_invalid) { should_not be_empty }
-    # its(:value_invalid) { should eql([val_nok]) }
-    # its(:to_write_script) { should be_empty }
-
-    # val_nok.each do |k,v|
-    #   its('errors.inspect') { should include("'#{k.to_s}'") }
-    # end
   end
 end

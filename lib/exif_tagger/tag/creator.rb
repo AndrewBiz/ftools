@@ -18,9 +18,12 @@ module ExifTagger
 
       def to_write_script
         str = ''
-        @value.each do |o|
-          str << %Q{-MWG:Creator-=#{o}\n}
-          str << %Q{-MWG:Creator+=#{o}\n}
+        unless @value.empty?
+          str << print_warnings
+          @value.each do |o|
+            str << print_line(%Q(-MWG:Creator-=#{o}\n))
+            str << print_line(%Q(-MWG:Creator+=#{o}\n))
+          end
         end
         str
       end
@@ -31,8 +34,8 @@ module ExifTagger
         @value.each do |v|
           bsize = v.bytesize
           if bsize > MAX_BYTESIZE
-            @errors << %{#{tag_name}: '#{v}' } +
-                       %{is #{bsize - MAX_BYTESIZE} bytes longer than allowed #{MAX_BYTESIZE}}
+            @errors << %(#{tag_name}: '#{v}' ) +
+                       %(is #{bsize - MAX_BYTESIZE} bytes longer than allowed #{MAX_BYTESIZE})
             @value_invalid << v
           end
         end

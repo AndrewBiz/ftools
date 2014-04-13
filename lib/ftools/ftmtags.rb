@@ -15,6 +15,8 @@ module FTools
     def process_file(ftfile)
       begin
         tags = MiniExiftool.new(ftfile.filename,
+                                numerical: false,
+                                coord_format: '%d %d %.4f',
                                 replace_invalid_chars: true,
                                 composite: true,
                                 timestamps: DateTime)
@@ -22,7 +24,6 @@ module FTools
         raise FTools::Error, "EXIF tags reading - #{e.message}"
       end
       puts "#{ftfile}"
-
       if @options_cli['--full_dump']
         all_tags = tags.tags.uniq
         all_tags.delete nil
@@ -30,7 +31,6 @@ module FTools
           v = tags[t]
           puts format('  %-27s %-10s %s', t, "(#{v.class})", v)
         end
-        # tags.values.each { |k, v| puts "#{k}=#{v}" }
       else
         ExifTagger::TAGS_SUPPORTED.each do |tag|
           puts "#{tag.to_s.camelize}"

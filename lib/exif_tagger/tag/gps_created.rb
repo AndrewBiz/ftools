@@ -34,12 +34,13 @@ module ExifTagger
       def to_write_script
         str = ''
         unless @value.empty?
-          str << %Q{-GPSLatitude="#{@value[:gps_latitude]}"\n}
-          str << %Q{-GPSLatitudeRef=#{@value[:gps_latitude_ref]}\n}
-          str << %Q{-GPSLongitude="#{@value[:gps_longitude]}"\n}
-          str << %Q{-GPSLongitudeRef=#{@value[:gps_longitude_ref]}\n}
-          str << %Q{-GPSAltitude=#{@value[:gps_altitude]}\n}
-          str << %Q{-GPSAltitudeRef=#{@value[:gps_altitude_ref]}\n}
+          str << print_warnings
+          str << print_line(%Q(-GPSLatitude="#{@value[:gps_latitude]}"\n))
+          str << print_line(%Q(-GPSLatitudeRef=#{@value[:gps_latitude_ref]}\n))
+          str << print_line(%Q(-GPSLongitude="#{@value[:gps_longitude]}"\n))
+          str << print_line(%Q(-GPSLongitudeRef=#{@value[:gps_longitude_ref]}\n))
+          str << print_line(%Q(-GPSAltitude=#{@value[:gps_altitude]}\n))
+          str << print_line(%Q(-GPSAltitudeRef=#{@value[:gps_altitude_ref]}\n))
         end
         str
       end
@@ -49,24 +50,24 @@ module ExifTagger
       def validate
         unknown_keys = @value.keys - VALID_KEYS
         unknown_keys.each do |k|
-          @errors << %{#{tag_name}: KEY '#{k}' is unknown}
+          @errors << %(#{tag_name}: KEY '#{k}' is unknown)
         end
         missed_keys = VALID_KEYS - @value.keys
         missed_keys.each do |k|
-          @errors << %{#{tag_name}: KEY '#{k}' is missed}
+          @errors << %(#{tag_name}: KEY '#{k}' is missed)
         end
         if @errors.empty?
           valid_values = ['N', 'S']
           unless valid_values.include? @value[:gps_latitude_ref]
-            @errors << %{#{tag_name}: value of 'gps_latitude_ref' should be one of #{valid_values}}
+            @errors << %(#{tag_name}: value of 'gps_latitude_ref' should be one of #{valid_values})
           end
           valid_values = ['E', 'W']
           unless valid_values.include? @value[:gps_longitude_ref]
-            @errors << %{#{tag_name}: value of 'gps_longitude_ref' should be one of #{valid_values}}
+            @errors << %(#{tag_name}: value of 'gps_longitude_ref' should be one of #{valid_values})
           end
           valid_values = ['Above Sea Level', 'Below Sea Level']
           unless valid_values.include? @value[:gps_altitude_ref]
-            @errors << %{#{tag_name}: value of 'gps_altitude_ref' should be one of #{valid_values}}
+            @errors << %(#{tag_name}: value of 'gps_altitude_ref' should be one of #{valid_values})
           end
         end
         unless @errors.empty?

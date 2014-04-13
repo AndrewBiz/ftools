@@ -7,7 +7,7 @@ module FTools
   tool_name = File.basename(__FILE__)
   require_relative "../lib/ftools/#{tool_name}"
 
-  VERSION = '0.3.0'
+  VERSION = '0.4.0'
 
   file_type = FILE_TYPE_IMAGE + FILE_TYPE_VIDEO + FILE_TYPE_AUDIO
   usage = <<DOCOPT

@@ -18,7 +18,10 @@ module ExifTagger
 
       def to_write_script
         str = ''
-        str << %Q{-MWG:Copyright=#{@value}\n} unless @value.empty?
+        unless @value.empty?
+          str << print_warnings
+          str << print_line(%Q(-MWG:Copyright=#{@value}\n))
+        end
         str
       end
 
