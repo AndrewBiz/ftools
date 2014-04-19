@@ -12,5 +12,5 @@ peterburg_other:
     :gps_latitude_ref: "N"
     :gps_longitude: "20 20 00"
     :gps_longitude_ref: "E"
-    :gps_altitude: 888
+    :gps_altitude: "888"
     :gps_altitude_ref: "Above Sea Level"

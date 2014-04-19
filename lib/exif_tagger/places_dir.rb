@@ -5,6 +5,24 @@
 require 'yaml'
 require 'date'
 
+# Hash Refine
+module HashRefine
+  refine Hash do
+    def each_leaf(full_key = [], &blk)
+      each do |k, v|
+        current_key = full_key + [k]
+        if v.kind_of? Hash
+          v.each_leaf(current_key, &blk)
+        else
+          yield(current_key, v)
+        end
+      end
+    end
+  end
+end
+
+using HashRefine
+
 # Foto tools
 module ExifTagger
   # Places directory
@@ -64,54 +82,61 @@ module ExifTagger
       end
     end
 
+    PLACE_TYPE = {
+      world_region: String,
+      country: String,
+      country_code: String,
+      state: String,
+      city: String,
+      location: String,
+      gps_created: {
+        gps_latitude: String,
+        gps_latitude_ref: String,
+        gps_longitude: String,
+        gps_longitude_ref: String,
+        gps_altitude: String,
+        gps_altitude_ref: String }
+    }
+
     def validate
       @errors = []
-      # @collection.each do |key, subkey|
-      #   err = %(#{key}: :creator:)
-      #   val = subkey[:creator]
-      #   if val.nil?
-      #     @errors << %(#{err} is MISSED)
-      #   else
-      #     if val.kind_of? Array
-      #       if val.empty?
-      #         @errors << %(#{err} is EMPTY, expected Array of strings, e.g. ["Creator1", "Creator2"])
-      #       else
-      #         val.each do |i|
-      #           if i.to_s.empty?
-      #             @errors << %(#{err} has EMPTY parts, expected Array of strings, e.g. ["Creator1", "Creator2"])
-      #           end  
-      #           unless i.kind_of? String
-      #             @errors << %(#{err} has NON-STRING parts, expected Array of strings, e.g. ["Creator1", "Creator2"])
-      #           end  
-      #         end
-      #       end
-      #     else
-      #       @errors << %(#{err} is WRONG TYPE, expected Array of strings, e.g. ["Creator1", "Creator2"])
-      #     end
-      #   end
+      place_type = simplify_hash(PLACE_TYPE)
+      @collection.each do |place_id, place_def|
+        place_cur = simplify_hash(place_def)
+        missed_keys = place_type.keys - place_cur.keys
+        missed_keys.each { |k| @errors << %(#{place_id}: '#{k}' is MISSED) }
+        ok_keys = place_type.keys - missed_keys
+        ok_keys.each do |k|
+          val = place_cur[k]
+          type = place_type[k]
+          if val.nil? || !val.kind_of?(type)
+            @errors << %(#{place_id}: '#{k}' is WRONG TYPE, should be #{type})
+          else
+            if val.respond_to?(:empty?) && val.empty?
+              @errors << %(#{place_id}: '#{k}' is EMPTY)
+            end
+          end
+        end
+      end
+    end
 
-      #   err = %(#{key}: :copyright:)
-      #   val = subkey[:copyright]
-      #   if val.nil?
-      #     @errors << %(#{err} is MISSED)
-      #   elsif val.to_s.empty?
-      #     @errors << %(#{err} is EMPTY, expected String, e.g. "2014 Copyright")
-      #   else
-      #     unless val.kind_of? String
-      #       @errors << %(#{err} is WRONG TYPE, expected String, e.g. "2014 Copyright")
-      #     end
-      #   end
-      # end
+    def simplify_hash(hash = {})
+      s_hash = {}
+      hash.each_leaf do |k, v|
+        s_key = k * '.'
+        s_hash[s_key] = v
+      end
+      s_hash
     end
 
     def freeze
-      # @filename.freeze
-      # @collection.freeze
-      # @collection.each do |key, subkey|
-      #   subkey.freeze
-      #   subkey.each { |k, v| v.freeze }
-      # end
-      # @errors.freeze
+      @filename.freeze
+      @collection.freeze
+      @collection.each do |key, subkey|
+        subkey.freeze
+        subkey.each { |k, v| v.freeze }
+      end
+      @errors.freeze
     end
   end
 end

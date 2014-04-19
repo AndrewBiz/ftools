@@ -11,7 +11,7 @@ require_relative 'ft_file.rb'
 
 # Foto Tools
 module FTools
-  VERSION_CORE = '0.4.0'
+  VERSION_CORE = '0.4.1'
 
   # Main class processing input stream
   class Runner
