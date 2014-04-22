@@ -8,6 +8,7 @@ require 'tag/city'
 describe ExifTagger::Tag::City do
   let(:val_ok) { 'Moscow' }
   let(:val_orig) { { 'City' => 'Kiev' } }
+  let(:val_orig_empty) { { 'City' => '', 'LocationShownCity' => '' } }
   let(:tag) { described_class.new(val_ok) }
 
   it_behaves_like 'any tag'
@@ -31,6 +32,11 @@ describe ExifTagger::Tag::City do
       tag.validate_with_original(val_orig)
       expect(tag.to_write_script).to include('# -MWG:City=Moscow')
       expect(tag.to_write_script).to match(/# WARNING: ([\w]*) has original value:/)
+    end
+    it 'considers empty strings as a no-value' do
+      tag.validate_with_original(val_orig_empty)
+      expect(tag.warnings).to be_empty
+      expect(tag.warnings.inspect).not_to include('has original value:')
     end
   end
 

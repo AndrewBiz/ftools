@@ -154,7 +154,7 @@ Feature: Set EXIF tags in photo and video files
 
     When I successfully run `ftls_fttagset`
 
-    Then the stdout from "ftls_fttagset" should contain "20130103-103254_ANB DSC03313.JPG"
+    Then the stderr from "ftls_fttagset" should contain "20130103-103254_ANB DSC03313.JPG"
 
     When I successfully run `fttags '20130103-103254_ANB DSC03313.JPG'`
     Then the stdout from "fttags '20130103-103254_ANB DSC03313.JPG'" should contain each of:
@@ -263,7 +263,7 @@ Feature: Set EXIF tags in photo and video files
 
     When I successfully run `ftls_fttagset`
 
-    Then the stdout from "ftls_fttagset" should contain "20130103-153908_ANB DSC03403.JPG"
+    Then the stderr from "ftls_fttagset" should contain "20130103-153908_ANB DSC03403.JPG"
 
     When I successfully run `fttags '20130103-153908_ANB DSC03403.JPG'`
     Then the stdout from "fttags '20130103-153908_ANB DSC03403.JPG'" should contain each of:

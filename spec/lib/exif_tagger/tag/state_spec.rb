@@ -8,6 +8,11 @@ require 'tag/state'
 describe ExifTagger::Tag::State do
   let(:val_ok) { 'Moscow oblast' }
   let(:val_orig) { { 'State' => 'Sverdlovsk oblast' } }
+  let(:val_orig_empty) do
+    { 'State' => '',
+      'Province-State' => '',
+      'LocationShownProvinceState' => '' }
+  end
   let(:tag) { described_class.new(val_ok) }
 
   it_behaves_like 'any tag'
@@ -31,6 +36,11 @@ describe ExifTagger::Tag::State do
       tag.validate_with_original(val_orig)
       expect(tag.to_write_script).to include('# -MWG:State=Moscow oblast')
       expect(tag.to_write_script).to match(/# WARNING: ([\w]*) has original value:/)
+    end
+    it 'considers empty strings as a no-value' do
+      tag.validate_with_original(val_orig_empty)
+      expect(tag.warnings).to be_empty
+      expect(tag.warnings.inspect).not_to include('has original value:')
     end
   end
 

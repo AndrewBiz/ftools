@@ -15,6 +15,15 @@ describe ExifTagger::Tag::GpsCreated do
       gps_altitude_ref: 'Above Sea Level' }
   end
   let(:val_orig) { { 'GPSLatitude' => '20 20 00', 'GPSLongitude' => '20 20 00' } }
+  let(:val_orig_empty) do
+    { 'GPSPosition' => '',
+      'GPSLatitude' => '',
+      'GPSLatitudeRef' => '',
+      'GPSLongitude' => '',
+      'GPSLongitudeRef' => '',
+      'GPSAltitude' => '',
+      'GPSAltitudeRef' => '' }
+  end
   let(:tag) { described_class.new(val_ok) }
 
   it_behaves_like 'any tag'
@@ -48,6 +57,11 @@ describe ExifTagger::Tag::GpsCreated do
       expect(tag.to_write_script).to include('# -GPSAltitude=170.0')
       expect(tag.to_write_script).to include('# -GPSAltitudeRef=Above Sea Level')
       expect(tag.to_write_script).to match(/# WARNING: ([\w]*) has original value:/)
+    end
+    it 'considers empty strings as a no-value' do
+      tag.validate_with_original(val_orig_empty)
+      expect(tag.warnings).to be_empty
+      expect(tag.warnings.inspect).not_to include('has original value:')
     end
   end
 

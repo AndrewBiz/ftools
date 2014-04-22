@@ -8,6 +8,12 @@ require 'tag/country'
 describe ExifTagger::Tag::Country do
   let(:val_ok) { 'Russia' }
   let(:val_orig) { { 'Country' => 'Ukraine' } }
+  let(:val_orig_empty) do {
+    'Country' => '',
+    'Country-PrimaryLocationName' => '',
+    'LocationShownCountryName' => ''
+    }
+  end
   let(:tag) { described_class.new(val_ok) }
 
   it_behaves_like 'any tag'
@@ -31,6 +37,11 @@ describe ExifTagger::Tag::Country do
       tag.validate_with_original(val_orig)
       expect(tag.to_write_script).to include('# -MWG:Country=Russia')
       expect(tag.to_write_script).to match(/# WARNING: ([\w]*) has original value:/)
+    end
+    it 'considers empty strings as a no-value' do
+      tag.validate_with_original(val_orig_empty)
+      expect(tag.warnings).to be_empty
+      expect(tag.warnings.inspect).not_to include('has original value:')
     end
   end
 

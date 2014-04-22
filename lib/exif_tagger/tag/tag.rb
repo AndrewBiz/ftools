@@ -54,11 +54,13 @@ module ExifTagger
         self.class::EXIFTOOL_TAGS.each do |tag|
           v = values[tag]
           unless v.nil?
-            case v.class
-            when Array || String
+            case
+            when v.kind_of?(String)
               @warnings << "#{tag_name} has original value: #{tag}='#{v}'" unless v.empty?
+            when v.kind_of?(Array)
+              @warnings << "#{tag_name} has original value: #{tag}=#{v}" unless v.join.empty?
             else
-              @warnings << "#{tag_name} has original value: #{tag}='#{v}'"
+              @warnings << "#{tag_name} has original value: #{tag}=#{v}"
             end
           end
         end

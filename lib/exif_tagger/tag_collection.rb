@@ -84,9 +84,8 @@ module ExifTagger
     def warning_message
       str = ''
       if with_warnings?
-        str = "Tags have warnings:\n"
         @collection.each do |item|
-          item.warnings.each { |e| str << '    ' + e + "\n" }
+          item.warnings.each { |e| str << '    WARNING: ' + e + "\n" }
         end
       end
       str

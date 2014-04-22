@@ -9,6 +9,7 @@ describe ExifTagger::Tag::Copyright do
 
   let(:val_ok) { '2014 (c) Andrew Bizyaev' }
   let(:val_orig) { { 'Copyright' => 'Shirli-Myrli' } }
+  let(:val_orig_empty) { { 'Copyright' => '', 'CopyrightNotice' => '', 'Rights' => '' } }
   let(:tag) { described_class.new(val_ok) }
 
   it_behaves_like 'any tag'
@@ -32,6 +33,11 @@ describe ExifTagger::Tag::Copyright do
       tag.validate_with_original(val_orig)
       expect(tag.to_write_script).to include('# -MWG:Copyright=2014 (c) Andrew Bizyaev')
       expect(tag.to_write_script).to match(/# WARNING: ([\w]*) has original value:/)
+    end
+    it 'considers empty strings as a no-value' do
+      tag.validate_with_original(val_orig_empty)
+      expect(tag.warnings).to be_empty
+      expect(tag.warnings.inspect).not_to include('has original value:')
     end
   end
 
