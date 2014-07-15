@@ -19,7 +19,7 @@ module FTools
       case FTools.os
       when :windows
         # workaround for win32
-        ARGV.map! { |a| a.encode('internal', 'filesystem') }
+        ARGV.map! { |a| a.encode('utf-8', 'filesystem') }
         @os = OSWin.new
       else
         @os = OSUnix.new
