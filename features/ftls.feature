@@ -125,15 +125,15 @@ Feature: Generate a list of ftools-friendly-files
     | fotos/fotos2/f6.tif          |
     | fotos/fotos2/fotos3/f6.png   |
 
-  #@announce
+  @announce
   Scenario: 6 Default output produces supported-by-ftools file list with CAPITALIZED extentions
     Given a directory named "capitalized"
     Given empty files named:
-    | foto_cap.JPG            |
+    | foto_cap.JPG           |
     | ./capitalized/foto.TIF  |
     | ./capitalized/video.DV  |
     | ./capitalized/video.MOV |
-    When I successfully run `ftls foto_cap.jpg capitalized`
+    When I successfully run `ftls foto_cap.JPG capitalized`
     Then the stdout should contain each of:
     | foto_cap. |
     | foto.TIF  |
