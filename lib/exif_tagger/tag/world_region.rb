@@ -9,6 +9,7 @@ module ExifTagger
     # -XMP-iptcExt:LocationShownWorldRegion, String
     class WorldRegion < Tag
       MAX_BYTESIZE = 64 # No limit in XMP spec
+      EXIFTOOL_TAGS = %w(LocationShownWorldRegion)
 
       def initialize(value_raw = [])
         super(value_raw.to_s)
@@ -16,7 +17,10 @@ module ExifTagger
 
       def to_write_script
         str = ''
-        str << %Q{-XMP-iptcExt:LocationShownWorldRegion=#{@value}\n} unless @value.empty?
+        unless @value.empty?
+          str << print_warnings
+          str << print_line(%Q(-XMP-iptcExt:LocationShownWorldRegion=#{@value}\n))
+        end
         str
       end
 

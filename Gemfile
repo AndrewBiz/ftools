@@ -2,8 +2,8 @@ source 'https://rubygems.org'
 
 gem 'nesty', '~>1.0'
 gem 'docopt', '~>0.5'
-gem 'mini_exiftool'
-gem 'active_support', '~>3.0'
+gem 'mini_exiftool', '~>2.4'
+gem 'activesupport', '~>3.0'
 gem 'i18n'
 
 # Add dependencies to develop your gem here.
@@ -21,12 +21,13 @@ group :development do
     gem 'win32console', require: false
     gem 'rb-notifu', '>= 0', require: false
   end
-  
+
   gem 'guard'
   gem 'guard-rspec'
   gem 'guard-cucumber'
-  gem 'rspec', '>= 0'
+  gem 'rspec', '~> 2.9'
   gem 'aruba'
   gem 'bundler', '>= 0'
   gem 'fuubar'
+  gem 'rubocop'
 end

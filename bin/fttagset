@@ -7,7 +7,7 @@ module FTools
   tool_name = File.basename(__FILE__)
   require_relative "../lib/ftools/#{tool_name}"
 
-  VERSION = '0.3.0'
+  VERSION = '0.4.0'
   # TODO: only supported types - to check
   file_type = FILE_TYPE_IMAGE + FILE_TYPE_VIDEO + FILE_TYPE_AUDIO
   usage = <<DOCOPT
@@ -28,10 +28,10 @@ Usage:
 
 Options:
   -e EVT --event=EVT     Event profile to use [default: ./event.yml]
-  -c CRT --creators=CRT  CREATORs (authors) directory,
-                         yaml format [default: ~/ftools/creators.yml]
-  -p PLC --places=PLC    PLACEs directory,
-                         yaml format [default: ~/ftools/places.yml]
+  -c CRT --creators=CRT  CREATORs (authors) directory file,
+                         yaml format [default: #{ENV['HOME']}/ftools/creators.yml]
+  -p PLC --places=PLC    PLACEs directory file,
+                         yaml format [default: #{ENV['HOME']}/ftools/places.yml]
   -D --debug    Turn on debugging (verbose) mode
   -h --help     Show this screen.
   -v --version  Show version.

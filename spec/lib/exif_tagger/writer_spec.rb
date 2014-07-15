@@ -3,15 +3,25 @@
 # (c) ANB Andrew Bizyaev
 
 require_relative '../../../spec/spec_helper'
-require 'writer'
+require 'exif_tagger'
 
 describe ExifTagger::Writer do
-  let(:writer) { ExifTagger::Writer.new(memo: 'automatically generated') }
+  let(:output) { double('output').as_null_object }
+  let(:writer) do
+    ExifTagger::Writer.new(script_name: 'exif_tagger.txt',
+                           memo: 'automatically generated',
+                           output: output)
+  end
   let(:mfile) { StringIO.new('script.txt', 'w+:utf-8') }
 
   before :each do
     allow(File).to receive(:open).and_return(mfile)
     allow(File).to receive(:close).and_return true
+  end
+
+  it 'informs it has started generated script' do
+    expect(output).to receive(:puts).with("*** Preparing exiftool script 'exif_tagger.txt' ...")
+    writer
   end
 
   it 'knows the exiftool command to be run' do
@@ -26,7 +36,7 @@ describe ExifTagger::Writer do
   end
 
   it 'starts with counter (number of added files) == 0' do
-    expect(writer.counter).to eql 0
+    expect(writer.added_files_count).to eql 0
   end
 
   it 'adds instructions into script' do
@@ -90,25 +100,37 @@ describe ExifTagger::Writer do
     expect(mfile.string).to include('-execute')
   end
 
-  it 'increments :counter after :add_to_script' do
+  it 'increments counter after :add_to_script' do
     tags2write = ExifTagger::TagCollection.new(
       creator: %w(Andrey),
       copyright: %(Andrey Bizyaev),
       modify_date: 'now')
 
     writer.add_to_script(ftfile: 'test.jpg', tags: tags2write)
-    expect(writer.counter).to eql 1
+    expect(writer.added_files_count).to eql 1
     expect(mfile.string).to include('# **(1)**')
     writer.add_to_script(ftfile: 'test.jpg', tags: tags2write)
-    expect(writer.counter).to eql 2
+    expect(writer.added_files_count).to eql 2
     writer.add_to_script(ftfile: 'test.jpg', tags: tags2write)
     writer.add_to_script(ftfile: 'test.jpg', tags: tags2write)
     writer.add_to_script(ftfile: 'test.jpg', tags: tags2write)
-    expect(writer.counter).to eql 5
+    expect(writer.added_files_count).to eql 5
     expect(mfile.string).to include('# **(2)**')
     expect(mfile.string).to include('# **(3)**')
     expect(mfile.string).to include('# **(4)**')
     expect(mfile.string).to include('# **(5)**')
+  end
+
+  it 'informs when finished the script preparation' do
+    tags2write = ExifTagger::TagCollection.new(
+      creator: %w(Andrey),
+      copyright: %(Andrey Bizyaev),
+      modify_date: 'now')
+
+    allow(writer).to receive(:system) { true }
+    expect(output).to receive(:puts).with("*** Finished preparation of the script 'exif_tagger.txt'")
+    writer.add_to_script(ftfile: 'foto1.jpg', tags: tags2write)
+    writer.close_script
   end
 
   it 'runs the exiftool script' do
@@ -117,17 +139,27 @@ describe ExifTagger::Writer do
       copyright: %(Andrey Bizyaev),
       modify_date: 'now')
 
+    expect(output).to receive(:puts).with("*** Preparing exiftool script 'exif_tagger.txt' ...")
     allow(writer).to receive(:system) { true }
-    writer.add_to_script(ftfile: 'test.jpg', tags: tags2write)
-    expect(writer.counter).to eql 1
+    writer.add_to_script(ftfile: 'foto2.jpg', tags: tags2write)
+
+    expect(output).to receive(:puts).with("*** Finished preparation of the script 'exif_tagger.txt'")
+    expect(output).to receive(:puts).with('*** Running exiftool -@ exif_tagger.txt ...')
+    expect(output).to receive(:puts).with('*** Finished exiftool -@ exif_tagger.txt')
+    expect(writer.added_files_count).to eql 1
     expect(writer).to receive(:system).once
     writer.run!
   end
 
   it 'does not run the exiftool script if no files were added' do
+    expect(output).to receive(:puts).with("*** Preparing exiftool script 'exif_tagger.txt' ...")
     allow(writer).to receive(:system) { true }
-    expect(writer.counter).to eql 0
+    expect(writer.added_files_count).to eql 0
     expect(writer).not_to receive(:system)
+    expect(output).to receive(:puts).with("*** Finished preparation of the script 'exif_tagger.txt'")
+    expect(output).not_to receive(:puts).with('*** Running exiftool -@ exif_tagger.txt ...')
+    expect(output).not_to receive(:puts).with('*** Finished exiftool -@ exif_tagger.txt')
+    expect(output).to receive(:puts).with('*** Nothing to update, skip running exiftool -@ exif_tagger.txt ...')
     writer.run!
   end
 end

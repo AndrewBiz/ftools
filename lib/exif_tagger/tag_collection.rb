@@ -2,22 +2,24 @@
 # encoding: UTF-8
 # (c) ANB Andrew Bizyaev
 
-require_relative 'error'
-require 'active_support/core_ext'
-
-# loading exif tag classes
-lib_dir = File.join(__dir__, 'tag', '*.rb')
-Dir.glob(lib_dir).each { |file| require_relative file }
-
 module ExifTagger
   # EXIF tags collection
   class TagCollection
     include Enumerable
 
-    def initialize(init_values = {})
+    def initialize(init_values = nil)
       @collection = []
-      init_values.each do |k, v|
-        self[k] = v
+      unless init_values.nil?
+        case
+        when init_values.kind_of?(Hash)
+          init_values.each do |k, v|
+            self[k] = v
+          end
+        when init_values.kind_of?(ExifTagger::TagCollection)
+          init_values.each do |item|
+            self[item.tag_id] = item.value
+          end
+        end
       end
     end
 
@@ -50,6 +52,43 @@ module ExifTagger
 
     def delete(tag)
       @collection.delete(tag)
+    end
+
+    def valid?
+      ok = true
+      @collection.each { |i| ok &&= i.valid? }
+      ok
+    end
+
+    def with_warnings?
+      warn = false
+      @collection.each { |i| warn ||= i.warnings.empty? }
+      warn
+    end
+
+    def validate_with_original(tags_original)
+      @collection.each { |i| i.validate_with_original(tags_original) }
+    end
+
+    def error_message
+      str = ''
+      unless valid?
+        str = "Tags are NOT VALID:\n"
+        @collection.each do |item|
+          item.errors.each { |e| str << '    ' + e + "\n" }
+        end
+      end
+      str
+    end
+
+    def warning_message
+      str = ''
+      if with_warnings?
+        @collection.each do |item|
+          item.warnings.each { |e| str << '    WARNING: ' + e + "\n" }
+        end
+      end
+      str
     end
 
     private

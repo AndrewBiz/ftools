@@ -6,7 +6,7 @@ require_relative '../../../spec/spec_helper'
 require 'exif_tagger'
 
 describe ExifTagger::TagCollection do
-  let(:mytags) { ExifTagger::TagCollection.new }
+  let(:mytags) { described_class.new }
 
   it 'saves the tag value' do
     val_array = %w(aaa bbb ааа ббб)
@@ -91,10 +91,12 @@ describe ExifTagger::TagCollection do
     expect(mytags[:image_unique_id]).to include('20140223-003748-0123')
     expect(mytags[:coded_character_set]).to include('UTF8')
     expect(mytags[:modify_date]).to include('now')
+    expect(mytags).to be_valid
+    expect(mytags.error_message).to be_empty
   end
 
   it 'saves basic exif tags when they set via initial hash' do
-    mytags = ExifTagger::TagCollection.new(
+    mytags = described_class.new(
       creator: %w(Andrey\ Bizyaev Matz),
       copyright: %(2014 \(c\) Andrey Bizyaev),
       keywords: %w(keyword1 keyword2),
@@ -136,6 +138,119 @@ describe ExifTagger::TagCollection do
     expect(mytags[:image_unique_id]).to include('20140223-003748-0123')
     expect(mytags[:coded_character_set]).to include('UTF8')
     expect(mytags[:modify_date]).to include('now')
+    expect(mytags).to be_valid
+    expect(mytags.error_message).to be_empty
+  end
+
+  it 'saves basic exif tags when they set via another tag collection' do
+    deftags = described_class.new(
+      creator: %w(Andrey\ Bizyaev Matz),
+      copyright: %(2014 \(c\) Andrey Bizyaev),
+      keywords: %w(keyword1 keyword2),
+      world_region: %(Europe),
+      country: %(Russia),
+      country_code: 'RU',
+      state: %(State),
+      city: %(Moscow),
+      location: %(Pushkin street 1),
+      gps_created: { gps_latitude: '55 36 31.49',
+                     gps_latitude_ref: 'N',
+                     gps_longitude: '37 43 28.27',
+                     gps_longitude_ref: 'E',
+                     gps_altitude: '170.0',
+                     gps_altitude_ref: 'Above Sea Level' },
+      collections: { collection_name: 'Collection Name',
+                     collection_uri: 'www.site.com' },
+      image_unique_id: '20140223-003748-0123',
+      coded_character_set: 'UTF8',
+      modify_date: 'now')
+
+    mytags = described_class.new(deftags)
+
+    expect(mytags[:creator]).to match_array(%w(Andrey\ Bizyaev Matz))
+    expect(mytags[:copyright]).to include(%(2014 (c) Andrey Bizyaev))
+    expect(mytags[:keywords]).to match_array(%w(keyword1 keyword2))
+    expect(mytags[:world_region]).to include(%(Europe))
+    expect(mytags[:country]).to include(%(Russia))
+    expect(mytags[:country_code]).to include('RU')
+    expect(mytags[:state]).to include(%(State))
+    expect(mytags[:city]).to include(%(Moscow))
+    expect(mytags[:location]).to include(%(Pushkin street 1))
+    expect(mytags[:gps_created]).to eql(gps_latitude: '55 36 31.49',
+                                        gps_latitude_ref: 'N',
+                                        gps_longitude: '37 43 28.27',
+                                        gps_longitude_ref: 'E',
+                                        gps_altitude: '170.0',
+                                        gps_altitude_ref: 'Above Sea Level')
+    expect(mytags[:collections]).to eql(collection_name: 'Collection Name',
+                                        collection_uri: 'www.site.com')
+    expect(mytags[:image_unique_id]).to include('20140223-003748-0123')
+    expect(mytags[:coded_character_set]).to include('UTF8')
+    expect(mytags[:modify_date]).to include('now')
+
+    expect(mytags[:creator]).to eq(deftags[:creator])
+    expect(mytags[:copyright]).to eq(deftags[:copyright])
+    expect(mytags[:keywords]).to eq(deftags[:keywords])
+    expect(mytags[:world_region]).to eq(deftags[:world_region])
+    expect(mytags[:country]).to eq(deftags[:country])
+    expect(mytags[:country_code]).to eq(deftags[:country_code])
+    expect(mytags[:state]).to eq(deftags[:state])
+    expect(mytags[:city]).to eq(deftags[:city])
+    expect(mytags[:location]).to eq(deftags[:location])
+    expect(mytags[:location]).to eq(deftags[:location])
+    expect(mytags[:collections]).to eq(deftags[:collections])
+    expect(mytags[:image_unique_id]).to eq(deftags[:image_unique_id])
+    expect(mytags[:coded_character_set]).to eq(deftags[:coded_character_set])
+    expect(mytags[:modify_date]).to eq(deftags[:modify_date])
+
+    expect(mytags).to be_valid
+    expect(mytags.error_message).to be_empty
+  end
+
+  context 'when previous tag value (read by mini_exiftool) exists -' do
+    mytags = described_class.new(
+        creator: %w(Andrey\ Bizyaev Matz),
+        copyright: %(2014 \(c\) Andrey Bizyaev),
+        keywords: %w(keyword1 keyword2),
+        world_region: %(Europe),
+        country: %(Russia),
+        country_code: 'RU',
+        state: %(State),
+        city: %(Moscow),
+        location: %(Pushkin street 1),
+        gps_created: { gps_latitude: '55 36 31.49',
+                       gps_latitude_ref: 'N',
+                       gps_longitude: '37 43 28.27',
+                       gps_longitude_ref: 'E',
+                       gps_altitude: '170.0',
+                       gps_altitude_ref: 'Above Sea Level' },
+        collections: { collection_name: 'Collection Name',
+                       collection_uri: 'www.site.com' },
+        image_unique_id: '20140223-003748-0123',
+        coded_character_set: 'UTF8',
+        modify_date: 'now')
+
+    mytags.validate_with_original('Copyright' => 'Original copyright',
+                                  'State' => 'Old state')
+    it 'produce warnings' do
+      expect(mytags).to be_with_warnings
+      expect(mytags.warning_message).to include('Original copyright')
+      expect(mytags.warning_message).to include('Old state')
+    end
+  end
+
+  context 'when receives wrong tag values' do
+    subject do
+      described_class.new(
+        world_region: %(Europe),
+        country: %(Russia),
+        state: %(State),
+        city: %(Very_very_long_name_of_the_supur_puper_city),
+        location: %(Location_too_long123123456789012345))
+    end
+    it { should_not be_valid }
+    its(:error_message) { should include('Very_very_long_name_of_the_supur_puper_city') }
+    its(:error_message) { should include('Location_too_long123123456789012345') }
   end
 end
 

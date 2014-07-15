@@ -12,5 +12,5 @@ moscow:
     :gps_latitude_ref: "N" # GPSLatitudeRef=N' = North 'S' = South
     :gps_longitude: "30 18 50.067" #GPSLongitude=37 deg 43' 12.75"
     :gps_longitude_ref: "E" #GPSLongitudeRef='E' = East 'W' = West
-    :gps_altitude: 0.5 # GPSAltitude
+    :gps_altitude: "0.5" # GPSAltitude
     :gps_altitude_ref: "Above Sea Level" # GPSAltitudeRef=Below Sea Level

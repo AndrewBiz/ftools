@@ -10,6 +10,7 @@ module ExifTagger
     #   = EXIF:Copyright IPTC:CopyrightNotice XMP-dc:Rights
     class Copyright < Tag
       MAX_BYTESIZE = 128
+      EXIFTOOL_TAGS = %w(Copyright CopyrightNotice Rights)
 
       def initialize(value_raw = '')
         super(value_raw.to_s)
@@ -17,7 +18,10 @@ module ExifTagger
 
       def to_write_script
         str = ''
-        str << %Q{-MWG:Copyright=#{@value}\n} unless @value.empty?
+        unless @value.empty?
+          str << print_warnings
+          str << print_line(%Q(-MWG:Copyright=#{@value}\n))
+        end
         str
       end
 

@@ -9,6 +9,7 @@ module ExifTagger
     # XMP-iptcExt:LocationShownCountryCode, String
     class CountryCode < Tag
       MAX_BYTESIZE = 32
+      EXIFTOOL_TAGS = %w(LocationShownCountryCode)
 
       def initialize(value_raw = '')
         super(value_raw.to_s)
@@ -16,7 +17,10 @@ module ExifTagger
 
       def to_write_script
         str = ''
-        str << %Q{-XMP-iptcExt:LocationShownCountryCode=#{@value}\n} unless @value.empty?
+        unless @value.empty?
+          str << print_warnings
+          str << print_line(%Q(-XMP-iptcExt:LocationShownCountryCode=#{@value}\n))
+        end
         str
       end
 

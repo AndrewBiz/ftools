@@ -9,6 +9,7 @@ module ExifTagger
     # ImageUniqueID, String
     class ImageUniqueId < Tag
       MAX_BYTESIZE = 32 # no limit in EXIF spec
+      EXIFTOOL_TAGS = %w(ImageUniqueID)
 
       def initialize(value_raw = [])
         super(value_raw.to_s)
@@ -16,8 +17,20 @@ module ExifTagger
 
       def to_write_script
         str = ''
-        str << %Q{-ImageUniqueID=#{@value}\n} unless @value.empty?
+        unless @value.empty?
+          str << print_warnings
+          str << print_line(%Q(-ImageUniqueID=#{@value}\n))
+        end
         str
+      end
+
+      def validate_with_original(values)
+        @warnings = []
+        v = values[EXIFTOOL_TAGS[0]]
+        if v =~ /(\d{8}-\S+)/
+          @warnings << "#{tag_name} has original correct value: '#{v}'"
+        end
+        @warnings.freeze
       end
 
       private
@@ -25,8 +38,8 @@ module ExifTagger
       def validate
         bsize = @value.bytesize
         if bsize > MAX_BYTESIZE
-          @errors << %{#{tag_name}: '#{@value}' } +
-                     %{is #{bsize - MAX_BYTESIZE} bytes longer than allowed #{MAX_BYTESIZE}}
+          @errors << %(#{tag_name}: '#{@value}' ) +
+                     %(is #{bsize - MAX_BYTESIZE} bytes longer than allowed #{MAX_BYTESIZE})
           @value_invalid << @value
           @value = ''
         end

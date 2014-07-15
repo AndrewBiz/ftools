@@ -11,6 +11,7 @@ module ExifTagger
     #       XMP-iptcExt:LocationShownCountryName
     class Country < Tag
       MAX_BYTESIZE = 64
+      EXIFTOOL_TAGS = %w(Country-PrimaryLocationName Country LocationShownCountryName)
 
       def initialize(value_raw = '')
         super(value_raw.to_s)
@@ -18,7 +19,10 @@ module ExifTagger
 
       def to_write_script
         str = ''
-        str << %Q{-MWG:Country=#{@value}\n} unless @value.empty?
+        unless @value.empty?
+          str << print_warnings
+          str << print_line(%Q(-MWG:Country=#{@value}\n))
+        end
         str
       end
 
@@ -27,8 +31,8 @@ module ExifTagger
       def validate
         bsize = @value.bytesize
         if bsize > MAX_BYTESIZE
-          @errors << %{#{tag_name}: '#{@value}' } +
-                     %{is #{bsize - MAX_BYTESIZE} bytes longer than allowed #{MAX_BYTESIZE}}
+          @errors << %(#{tag_name}: '#{@value}' ) +
+                     %(is #{bsize - MAX_BYTESIZE} bytes longer than allowed #{MAX_BYTESIZE})
           @value_invalid << @value
           @value = ''
         end

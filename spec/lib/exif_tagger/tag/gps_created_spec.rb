@@ -2,42 +2,67 @@
 # encoding: UTF-8
 # (c) ANB Andrew Bizyaev
 
-require_relative '../../../../spec/spec_helper'
+require 'spec_helper'
 require 'tag/gps_created'
 
 describe ExifTagger::Tag::GpsCreated do
-  val1 = { gps_latitude: '55 36 31.49',
-           gps_latitude_ref: 'N',
-           gps_longitude: '37 43 28.27',
-           gps_longitude_ref: 'E',
-           gps_altitude: '170.0',
-           gps_altitude_ref: 'Above Sea Level' }
-  context "when saves the #{val1}" do
-    subject { ExifTagger::Tag::GpsCreated.new(val1) }
-    its(:value) { should eql(val1) }
-    its(:to_s) { should include(val1.to_s) }
-    its(:tag_id) { should be(:gps_created) }
-    its(:tag_name) { should eq('GpsCreated') }
-    it { should be_valid }
-    its(:errors) { should  be_empty }
-    its(:value_invalid) { should be_empty }
+  let(:val_ok) do
+    { gps_latitude: '55 36 31.49',
+      gps_latitude_ref: 'N',
+      gps_longitude: '37 43 28.27',
+      gps_longitude_ref: 'E',
+      gps_altitude: '170.0',
+      gps_altitude_ref: 'Above Sea Level' }
+  end
+  let(:val_orig) { { 'GPSLatitude' => '20 20 00', 'GPSLongitude' => '20 20 00' } }
+  let(:val_orig_empty) do
+    { 'GPSPosition' => '',
+      'GPSLatitude' => '',
+      'GPSLatitudeRef' => '',
+      'GPSLongitude' => '',
+      'GPSLongitudeRef' => '',
+      'GPSAltitude' => '',
+      'GPSAltitudeRef' => '' }
+  end
+  let(:tag) { described_class.new(val_ok) }
 
-    it 'generates write_script to be used with exiftool' do
-      script = subject.to_write_script
-      expect(script).to include('-GPSLatitude="55 36 31.49"')
-      expect(script).to include('-GPSLatitudeRef=N')
-      expect(script).to include('-GPSLongitude="37 43 28.27"')
-      expect(script).to include('-GPSLongitudeRef=E')
-      expect(script).to include('-GPSAltitude=170.0')
-      expect(script).to include('-GPSAltitudeRef=Above Sea Level')
-    end
+  it_behaves_like 'any tag'
+
+  it 'knows it\'s ID' do
+    expect(tag.tag_id).to be :gps_created
+    expect(tag.tag_name).to eq 'GpsCreated'
   end
 
-  it 'prevents its properties to be altered from outside' do
-    tag = ExifTagger::Tag::GpsCreated.new(val1)
-    expect { tag.value[:gps_latitude] = '00 00 00.00' }.to raise_error(RuntimeError)
-    expect { tag.value_invalid << 'new invalid value' }.to raise_error(RuntimeError)
-    expect { tag.errors << 'new error' }.to raise_error(RuntimeError)
+  it 'generates write_script for exiftool' do
+    expect(tag.to_write_script).to include('-GPSLatitude="55 36 31.49"')
+    expect(tag.to_write_script).to include('-GPSLatitudeRef=N')
+    expect(tag.to_write_script).to include('-GPSLongitude="37 43 28.27"')
+    expect(tag.to_write_script).to include('-GPSLongitudeRef=E')
+    expect(tag.to_write_script).to include('-GPSAltitude=170.0')
+    expect(tag.to_write_script).to include('-GPSAltitudeRef=Above Sea Level')
+  end
+
+  context 'when the original value (read by mini_exiftool) exists -' do
+    it 'generates warnings' do
+      tag.validate_with_original(val_orig)
+      expect(tag.warnings).not_to be_empty
+      expect(tag.warnings.inspect).to include('has original value:')
+    end
+    it 'generates write_script with commented lines' do
+      tag.validate_with_original(val_orig)
+      expect(tag.to_write_script).to include('# -GPSLatitude="55 36 31.49"')
+      expect(tag.to_write_script).to include('# -GPSLatitudeRef=N')
+      expect(tag.to_write_script).to include('# -GPSLongitude="37 43 28.27"')
+      expect(tag.to_write_script).to include('# -GPSLongitudeRef=E')
+      expect(tag.to_write_script).to include('# -GPSAltitude=170.0')
+      expect(tag.to_write_script).to include('# -GPSAltitudeRef=Above Sea Level')
+      expect(tag.to_write_script).to match(/# WARNING: ([\w]*) has original value:/)
+    end
+    it 'considers empty strings as a no-value' do
+      tag.validate_with_original(val_orig_empty)
+      expect(tag.warnings).to be_empty
+      expect(tag.warnings.inspect).not_to include('has original value:')
+    end
   end
 
   context 'when gets invalid input' do
@@ -48,7 +73,7 @@ describe ExifTagger::Tag::GpsCreated do
                   gps_longitude_ref: 'E',
                   gps_altitude: '170.0',
                   gps_altitude_ref: 'Above Sea Level' }
-      subject { ExifTagger::Tag::GpsCreated.new(val_nok) }
+      subject { described_class.new(val_nok) }
       its(:value) { should be_empty }
       it { should_not be_valid }
       its(:value_invalid) { should_not be_empty }
@@ -61,7 +86,7 @@ describe ExifTagger::Tag::GpsCreated do
                   gps_longitude: '37 43 28.27',
                   gps_altitude: '170.0',
                   gps_altitude_ref: 'Above Sea Level' }
-      subject { ExifTagger::Tag::GpsCreated.new(val_nok) }
+      subject { described_class.new(val_nok) }
       its(:value) { should be_empty }
       it { should_not be_valid }
       its(:value_invalid) { should_not be_empty }
@@ -77,7 +102,7 @@ describe ExifTagger::Tag::GpsCreated do
                   gps_longitude_ref: 'Y',
                   gps_altitude: '170.0',
                   gps_altitude_ref: 'Tralala' }
-      subject { ExifTagger::Tag::GpsCreated.new(val_nok) }
+      subject { described_class.new(val_nok) }
       its(:value) { should be_empty }
       it { should_not be_valid }
       its(:value_invalid) { should_not be_empty }

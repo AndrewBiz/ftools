@@ -2,54 +2,56 @@
 # encoding: UTF-8
 # (c) ANB Andrew Bizyaev
 
-require_relative '../../../../spec/spec_helper'
+require 'spec_helper'
 require 'tag/state'
 
 describe ExifTagger::Tag::State do
-  val1 = %{Moscow oblast}
-  context "when saves the #{val1}" do
-    subject { ExifTagger::Tag::State.new(val1) }
-    its(:value) { should eql(val1) }
-    its(:to_s) { should include(val1.to_s) }
-    its(:tag_id) { should be(:state) }
-    its(:tag_name) { should eq('State') }
-    it { should be_valid }
-    its(:errors) { should  be_empty }
-    its(:value_invalid) { should be_empty }
+  let(:val_ok) { 'Moscow oblast' }
+  let(:val_orig) { { 'State' => 'Sverdlovsk oblast' } }
+  let(:val_orig_empty) do
+    { 'State' => '',
+      'Province-State' => '',
+      'LocationShownProvinceState' => '' }
+  end
+  let(:tag) { described_class.new(val_ok) }
 
-    it 'generates write_script to be used with exiftool' do
-      script = subject.to_write_script
-      expect(script).to include("-MWG:State=#{val1}")
-    end
+  it_behaves_like 'any tag'
+
+  it 'knows it\'s ID' do
+    expect(tag.tag_id).to be :state
+    expect(tag.tag_name).to eq 'State'
   end
 
-  val2 = 12_345
-  context "when gets a non-string as input: #{val2}" do
-    subject { ExifTagger::Tag::State.new(val2) }
-    val_normal = '12345'
-    it 'converts the input to the string' do
-      expect(subject.value).to eql(val_normal)
-    end
-    it { should be_valid }
-    its(:errors) { should  be_empty }
-    its(:value_invalid) { should be_empty }
+  it 'generates write_script for exiftool' do
+    expect(tag.to_write_script).to include('-MWG:State=Moscow oblast')
   end
 
-  it 'prevents its properties to be altered from outside' do
-    tag = ExifTagger::Tag::State.new(val1)
-    expect { tag.value << 'newvalue' }.to raise_error(RuntimeError)
-    expect { tag.value_invalid << 'new invalid value' }.to raise_error(RuntimeError)
-    expect { tag.errors << 'new error' }.to raise_error(RuntimeError)
+  context 'when the original value (read by mini_exiftool) exists -' do
+    it 'generates warnings' do
+      tag.validate_with_original(val_orig)
+      expect(tag.warnings).not_to be_empty
+      expect(tag.warnings.inspect).to include('has original value:')
+    end
+    it 'generates write_script with commented lines' do
+      tag.validate_with_original(val_orig)
+      expect(tag.to_write_script).to include('# -MWG:State=Moscow oblast')
+      expect(tag.to_write_script).to match(/# WARNING: ([\w]*) has original value:/)
+    end
+    it 'considers empty strings as a no-value' do
+      tag.validate_with_original(val_orig_empty)
+      expect(tag.warnings).to be_empty
+      expect(tag.warnings.inspect).not_to include('has original value:')
+    end
   end
 
   context 'when gets invalid values' do
     val_nok = '123456789012345678901234567890123'# bytesize=33
-    subject { ExifTagger::Tag::State.new(val_nok) }
+    subject { described_class.new(val_nok) }
     its(:value) { should be_empty }
     it { should_not be_valid }
     its(:value_invalid) { should_not be_empty }
     its(:value_invalid) { should match_array([val_nok]) }
-    its('errors.inspect') { should include("'#{val_nok.to_s}'") }
+    its('errors.inspect') { should include("'#{val_nok}'") }
     its(:to_write_script) { should be_empty }
   end
 end

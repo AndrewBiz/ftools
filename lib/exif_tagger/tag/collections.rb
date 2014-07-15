@@ -11,6 +11,7 @@ module ExifTagger
     #   CollectionURI
     class Collections < Tag
       VALID_KEYS = [:collection_name, :collection_uri]
+      EXIFTOOL_TAGS = %w(CollectionName CollectionURI)
       def initialize(value_raw = {})
         super
       end
@@ -18,8 +19,9 @@ module ExifTagger
       def to_write_script
         str = ''
         unless @value.empty?
-          str << %Q{-XMP-mwg-coll:Collections-={CollectionName=#{@value[:collection_name]}, CollectionURI=#{@value[:collection_uri]}}\n}
-          str << %Q{-XMP-mwg-coll:Collections+={CollectionName=#{@value[:collection_name]}, CollectionURI=#{@value[:collection_uri]}}\n}
+          str << print_warnings
+          str << print_line(%Q{-XMP-mwg-coll:Collections-={CollectionName=#{@value[:collection_name]}, CollectionURI=#{@value[:collection_uri]}}\n})
+          str << print_line(%Q{-XMP-mwg-coll:Collections+={CollectionName=#{@value[:collection_name]}, CollectionURI=#{@value[:collection_uri]}}\n})
         end
         str
       end

@@ -2,39 +2,42 @@
 # encoding: UTF-8
 # (c) ANB Andrew Bizyaev
 
-require_relative '../../../../spec/spec_helper'
+require 'spec_helper'
 require 'tag/modify_date'
+require 'date'
 
 describe ExifTagger::Tag::ModifyDate do
-  val1 = 'now'
-  context "when saves the #{val1}" do
-    subject { ExifTagger::Tag::ModifyDate.new(val1) }
-    its(:value) { should eq(val1) }
-    its(:to_s) { should include(val1.to_s) }
-    its(:tag_id) { should be(:modify_date) }
-    its(:tag_name) { should eq('ModifyDate') }
-    it { should be_valid }
-    its(:errors) { should  be_empty }
-    its(:value_invalid) { should be_empty }
+  let(:val_ok) { 'now' }
+  let(:val_orig) { { 'ModifyDate' => DateTime.now } }
+  let(:tag) { described_class.new(val_ok) }
 
-    it 'generates write_script to be used with exiftool' do
-      script = subject.to_write_script
-      expect(script).to include("-EXIF:ModifyDate=#{val1}")
+  it_behaves_like 'any tag'
+
+  it 'knows it\'s ID' do
+    expect(tag.tag_id).to be :modify_date
+    expect(tag.tag_name).to eq 'ModifyDate'
+  end
+
+  it 'generates write_script for exiftool' do
+    expect(tag.to_write_script).to include('-EXIF:ModifyDate=now')
+  end
+
+  context 'when the original value (read by mini_exiftool) exists -' do
+    it 'generates NO warnings' do
+      tag.validate_with_original(val_orig)
+      expect(tag.warnings).to be_empty
+    end
+    it 'generates write_script for exiftool' do
+      tag.validate_with_original(val_orig)
+      expect(tag.to_write_script).to include('-EXIF:ModifyDate=now')
+      expect(tag.to_write_script).not_to include('# -EXIF:ModifyDate=now')
+      expect(tag.to_write_script).not_to match(/# WARNING: ([\w]*) has original value:/)
     end
   end
 
-  it 'prevents its properties to be altered from outside' do
-    val = 'zzz'
-    tag = ExifTagger::Tag::ModifyDate.new(val)
-    expect { tag.value << 'newvalue' }.to raise_error(RuntimeError)
-    expect { tag.value_invalid << 'new invalid value' }.to raise_error(RuntimeError)
-    expect { tag.errors << 'new error' }.to raise_error(RuntimeError)
-  end
-
-  context 'when gets invalid values' do
+  context 'when gets invalid value' do
     val_nok = '123456789012345678901234567890123' # bytesize=33
-
-    subject { ExifTagger::Tag::ModifyDate.new(val_nok) }
+    subject { described_class.new(val_nok) }
     its(:value) { should be_empty }
     it { should_not be_valid }
     its(:value_invalid) { should_not be_empty }

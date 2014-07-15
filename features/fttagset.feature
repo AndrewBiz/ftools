@@ -34,8 +34,7 @@ Feature: Set EXIF tags in photo and video files
     And example file "features/media/events/event.yml" copied to "2settag"
     And example file "features/media/directories/creators_wrong.yml" copied to file "2settag/creators.yml"
     And example file "features/media/directories/places.yml" copied to "2settag"
-    And example files from "features/media/renamed" copied to "2settag" named:
-    | 20130103-103254_ANB DSC03313.JPG |
+    And example file "features/media/renamed/20130103-103254_ANB DSC03313_notagset.JPG" copied to file "2settag/20130103-103254_ANB DSC03313.JPG"
 
     When I cd to "2settag"
     And I run `ftls_fttagset`
@@ -66,7 +65,7 @@ Feature: Set EXIF tags in photo and video files
     And example file "features/media/events/event.yml" copied to "2settag"
     And example file "features/media/directories/creators.yml" copied to file "2settag/creators.yml"
     And example file "features/media/directories/places_wrong.yml" copied to file "2settag/places.yml"
-    And example file "features/media/renamed/20130103-103254_ANB DSC03313.JPG" copied to file "2settag/20130103-103254_ANB DSC03313.JPG"
+    And example file "features/media/renamed/20130103-103254_ANB DSC03313_notagset.JPG" copied to file "2settag/20130103-103254_ANB DSC03313.JPG"
 
     When I cd to "2settag"
     And I run `ftls_fttagset`
@@ -75,13 +74,29 @@ Feature: Set EXIF tags in photo and video files
     Then the stderr should contain each of:
     | Place 'peterburg' is not found   |
 
+  # @announce
+  Scenario: 17 Fails if the default tags are not valid
+    Given a directory named "2settag"
+    And example file "features/media/events/event-RU-wrong.yml" copied to file "2settag/event.yml"
+    And example file "features/media/directories/creators.yml" copied to file "2settag/creators.yml"
+    And example file "features/media/directories/places-RU-wrong.yml" copied to file "2settag/places.yml"
+    And example file "features/media/renamed/20130103-103254_ANB DSC03313_notagset.JPG" copied to file "2settag/20130103-103254_ANB DSC03313.JPG"
+
+    When I cd to "2settag"
+    And I run `ftls_fttagset`
+
+    Then the exit status should not be 0
+    Then the stderr should contain each of:
+    | Балтийское море - очень неспокойное осенью |
+    | Дворцовая площадь дом 1                    |
+
   #@announce
   Scenario: 20 Rejects update the file if the AUTHOR is unknown
     Given a directory named "2settag"
     And example file "features/media/events/event.yml" copied to "2settag"
     And example file "features/media/directories/creators.yml" copied to "2settag"
     And example file "features/media/directories/places.yml" copied to "2settag"
-    And example file "features/media/renamed/20130103-103254_ANB DSC03313.JPG" copied to file "2settag/20130103-103254_XXX DSC03313.JPG"
+    And example file "features/media/renamed/20130103-103254_ANB DSC03313_notagset.JPG" copied to file "2settag/20130103-103254_XXX DSC03313.JPG"
 
     When I cd to "2settag"
     And I successfully run `ftls_fttagset`
@@ -90,14 +105,28 @@ Feature: Set EXIF tags in photo and video files
     | 20130103-103254_XXX DSC03313.JPG |
     | Author 'XXX' is not found        |
 
-   @announce
+  # @announce
+  Scenario: 22 Rejects update the file if the AUTHOR is invalid
+    Given a directory named "2settag"
+    And example file "features/media/events/event.yml" copied to "2settag"
+    And example file "features/media/directories/creators-RU-wrong.yml" copied to file "2settag/creators.yml"
+    And example file "features/media/directories/places.yml" copied to "2settag"
+    And example file "features/media/renamed/20130103-103254_ANB DSC03313_notagset.JPG" copied to file "2settag/20130103-103254_ANB DSC03313.JPG"
+
+    When I cd to "2settag"
+    And I successfully run `ftls_fttagset`
+
+    Then the stderr should contain each of:
+    | 20130103-103254_ANB DSC03313.JPG |
+    | Андрей Николаевич Бизяев         |
+
+  # @announce
   Scenario: 30 The jpg file is saved with core tags set (ASCII charset)
     Given a directory named "2settag"
     And example file "features/media/events/event.yml" copied to "2settag"
     And example file "features/media/directories/creators.yml" copied to "2settag"
     And example file "features/media/directories/places.yml" copied to "2settag"
-    And example files from "features/media/renamed" copied to "2settag" named:
-    | 20130103-103254_ANB DSC03313.JPG |
+    And example file "features/media/renamed/20130103-103254_ANB DSC03313_notagset.JPG" copied to file "2settag/20130103-103254_ANB DSC03313.JPG"
 
     When I cd to "2settag"
     And I successfully run `fttags '20130103-103254_ANB DSC03313.JPG'`
@@ -125,7 +154,7 @@ Feature: Set EXIF tags in photo and video files
 
     When I successfully run `ftls_fttagset`
 
-    Then the stdout from "ftls_fttagset" should contain "20130103-103254_ANB DSC03313.JPG"
+    Then the stderr from "ftls_fttagset" should contain "20130103-103254_ANB DSC03313.JPG"
 
     When I successfully run `fttags '20130103-103254_ANB DSC03313.JPG'`
     Then the stdout from "fttags '20130103-103254_ANB DSC03313.JPG'" should contain each of:
@@ -171,6 +200,140 @@ Feature: Set EXIF tags in photo and video files
     | anblab.net                                   |
     | CodedCharacterSet                            |
     | UTF8                                         |
+    And the output should match /^ImageUniqueID *: (\d{8}-\S+)/
+
+  #@announce
+  Scenario: 40 The existing tags in the JPG file will not be owerwritten
+
+    Given a directory named "2settag"
+    And example file "features/media/events/event-overwrite.yml" copied to file "2settag/event.yml"
+    And example file "features/media/directories/creators-overwrite.yml" copied to file "2settag/creators.yml"
+    And example file "features/media/directories/places-overwrite.yml" copied to file "2settag/places.yml"
+    And example file "features/media/renamed/20130103-153908_ANB DSC03403_alltagset.JPG" copied to file "2settag/20130103-153908_ANB DSC03403.JPG"
+
+    When I cd to "2settag"
+    And I successfully run `fttags '20130103-153908_ANB DSC03403.JPG'`
+
+    Then the stdout from "fttags '20130103-153908_ANB DSC03403.JPG'" should contain each of:
+    | Creator                                       |
+    | Andrey Bizyaev (photographer)                 |
+    | Andrey Bizyaev (camera owner)                 |
+    | Copyright                                     |
+    | 2013 (c) Andrey Bizyaev. All Rights Reserved. |
+    | Keywords                                      |
+    | before-what-travel                            |
+    | before-who-Andrew                             |
+    | before-where-Baltic                           |
+    | before-when-day                               |
+    | before-why-vacation                           |
+    | before-how-fine                               |
+    | before-method-digicam                         |
+    | LocationShownWorldRegion                      |
+    | Europe                                        |
+    | Country                                       |
+    | Russia                                        |
+    | LocationShownCountryCode                      |
+    | RU                                            |
+    | State                                         |
+    | Санкт-Петербург                               |
+    | City                                          |
+    | Санкт-Петербург                               |
+    | Location                                      |
+    | Дворцовая пл.                                 |
+    | GPSLatitude                                   |
+    | 60 0 0.00000000                               |
+    | GPSLatitudeRef                                |
+    | North                                         |
+    | GPSLongitude                                  |
+    | 25 0 0.00000000                               |
+    | GPSLongitudeRef                               |
+    | East                                          |
+    | GPSAltitude                                   |
+    | 0.5 m                                         |
+    | GPSAltitudeRef                                |
+    | Above Sea Level                               |
+    | CollectionName                                |
+    | S-Peterburg Travel                            |
+    | CollectionURI                                 |
+    | anblab.net                                    |
+    | ImageUniqueID                                 |
+    | 20140402-205030-0001                          |
+    | CodedCharacterSet                             |
+    | UTF8                                          |
+
+    When I successfully run `ftls_fttagset`
+
+    Then the stderr from "ftls_fttagset" should contain "20130103-153908_ANB DSC03403.JPG"
+
+    When I successfully run `fttags '20130103-153908_ANB DSC03403.JPG'`
+    Then the stdout from "fttags '20130103-153908_ANB DSC03403.JPG'" should contain each of:
+    | Creator                                       |
+    | Andrey Bizyaev (photographer)                 |
+    | Andrey Bizyaev (camera owner)                 |
+    | Copyright                                     |
+    | 2013 (c) Andrey Bizyaev. All Rights Reserved. |
+    | Keywords                                      |
+    | before-what-travel                            |
+    | before-who-Andrew                             |
+    | before-where-Baltic                           |
+    | before-when-day                               |
+    | before-why-vacation                           |
+    | before-how-fine                               |
+    | before-method-digicam                         |
+    | what-to_be_added                              |
+    | who-to_be_added                               |
+    | where-to_be_added                             |
+    | when-to_be_added                              |
+    | why-to_be_added                               |
+    | how-to_be_added                               |
+    | method-to_be_added                            |
+    | LocationShownWorldRegion                      |
+    | Europe                                        |
+    | Country                                       |
+    | Russia                                        |
+    | LocationShownCountryCode                      |
+    | RU                                            |
+    | State                                         |
+    | Санкт-Петербург                               |
+    | City                                          |
+    | Санкт-Петербург                               |
+    | Location                                      |
+    | Дворцовая пл.                                 |
+    | GPSLatitude                                   |
+    | 60 0 0.00000000                               |
+    | GPSLatitudeRef                                |
+    | North                                         |
+    | GPSLongitude                                  |
+    | 25 0 0.00000000                               |
+    | GPSLongitudeRef                               |
+    | East                                          |
+    | GPSAltitude                                   |
+    | 0.5 m                                         |
+    | GPSAltitudeRef                                |
+    | Above Sea Level                               |
+    | CollectionName                                |
+    | S-Peterburg Travel                            |
+    | CollectionURI                                 |
+    | anblab.net                                    |
+    | ImageUniqueID                                 |
+    | 20140402-205030-0001                          |
+    | CodedCharacterSet                             |
+    | UTF8                                          |
+
+    And the stdout from "fttags '20130103-153908_ANB DSC03403.JPG'" should not contain any of:
+    | Arnold Schwarzenegger   |
+    | (c) Arny                |
+    | Asiopa                  |
+    | Xland                   |
+    | XX                      |
+    | Xxxsheer                |
+    | Nsk                     |
+    | Far market              |
+    | 19 19 00                |
+    | 20 20 00                |
+    | 888                     |
+    | title_to_be_overwritten |
+    | uri_to_be_overwritten   |
 
 # -DateTimeOriginal                : 2013-01-03 10:32:20
 # -CreateDate                      : 2013-01-03 10:32:20
