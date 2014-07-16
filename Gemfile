@@ -26,6 +26,7 @@ group :development do
   gem 'guard-rspec'
   gem 'guard-cucumber'
   gem 'rspec', '~> 2.9'
+  gem 'rspec-its', '~> 1.0'
   gem 'aruba'
   gem 'bundler', '>= 0'
   gem 'fuubar'

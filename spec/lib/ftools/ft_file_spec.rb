@@ -58,57 +58,57 @@ describe FTools::FTFile do
     fn2 = FTools::FTFile.new('file2.ext')
     fn3 = FTools::FTFile.new('file1.ext')
 
-    expect(fn1 == fn2).to be_false
-    expect(fn1 == fn3).to be_true
+    expect(fn1).not_to eq(fn2)
+    expect(fn1).to eq(fn3)
   end
 
   describe 'validates the author NICKNAME' do
     an1 = 'A'
     it "and reports wrong size for '#{an1}'" do
       ok, message = FTools::FTFile.validate_author(an1)
-      expect(ok).to be_false
+      expect(ok).to be false
       expect(message).to include('wrong author size')
     end
     an2 = 'ANNB'
     it "and reports wrong size for '#{an2}'" do
       ok, message = FTools::FTFile.validate_author(an2)
-      expect(ok).to be_false
+      expect(ok).to be false
       expect(message).to include('wrong author size')
     end
     an3 = 'ANB'
     it "and keeps silince for '#{an3}'" do
       ok, message = FTools::FTFile.validate_author(an3)
-      expect(ok).to be_true
+      expect(ok).to be true
       expect(message).to be_empty
     end
     an4 = 'A N'
     it "and reports wrong SPACE char for '#{an4}'" do
       ok, message = FTools::FTFile.validate_author(an4)
-      expect(ok).to be_false
+      expect(ok).to be false
       expect(message).to include('should not contain spaces')
     end
     an5 = 'A_B'
     it "and reports wrong '_' char for '#{an5}'" do
       ok, message = FTools::FTFile.validate_author(an5)
-      expect(ok).to be_false
+      expect(ok).to be false
       expect(message).to include('_')
     end
     an6 = 'A-B'
     it "and reports wrong '-' char for '#{an6}'" do
       ok, message = FTools::FTFile.validate_author(an6)
-      expect(ok).to be_false
+      expect(ok).to be false
       expect(message).to include('-')
     end
     an7 = 'A5B'
     it "and reports wrong DIGIT char for '#{an7}'" do
       ok, message = FTools::FTFile.validate_author(an7)
-      expect(ok).to be_false
+      expect(ok).to be false
       expect(message).to include('should not contain digits')
     end
     an8 = 'AБB'
     it "and reports wrong non-ASCII char for '#{an8}'" do
       ok, message = FTools::FTFile.validate_author(an8)
-      expect(ok).to be_false
+      expect(ok).to be false
       expect(message).to include('should contain only ASCII')
     end
   end
@@ -333,33 +333,33 @@ describe FTools::FTFile do
       obj = FTools::FTFile.new(fndt1)
       expect(obj.date_time).to eq \
         DateTime.strptime('2001-12-31T11:22:33+00:00')
-      expect(obj.date_time_ok?).to be_true
+      expect(obj.date_time_ok?).to be true
     end
     fndt2 = '20011231-112269_ANB cleanname.jpg'
     it fndt2 do
       obj = FTools::FTFile.new(fndt2)
-      expect(obj.date_time_ok?).to be_false
+      expect(obj.date_time_ok?).to be false
     end
     fndt3 = '20011231-1122_ANB cleanname.jpg'
     it fndt3 do
       obj = FTools::FTFile.new(fndt3)
       expect(obj.date_time).to eq \
         DateTime.strptime('2001-12-31T11:22:00+00:00')
-      expect(obj.date_time_ok?).to be_true
+      expect(obj.date_time_ok?).to be true
     end
     fndt4 = '20011231_cleanname.jpg'
     it fndt4 do
       obj = FTools::FTFile.new(fndt4)
       expect(obj.date_time).to eq \
         DateTime.strptime('2001-12-31T00:00:00+00:00')
-      expect(obj.date_time_ok?).to be_true
+      expect(obj.date_time_ok?).to be true
     end
     fndt5 = '2001_cleanname.jpg'
     it fndt5 do
       obj = FTools::FTFile.new(fndt5)
       expect(obj.date_time).to eq \
         DateTime.strptime('2001-01-01T00:00:00+00:00')
-      expect(obj.date_time_ok?).to be_true
+      expect(obj.date_time_ok?).to be true
     end
   end
 
@@ -367,59 +367,59 @@ describe FTools::FTFile do
     fts1 = '20011231-112233_ANB[20010101-ABCDEF]{flags}cleanname.jpg'
     it fts1 do
       obj = FTools::FTFile.new(fts1)
-      expect(obj.basename_is_standard?).to be_false
+      expect(obj.basename_is_standard?).to be false
     end
     fts2 = '20011231-112233_ANB[20010101-ABCDEF]cleanname.jpg'
     it fts2 do
       obj = FTools::FTFile.new(fts2)
-      expect(obj.basename_is_standard?).to be_false
+      expect(obj.basename_is_standard?).to be false
     end
     fts3 = '20011231-112233_ANB_cleanname.jpg'
     it fts3 do
       obj = FTools::FTFile.new(fts3)
-      expect(obj.basename_is_standard?).to be_false
+      expect(obj.basename_is_standard?).to be false
     end
     fts4 = '20011231-112233_ANB-cleanname.jpg'
     it fts4 do
       obj = FTools::FTFile.new(fts4)
-      expect(obj.basename_is_standard?).to be_false
+      expect(obj.basename_is_standard?).to be false
     end
     fts5 = '20011232-112233_ANB cleanname.jpg'
     it fts5 do
       obj = FTools::FTFile.new(fts5)
-      expect(obj.basename_is_standard?).to be_false
+      expect(obj.basename_is_standard?).to be false
     end
     # STANDARD name!
     fts6 = '20011231-112233_ANB cleanname.jpg'
     it fts6 do
       obj = FTools::FTFile.new(fts6)
-      expect(obj.basename_is_standard?).to be_true
+      expect(obj.basename_is_standard?).to be true
     end
     fts7 = '20011231-1122_ANB cleanname.jpg'
     it fts7 do
       obj = FTools::FTFile.new(fts7)
-      expect(obj.basename_is_standard?).to be_false
+      expect(obj.basename_is_standard?).to be false
     end
     fts8 = '20011231-1122_cleanname.jpg'
     it fts8 do
       obj = FTools::FTFile.new(fts8)
-      expect(obj.basename_is_standard?).to be_false
+      expect(obj.basename_is_standard?).to be false
     end
     fts9 = '20011231_cleanname.jpg'
     it fts9 do
       obj = FTools::FTFile.new(fts9)
-      expect(obj.basename_is_standard?).to be_false
+      expect(obj.basename_is_standard?).to be false
     end
     fts10 = '2001_cleanname.jpg'
     it fts10 do
       obj = FTools::FTFile.new(fts10)
-      expect(obj.basename_is_standard?).to be_false
+      expect(obj.basename_is_standard?).to be false
     end
     # author shpuld be upcased
     fts11 = '20011231-112233_anb cleanname.jpg'
     it fts11 do
       obj = FTools::FTFile.new(fts11)
-      expect(obj.basename_is_standard?).to be_false
+      expect(obj.basename_is_standard?).to be false
     end
   end
 
@@ -436,7 +436,7 @@ describe FTools::FTFile do
         expect(obj.extname).to eq '.jpg'
         expect(obj.author).to be_empty
         expect(obj.date_time).to eq DateTime.new(0)
-        expect(obj.basename_is_standard?).to be_false
+        expect(obj.basename_is_standard?).to be false
       end
       it 'when I change all parts of the filename' do
         obj = FTools::FTFile.new('cleanname.jpg')
@@ -452,7 +452,7 @@ describe FTools::FTFile do
         expect(obj.extname).to eq '.jpg'
         expect(obj.author).to be_empty
         expect(obj.date_time).to eq DateTime.new(0)
-        expect(obj.basename_is_standard?).to be_false
+        expect(obj.basename_is_standard?).to be false
       end
     end
     describe 'and updates inner state' do
@@ -468,7 +468,7 @@ describe FTools::FTFile do
         expect(obj.extname).to eq '.jpg'
         expect(obj.author).to eq 'ANB'
         expect(obj.date_time).to eq DateTime.strptime('20131130-183657', '%Y%m%d-%H%M%S')
-        expect(obj.basename_is_standard?).to be_true
+        expect(obj.basename_is_standard?).to be true
       end
       it 'when I change all parts of the filename' do
         obj = FTools::FTFile.new('cleanname.jpg')
@@ -485,7 +485,7 @@ describe FTools::FTFile do
         expect(obj.extname).to eq '.jpeg'
         expect(obj.author).to eq 'ANB'
         expect(obj.date_time).to eq DateTime.strptime('20131130-183657', '%Y%m%d-%H%M%S')
-        expect(obj.basename_is_standard?).to be_true
+        expect(obj.basename_is_standard?).to be true
       end
     end
   end
@@ -502,7 +502,7 @@ describe FTools::FTFile do
         expect(obj.extname).to eq '.jpg'
         expect(obj.author).to eq 'ANB'
         expect(obj.date_time).to eq DateTime.strptime('20131130-183657', '%Y%m%d-%H%M%S')
-        expect(obj.basename_is_standard?).to be_true
+        expect(obj.basename_is_standard?).to be true
       end
       fcl02 = '20131130-183657_ANB cleanname.jpg'
       it "when I change all parts of the #{fcl01}" do
@@ -516,7 +516,7 @@ describe FTools::FTFile do
         expect(obj.extname).to eq '.jpg'
         expect(obj.author).to eq 'ANB'
         expect(obj.date_time).to eq DateTime.strptime('20131130-183657', '%Y%m%d-%H%M%S')
-        expect(obj.basename_is_standard?).to be_true
+        expect(obj.basename_is_standard?).to be true
       end
     end
     describe 'and updates inner state' do
@@ -530,7 +530,7 @@ describe FTools::FTFile do
         expect(obj.extname).to eq '.jpg'
         expect(obj.author).to be_empty
         expect(obj.date_time).to eq DateTime.new(0)
-        expect(obj.basename_is_standard?).to be_false
+        expect(obj.basename_is_standard?).to be false
       end
       fcl04 = '20131130-183657_ANB cleanname.jpg'
       it "when I change all parts of the #{fcl04}" do
@@ -544,7 +544,7 @@ describe FTools::FTFile do
         expect(obj.extname).to eq '.jpeg'
         expect(obj.author).to be_empty
         expect(obj.date_time).to eq DateTime.new(0)
-        expect(obj.basename_is_standard?).to be_false
+        expect(obj.basename_is_standard?).to be false
       end
     end
   end
@@ -559,7 +559,7 @@ describe FTools::FTFile do
       expect(obj.extname).to eq '.jpg'
       expect(obj.author).to eq 'ANB'
       expect(obj.date_time).to eq DateTime.strptime('20131130-183657', '%Y%m%d-%H%M%S')
-      expect(obj.basename_is_standard?).to be_true
+      expect(obj.basename_is_standard?).to be true
 
       obj.dirname = 'new/dir/name'
       expect(obj.filename).to eq 'new/dir/name/20131130-183657_ANB cleanname.jpg'
@@ -569,7 +569,7 @@ describe FTools::FTFile do
       expect(obj.extname).to eq '.jpg'
       expect(obj.author).to eq 'ANB'
       expect(obj.date_time).to eq DateTime.strptime('20131130-183657', '%Y%m%d-%H%M%S')
-      expect(obj.basename_is_standard?).to be_true
+      expect(obj.basename_is_standard?).to be true
     end
   end
 end

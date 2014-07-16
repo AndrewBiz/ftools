@@ -27,7 +27,7 @@ describe ExifTagger::TagCollection do
     mytags[:keywords] = val1
     mytags[:keywords] = val2
 
-    expect(mytags[:keywords] == val1).to be_false
+    expect(mytags[:keywords]).not_to eql(val1)
     expect(mytags[:keywords]).to match_array(val2)
   end
 
