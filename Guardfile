@@ -1,7 +1,8 @@
 # A sample Guardfile
 # More info at https://github.com/guard/guard#readme
 
-notification :terminal_notifier, app_name: "ftools"
+# notification :terminal_notifier, app_name: "ftools"
+notification :tmux, display_message: true
 
 guard 'cucumber' do
   watch(%r{^features/.+\.feature$})
