@@ -6,7 +6,7 @@ Feature: Generate a list of ftools-friendly-files
   (one filename by line)
 
   #@announce
-  Scenario: 00 Default output with -h produces usage information 
+  Scenario: 00 Default output with -h produces usage information
     When I successfully run `ftls -h`
     Then the stderr should contain each of:
     | Keep Your Photos In Order |
@@ -20,7 +20,7 @@ Feature: Generate a list of ftools-friendly-files
     | -v                        |
 
   #@announce
-  Scenario: 01 Output with -v produces version information 
+  Scenario: 01 Output with -v produces version information
     When I successfully run `ftls -v`
     Then the output should match /[0-9]+\.[0-9]+\.[0-9]+ \(core [0-9]+\.[0-9]+\.[0-9]+\)/
 
@@ -61,7 +61,7 @@ Feature: Generate a list of ftools-friendly-files
     | video.mov |
     And the stdout should not contain "foto_wrong.psd"
     And the stdout should not contain "video_wrong.3gp"
-  
+
   #@announce
   Scenario: 2 The output DOES NOT show unsupported files EVEN if I intentionally enter it as a parameter
     Given empty files named:
@@ -125,7 +125,7 @@ Feature: Generate a list of ftools-friendly-files
     | fotos/fotos2/f6.tif          |
     | fotos/fotos2/fotos3/f6.png   |
 
-  @announce
+  #@announce
   Scenario: 6 Default output produces supported-by-ftools file list with CAPITALIZED extentions
     Given a directory named "capitalized"
     Given empty files named:

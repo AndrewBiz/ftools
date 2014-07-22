@@ -1,0 +1,48 @@
+#!/usr/bin/env ruby
+# encoding: UTF-8
+# (c) ANB Andrew Bizyaev
+
+# Foto processing tools
+module FTools
+  tool_name = File.basename(__FILE__)
+  require_relative "../lib/ftools/#{tool_name}"
+
+  VERSION = '0.1.0'
+  # TODO: only supported types - to check
+  file_type = FILE_TYPE_IMAGE #+ FILE_TYPE_VIDEO + FILE_TYPE_AUDIO
+  usage = <<DOCOPT
+***************************************************
+ftools - *Keep Your Photos In Order* (c) ANB
+***************************************************
+#{tool_name}, version #{VERSION}, writes EXIF tags DateTimeOriginal,
+CreateDate (represent the date-time stamp of the photo creation). Changes to
+these tags usually need to be done when the incorrect date-time was set in the
+camera and author wants to fix this mistake before further processing.
+#{tool_name} can only process files: #{file_type * ','}
+
+Optimized to be used with other *ftools* via pipes.
+Example: ftls | #{tool_name}
+
+Usage:
+  #{tool_name} -p DELTA | -m DELTA [-D]
+  #{tool_name} -h | --help
+  #{tool_name} -v | --version
+
+Options:
+  -p --shift-plus DELTA   DELTA will be added to existing DateTimeOriginal
+                          (DTO) and CreateDate values. The photo will become
+                          DELTA time yonger.
+                          e.g. DTO = 2014-07-20 10:00:05, DELTA = 01:02:03,
+                          result DTO = 2014-07-20 11:02:08
+  -m --shift-minus DELTA  DELTA will be substracted from existing
+                          DateTimeOriginal (DTO) and CreateDate values.
+                          The photo will become DELTA time older.
+                          e.g. DTO = 2014-07-20 10:00:05, DELTA = 00:02:03,
+                          result DTO = 2014-07-20 09:58:02
+  -D --debug    Turn on debugging (verbose) mode
+  -h --help     Show this screen.
+  -v --version  Show version.
+DOCOPT
+
+  FTools.const_get(tool_name.capitalize).new(usage, file_type).run!
+end
