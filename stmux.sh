@@ -11,6 +11,11 @@ tmux rename-window vim
 tmux new-window
 tmux rename-window rspec
 
+# RSpec window for running tests
+tmux new-window
+tmux rename-window pry
+tmux send-keys 'pry' 'C-m'
+
 # Window for running development server
 #tmux new-window
 #tmux rename-window server
