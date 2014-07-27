@@ -14,7 +14,7 @@ module FTools
 ***************************************************
 ftools - *Keep Your Photos In Order* (c) ANB
 ***************************************************
-#{tool_name}, version #{VERSION}, writes EXIF tags DateTimeOriginal,
+#{tool_name}, version #{VERSION}, updates EXIF tags DateTimeOriginal,
 CreateDate (represent the date-time stamp of the photo creation). Changes to
 these tags usually need to be done when the incorrect date-time was set in the
 camera and author wants to fix this mistake before further processing.
@@ -24,21 +24,19 @@ Optimized to be used with other *ftools* via pipes.
 Example: ftls | #{tool_name}
 
 Usage:
-  #{tool_name} -p DELTA | -m DELTA [-D]
+  #{tool_name} -s DELTA [-D]
   #{tool_name} -h | --help
   #{tool_name} -v | --version
 
 Options:
-  -p --shift-plus DELTA   DELTA will be added to existing DateTimeOriginal
-                          (DTO) and CreateDate values. The photo will become
-                          DELTA time yonger.
-                          e.g. DTO = 2014-07-20 10:00:05, DELTA = 01:02:03,
-                          result DTO = 2014-07-20 11:02:08
-  -m --shift-minus DELTA  DELTA will be substracted from existing
-                          DateTimeOriginal (DTO) and CreateDate values.
-                          The photo will become DELTA time older.
-                          e.g. DTO = 2014-07-20 10:00:05, DELTA = 00:02:03,
-                          result DTO = 2014-07-20 09:58:02
+  -s --shift-seconds DELTA  DELTA (in seconds) will be added to existing
+                            DateTimeOriginal (DTO) and CreateDate values.
+                            If DELTA is positive the photo will become
+                            yonger: e.g. DTO = 2014-07-20 10:00:05, DELTA = 65
+                            result DTO = 2014-07-20 10:01:10
+                            If DELTA is negative the photo will become older.
+                            e.g. DTO = 2014-07-20 10:00:05, DELTA = -10,
+                            result DTO = 2014-07-20 09:59:55
   -D --debug    Turn on debugging (verbose) mode
   -h --help     Show this screen.
   -v --version  Show version.

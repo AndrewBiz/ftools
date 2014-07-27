@@ -15,8 +15,7 @@ Feature: Set or modify EXIF DateTimeOriginal (CreateDate) in photo files
     | Example:                  |
     | Usage:                    |
     | Options:                  |
-    | -p --shift-plus           |
-    | -m --shift-minus          |
+    | -s --shift-seconds        |
     | -D --debug                |
     | -h --help                 |
     | --version                 |
@@ -26,3 +25,28 @@ Feature: Set or modify EXIF DateTimeOriginal (CreateDate) in photo files
   Scenario: 01 Output with -v produces version information
     When I successfully run `ftfixdate -v`
     Then the output should match /[0-9]+\.[0-9]+\.[0-9]+ \(core [0-9]+\.[0-9]+\.[0-9]+\)/
+
+
+  # @announce
+  Scenario: 10 The jpg file is saved with DTO and CreateDate shifted to 100 seconds plus
+    Given a directory named "2settag"
+    And example file "features/media/renamed/20130103-103254_ANB DSC03313_notagset.JPG" copied to file "2settag/20130103-103254_ANB DSC03313.JPG"
+
+    When I cd to "2settag"
+    And I successfully run `fttags '20130103-103254_ANB DSC03313.JPG'`
+
+    Then the stdout from "fttags '20130103-103254_ANB DSC03313.JPG'" should contain each of:
+    | DateTimeOriginal         |
+    | CreateDate               |
+    | 2013-01-03 10:32:54      |
+
+    When I successfully run `ftls_ftfixdate -s 100`
+
+    Then the stderr from "ftls_ftfixdate -s 100" should contain "20130103-103254_ANB DSC03313.JPG"
+
+    When I successfully run `fttags '20130103-103254_ANB DSC03313.JPG'`
+    Then the stdout from "fttags '20130103-103254_ANB DSC03313.JPG'" should contain each of:
+    | DateTimeOriginal         |
+    | CreateDate               |
+    | 2013-01-03 10:34:34      |
+
