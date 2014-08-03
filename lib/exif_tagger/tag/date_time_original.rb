@@ -22,13 +22,16 @@ module ExifTagger
         super(value_raw)
       end
 
+      # TODO: refactor to be used by all tags
       def to_write_script
         str = ''
         case
         when @value.kind_of?(String) && !@value.empty?
+          str << print_info
           str << print_warnings
           str << print_line(%Q(-MWG:DateTimeOriginal=#{@value}\n))
         when @value.kind_of?(DateTime) || @value.kind_of?(Time)
+          str << print_info
           str << print_warnings
           str << print_line(%Q(-MWG:DateTimeOriginal=#{@value.strftime('%F %T')}\n))
         end

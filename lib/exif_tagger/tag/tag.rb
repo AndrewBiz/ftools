@@ -12,12 +12,14 @@ module ExifTagger
 
       EXIFTOOL_TAGS = []
       attr_reader :errors, :value, :value_invalid, :warnings
+      attr_accessor :info
 
       def initialize(value_norm)
         @value = value_norm
         @errors = []
         @value_invalid = []
         @warnings = []
+        @info = ''
         validate
         @value.freeze
         @errors.freeze
@@ -68,6 +70,10 @@ module ExifTagger
       end
 
       private
+
+      def print_info
+        @info.empty? ? '' : "# INFO: #{@info}"
+      end
 
       def print_warnings
         str = ''

@@ -22,6 +22,11 @@ describe ExifTagger::Tag::DateTimeOriginal do
     expect(tag.to_write_script).to include('-MWG:DateTimeOriginal=2014-07-31 21:01:01')
   end
 
+  it 'gets info and puts it into write_script for exiftool' do
+    tag.info = "Here I describe usefull info about this tag"
+    expect(tag.to_write_script).to include('# INFO: Here I describe usefull info about this tag')
+  end
+
   context 'when the original value (read by mini_exiftool) exists -' do
     it 'generates warnings' do
       tag.validate_with_original(val_orig)
