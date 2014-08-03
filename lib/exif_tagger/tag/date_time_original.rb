@@ -3,6 +3,7 @@
 # (c) ANB Andrew Bizyaev
 
 require_relative 'tag'
+require 'date'
 
 module ExifTagger
   module Tag
@@ -18,30 +19,48 @@ module ExifTagger
       EXIFTOOL_TAGS = %w(DateTimeOriginal SubSecTimeOriginal DateCreated TimeCreated)
 
       def initialize(value_raw = '')
-        super(value_raw.to_s)
+        super(value_raw)
       end
 
       def to_write_script
         str = ''
-        unless @value.empty?
+        case
+        when @value.kind_of?(String) && !@value.empty?
           str << print_warnings
-          str << print_line(%Q(-EXIF:ModifyDate=#{@value}\n))
+          str << print_line(%Q(-MWG:DateTimeOriginal=#{@value}\n))
+        when @value.kind_of?(DateTime) || @value.kind_of?(Time)
+          str << print_warnings
+          str << print_line(%Q(-MWG:DateTimeOriginal=#{@value.strftime('%F %T')}\n))
         end
         str
-      end
-
-      def validate_with_original(values)
-        @warnings = []
-        @warnings.freeze
       end
 
       private
 
       def validate
-        bsize = @value.bytesize
-        if bsize > MAX_BYTESIZE
-          @errors << %(#{tag_name}: '#{@value}' ) +
-                     %(is #{bsize - MAX_BYTESIZE} bytes longer than allowed #{MAX_BYTESIZE})
+        case
+        when @value.kind_of?(String)
+          bsize = @value.bytesize  
+          if bsize > MAX_BYTESIZE
+            @errors << %(#{tag_name}: '#{@value}' ) +
+              %(is #{bsize - MAX_BYTESIZE} bytes longer than allowed #{MAX_BYTESIZE})
+            @value_invalid << @value
+            @value = ''
+          end
+        when @value.kind_of?(DateTime)
+          if @value == DateTime.new(0)
+            @errors << %(#{tag_name}: '#{@value}' zero Date)
+            @value_invalid << @value
+            @value = ''
+          end
+        when @value.kind_of?(Time)
+          if @value == Time.new(0)
+            @errors << %(#{tag_name}: '#{@value}' zero Date)
+            @value_invalid << @value
+            @value = ''
+          end
+        else
+          @errors << %(#{tag_name}: '#{@value}' is of wrong type (#{@value.class}))
           @value_invalid << @value
           @value = ''
         end

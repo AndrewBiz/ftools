@@ -3,6 +3,7 @@
 # (c) ANB Andrew Bizyaev
 
 require_relative 'tag'
+require 'date'
 
 module ExifTagger
   module Tag

@@ -38,11 +38,13 @@ module FTools
       rescue
         raise FTools::Error, "EXIF tags reading by mini_exiftool - #{e.message}"
       end
+      # TODO fail if DTO is not set
+      # TODO do not touch cd if nil
       tags_to_write = ExifTagger::TagCollection.new()
       tags_to_write[:date_time_original] = tags_original[:date_time_original] + @shift_seconds*(1.0/86400)
-      tags_to_write[:create_date] = tags_original[:create_date] + @shift_seconds*(1.0/86400)
+      # tags_to_write[:create_date] = tags_original[:create_date] + @shift_seconds*(1.0/86400)
 
-      tags_to_write.validate_with_original(tags_original)
+      # TODO tags_to_write.validate_with_original(tags_original)
       #STDERR.puts tags_to_write.warning_message if tags_to_write.with_warnings?
       fail FTools::Error, tags_to_write.error_message unless tags_to_write.valid?
       @writer.add_to_script(ftfile: ftfile_out, tags: tags_to_write)
