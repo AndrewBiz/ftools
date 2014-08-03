@@ -2,7 +2,7 @@
 # More info at https://github.com/guard/guard#readme
 
 # notification :terminal_notifier, app_name: "ftools"
-notification :tmux, display_message: true
+notification :tmux, display_message: false
 
 guard 'cucumber' do
   watch(%r{^features/.+\.feature$})
@@ -11,7 +11,7 @@ guard 'cucumber' do
   watch(%r{^bin/(.+)$}) { |m| "features/#{m[1]}.feature" }
 end
 
-guard :rspec, cli: '--color' do
+guard :rspec do
   watch(%r{^spec/.+_spec\.rb$})
   watch(%r{^bin/(.+)$}) { |m| "spec/#{m[1]}_spec.rb" }
   watch(%r{^lib/(.+)\.rb$})     { |m| "spec/lib/#{m[1]}_spec.rb" }
