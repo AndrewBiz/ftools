@@ -22,6 +22,7 @@ describe ExifTagger::Tag::DateTimeOriginal do
     expect(tag.to_write_script).to include('-MWG:DateTimeOriginal=2014-07-31 21:01:01')
   end
 
+  # TODO: --> it_behaves like any tag
   it 'gets info and puts it into write_script for exiftool' do
     tag.info = "Here I describe usefull info about this tag"
     expect(tag.to_write_script).to include('# INFO: Here I describe usefull info about this tag')
@@ -39,6 +40,8 @@ describe ExifTagger::Tag::DateTimeOriginal do
       expect(tag.to_write_script).to match(/# WARNING: ([\w]*) has original value:/)
     end
   end
+
+  # TODO: --> it_behaves like any date tag
 
   it 'accepts String value' do
     t = described_class.new('now')

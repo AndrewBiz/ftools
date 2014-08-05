@@ -18,26 +18,6 @@ module ExifTagger
       MAX_BYTESIZE = 32 # no limit set in EXIF spec
       EXIFTOOL_TAGS = %w(DateTimeOriginal SubSecTimeOriginal DateCreated TimeCreated)
 
-      def initialize(value_raw = '')
-        super(value_raw)
-      end
-
-      # TODO: refactor to be used by all tags
-      def to_write_script
-        str = ''
-        case
-        when @value.kind_of?(String) && !@value.empty?
-          str << print_info
-          str << print_warnings
-          str << print_line(%Q(-MWG:DateTimeOriginal=#{@value}\n))
-        when @value.kind_of?(DateTime) || @value.kind_of?(Time)
-          str << print_info
-          str << print_warnings
-          str << print_line(%Q(-MWG:DateTimeOriginal=#{@value.strftime('%F %T')}\n))
-        end
-        str
-      end
-
       private
 
       def validate
@@ -66,6 +46,16 @@ module ExifTagger
           @errors << %(#{tag_name}: '#{@value}' is of wrong type (#{@value.class}))
           @value_invalid << @value
           @value = ''
+        end
+      end
+
+      def generate_write_script_lines
+        @write_script_lines = []
+        case
+        when @value.kind_of?(String) && !@value.empty?
+          @write_script_lines << %Q(-MWG:DateTimeOriginal=#{@value})
+        when @value.kind_of?(DateTime) || @value.kind_of?(Time)
+          @write_script_lines << %Q(-MWG:DateTimeOriginal=#{@value.strftime('%F %T')})
         end
       end
     end

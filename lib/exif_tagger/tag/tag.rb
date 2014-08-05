@@ -11,14 +11,15 @@ module ExifTagger
       include Comparable
 
       EXIFTOOL_TAGS = []
-      attr_reader :errors, :value, :value_invalid, :warnings
+      attr_reader :errors, :value, :value_invalid, :warnings, :write_script_lines
       attr_accessor :info
 
-      def initialize(value_norm)
+      def initialize(value_norm = '')
         @value = value_norm
         @errors = []
         @value_invalid = []
         @warnings = []
+        @write_script_lines = []
         @info = ''
         validate
         @value.freeze
@@ -69,10 +70,21 @@ module ExifTagger
         @warnings.freeze
       end
 
+      def to_write_script
+        str = ''
+        generate_write_script_lines
+        unless @write_script_lines.empty?
+          str << print_info
+          str << print_warnings
+          str << print_lines
+        end
+        str
+      end
+
       private
 
       def print_info
-        @info.empty? ? '' : "# INFO: #{@info}"
+        @info.empty? ? '' : "# INFO: #{@info}\n"
       end
 
       def print_warnings
@@ -83,8 +95,12 @@ module ExifTagger
         str
       end
 
-      def print_line(str)
-        @warnings.empty? ? str : "# #{str}"
+      def print_lines
+        str = ''
+        @write_script_lines.each do |l|
+          str << (@warnings.empty? ? "#{l}\n" : "# #{l}\n")
+        end
+        str
       end
     end
   end
