@@ -16,18 +16,6 @@ module ExifTagger
         super(Array(value_raw).flatten.map { |i| i.to_s })
       end
 
-      def to_write_script
-        str = ''
-        unless @value.empty?
-          str << print_warnings
-          @value.each do |o|
-            str << print_line(%Q(-MWG:Creator-=#{o}\n))
-            str << print_line(%Q(-MWG:Creator+=#{o}\n))
-          end
-        end
-        str
-      end
-
       private
 
       def validate
@@ -40,6 +28,16 @@ module ExifTagger
           end
         end
         @value = @value - @value_invalid
+      end
+
+      def generate_write_script_lines
+        @write_script_lines = []
+        unless @value.empty?
+          @value.each do |o|
+            @write_script_lines << %Q(-MWG:Creator-=#{o})
+            @write_script_lines << %Q(-MWG:Creator+=#{o})
+          end
+        end
       end
     end
   end

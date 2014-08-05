@@ -22,12 +22,6 @@ describe ExifTagger::Tag::DateTimeOriginal do
     expect(tag.to_write_script).to include('-MWG:DateTimeOriginal=2014-07-31 21:01:01')
   end
 
-  # TODO: --> it_behaves like any tag
-  it 'gets info and puts it into write_script for exiftool' do
-    tag.info = "Here I describe usefull info about this tag"
-    expect(tag.to_write_script).to include('# INFO: Here I describe usefull info about this tag')
-  end
-
   context 'when the original value (read by mini_exiftool) exists -' do
     it 'generates warnings' do
       tag.validate_with_original(val_orig)
@@ -41,72 +35,5 @@ describe ExifTagger::Tag::DateTimeOriginal do
     end
   end
 
-  # TODO: --> it_behaves like any date tag
-
-  it 'accepts String value' do
-    t = described_class.new('now')
-    expect(t).to be_valid
-    expect(t.value).to eq 'now'
-    expect(t.value_invalid).to be_empty
-    expect(t.to_write_script).to include('-MWG:DateTimeOriginal=now')
-  end
-
-  it 'accepts DateTime value' do
-    t = described_class.new(DateTime.new(2014, 07, 31, 22, 53, 10))
-    expect(t).to be_valid
-    expect(t.value).to eq DateTime.new(2014, 07, 31, 22, 53, 10)
-    expect(t.value_invalid).to be_empty
-    expect(t.to_write_script).to include('-MWG:DateTimeOriginal=2014-07-31 22:53:10')
-  end
-
-  it 'accepts Time value' do
-    t = described_class.new(Time.new(2014, 07, 31, 22, 57, 10))
-    expect(t).to be_valid
-    expect(t.value).to eq Time.new(2014, 07, 31, 22, 57, 10)
-    expect(t.value_invalid).to be_empty
-    expect(t.to_write_script).to include('-MWG:DateTimeOriginal=2014-07-31 22:57:10')
-  end
-
-  it 'does not accept values of wrong type' do
-    t = described_class.new(Date.new(2014, 07, 31))
-    expect(t).not_to be_valid
-    expect(t.value).to be_empty
-    expect(t.value_invalid).not_to be_empty
-    expect(t.value_invalid).to match_array([Date.new(2014, 07, 31)])
-    expect(t.to_write_script).to be_empty
-    expect(t.errors.inspect).to include('wrong type (Date)')
-  end
- 
-  it 'does not accept too long String value' do
-    val_nok = '123456789012345678901234567890123' # bytesize=33
-    t = described_class.new(val_nok)
-    expect(t).not_to be_valid
-    expect(t.value).to be_empty
-    expect(t.value_invalid).not_to be_empty
-    expect(t.value_invalid).to match_array([val_nok])
-    expect(t.to_write_script).to be_empty
-    expect(t.errors.inspect).to include('longer than allowed')
-  end
- 
-  it 'does not accept zero DateTime value' do
-    val_nok = DateTime.new(0)
-    t = described_class.new(val_nok)
-    expect(t).not_to be_valid
-    expect(t.value).to be_empty
-    expect(t.value_invalid).not_to be_empty
-    expect(t.value_invalid).to match_array([val_nok])
-    expect(t.to_write_script).to be_empty
-    expect(t.errors.inspect).to include('zero Date')
-  end
- 
-  it 'does not accept zero Time value' do
-    val_nok = Time.new(0)
-    t = described_class.new(val_nok)
-    expect(t).not_to be_valid
-    expect(t.value).to be_empty
-    expect(t.value_invalid).not_to be_empty
-    expect(t.value_invalid).to match_array([val_nok])
-    expect(t.to_write_script).to be_empty
-    expect(t.errors.inspect).to include('zero Date')
-  end
+  it_behaves_like 'any date-tag'
 end

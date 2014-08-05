@@ -15,15 +15,6 @@ module ExifTagger
         super(value_raw.to_s)
       end
 
-      def to_write_script
-        str = ''
-        unless @value.empty?
-          str << print_warnings
-          str << print_line(%Q(-ImageUniqueID=#{@value}\n))
-        end
-        str
-      end
-
       def validate_with_original(values)
         @warnings = []
         v = values[EXIFTOOL_TAGS[0]]
@@ -42,6 +33,13 @@ module ExifTagger
                      %(is #{bsize - MAX_BYTESIZE} bytes longer than allowed #{MAX_BYTESIZE})
           @value_invalid << @value
           @value = ''
+        end
+      end
+
+      def generate_write_script_lines
+        @write_script_lines = []
+        unless @value.empty?
+          @write_script_lines << %Q(-ImageUniqueID=#{@value})
         end
       end
     end

@@ -16,18 +16,6 @@ module ExifTagger
         super(Array(value_raw).flatten.map { |i| i.to_s })
       end
 
-      def to_write_script
-        str = ''
-        unless @value.empty?
-          str << print_warnings
-          @value.each do |o|
-            str << print_line(%Q(-MWG:Keywords-=#{o}\n))
-            str << print_line(%Q(-MWG:Keywords+=#{o}\n))
-          end
-        end
-        str
-      end
-
       def validate_with_original(values)
         @warnings = []
         @warnings.freeze
@@ -45,6 +33,16 @@ module ExifTagger
           end
         end
         @value = @value - @value_invalid
+      end
+
+      def generate_write_script_lines
+        @write_script_lines = []
+        unless @value.empty?
+          @value.each do |o|
+            @write_script_lines << %Q(-MWG:Keywords-=#{o})
+            @write_script_lines << %Q(-MWG:Keywords+=#{o})
+          end
+        end
       end
     end
   end

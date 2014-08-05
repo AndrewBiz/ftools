@@ -8,6 +8,11 @@ shared_examples_for 'any tag' do
     expect(described_class::EXIFTOOL_TAGS).not_to be_empty
   end
 
+  it 'gets info and puts it into write_script for exiftool' do
+    tag.info = "Here I describe usefull info about this tag"
+    expect(tag.to_write_script).to include('# INFO: Here I describe usefull info about this tag')
+  end
+
   context 'when saves the correct value' do
     subject { described_class.new(val_ok) }
     its(:value) { should eql(val_ok) }

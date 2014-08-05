@@ -16,16 +16,6 @@ module ExifTagger
         super
       end
 
-      def to_write_script
-        str = ''
-        unless @value.empty?
-          str << print_warnings
-          str << print_line(%Q{-XMP-mwg-coll:Collections-={CollectionName=#{@value[:collection_name]}, CollectionURI=#{@value[:collection_uri]}}\n})
-          str << print_line(%Q{-XMP-mwg-coll:Collections+={CollectionName=#{@value[:collection_name]}, CollectionURI=#{@value[:collection_uri]}}\n})
-        end
-        str
-      end
-
       private
 
       def validate
@@ -40,6 +30,14 @@ module ExifTagger
         unless @errors.empty?
           @value_invalid << @value
           @value = {}
+        end
+      end
+
+      def generate_write_script_lines
+        @write_script_lines = []
+        unless @value.empty?
+          @write_script_lines << %Q(-XMP-mwg-coll:Collections-={CollectionName=#{@value[:collection_name]}, CollectionURI=#{@value[:collection_uri]}})
+          @write_script_lines << %Q(-XMP-mwg-coll:Collections+={CollectionName=#{@value[:collection_name]}, CollectionURI=#{@value[:collection_uri]}})
         end
       end
     end

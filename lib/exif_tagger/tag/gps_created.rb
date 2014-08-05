@@ -31,20 +31,6 @@ module ExifTagger
         super
       end
 
-      def to_write_script
-        str = ''
-        unless @value.empty?
-          str << print_warnings
-          str << print_line(%Q(-GPSLatitude="#{@value[:gps_latitude]}"\n))
-          str << print_line(%Q(-GPSLatitudeRef=#{@value[:gps_latitude_ref]}\n))
-          str << print_line(%Q(-GPSLongitude="#{@value[:gps_longitude]}"\n))
-          str << print_line(%Q(-GPSLongitudeRef=#{@value[:gps_longitude_ref]}\n))
-          str << print_line(%Q(-GPSAltitude=#{@value[:gps_altitude]}\n))
-          str << print_line(%Q(-GPSAltitudeRef=#{@value[:gps_altitude_ref]}\n))
-        end
-        str
-      end
-
       private
 
       def validate
@@ -73,6 +59,18 @@ module ExifTagger
         unless @errors.empty?
           @value_invalid << @value
           @value = {}
+        end
+      end
+
+      def generate_write_script_lines
+        @write_script_lines = []
+        unless @value.empty?
+          @write_script_lines << %Q(-GPSLatitude="#{@value[:gps_latitude]}")
+          @write_script_lines << %Q(-GPSLatitudeRef=#{@value[:gps_latitude_ref]})
+          @write_script_lines << %Q(-GPSLongitude="#{@value[:gps_longitude]}")
+          @write_script_lines << %Q(-GPSLongitudeRef=#{@value[:gps_longitude_ref]})
+          @write_script_lines << %Q(-GPSAltitude=#{@value[:gps_altitude]})
+          @write_script_lines << %Q(-GPSAltitudeRef=#{@value[:gps_altitude_ref]})
         end
       end
     end
