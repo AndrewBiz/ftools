@@ -12,7 +12,7 @@ module ExifTagger
 
       EXIFTOOL_TAGS = []
       attr_reader :errors, :value, :value_invalid, :warnings, :write_script_lines
-      attr_accessor :info
+      attr_accessor :info, :force_write
 
       def initialize(value_norm = '')
         @value = value_norm
@@ -21,6 +21,7 @@ module ExifTagger
         @warnings = []
         @write_script_lines = []
         @info = ''
+        @force_write = false
         validate
         @value.freeze
         @errors.freeze
@@ -52,10 +53,29 @@ module ExifTagger
         @errors.empty?
       end
 
+      # DEPRECATED!!!
       def validate_with_original(values)
         @warnings = []
         self.class::EXIFTOOL_TAGS.each do |tag|
           v = values[tag]
+          unless v.nil?
+            case
+            when v.kind_of?(String)
+              @warnings << "#{tag_name} has original value: #{tag}='#{v}'" unless v.empty?
+            when v.kind_of?(Array)
+              @warnings << "#{tag_name} has original value: #{tag}=#{v}" unless v.join.empty?
+            else
+              @warnings << "#{tag_name} has original value: #{tag}=#{v}"
+            end
+          end
+        end
+        @warnings.freeze
+      end
+      
+      def check_for_warnings(original_values: {})
+        @warnings = []
+        self.class::EXIFTOOL_TAGS.each do |tag|
+          v = original_values[tag]
           unless v.nil?
             case
             when v.kind_of?(String)
@@ -98,7 +118,10 @@ module ExifTagger
       def print_lines
         str = ''
         @write_script_lines.each do |l|
-          str << (@warnings.empty? ? "#{l}\n" : "# #{l}\n")
+          unless @warnings.empty?
+            str << '# ' unless @force_write
+          end
+          str << "#{l}\n"
         end
         str
       end
