@@ -27,26 +27,45 @@ Feature: Set or modify EXIF DateTimeOriginal (CreateDate) in photo files
     Then the output should match /[0-9]+\.[0-9]+\.[0-9]+ \(core [0-9]+\.[0-9]+\.[0-9]+\)/
 
 
-  # @announce
-  Scenario: 10 The jpg file is saved with DTO and CreateDate shifted to 100 seconds plus
+  #@announce
+  Scenario: 10 The jpg file is saved with DTO and CreateDate shifted to 100 seconds PLUS
     Given a directory named "2settag"
     And example file "features/media/renamed/20130103-103254_ANB DSC03313_notagset.JPG" copied to file "2settag/20130103-103254_ANB DSC03313.JPG"
 
     When I cd to "2settag"
     And I successfully run `fttags '20130103-103254_ANB DSC03313.JPG'`
 
-    Then the stdout from "fttags '20130103-103254_ANB DSC03313.JPG'" should contain each of:
-    | DateTimeOriginal         |
-    | CreateDate               |
-    | 2013-01-03 10:32:54      |
+    Then the stdout from "fttags '20130103-103254_ANB DSC03313.JPG'" should match each of:
+      |/^DateTimeOriginal( *):( *)2013-01-03 10:32:54/|
+      |/^CreateDate( *):( *)2013-01-03 10:32:54/|
 
     When I successfully run `ftls_ftfixdate -s 100`
 
     Then the stderr from "ftls_ftfixdate -s 100" should contain "20130103-103254_ANB DSC03313.JPG"
 
     When I successfully run `fttags '20130103-103254_ANB DSC03313.JPG'`
-    Then the stdout from "fttags '20130103-103254_ANB DSC03313.JPG'" should contain each of:
-    | DateTimeOriginal         |
-    | CreateDate               |
-    | 2013-01-03 10:34:34      |
+    Then the stdout from "fttags '20130103-103254_ANB DSC03313.JPG'" should match each of:
+      |/^DateTimeOriginal( *):( *)2013-01-03 10:34:34/|
+      |/^CreateDate( *):( *)2013-01-03 10:34:34/|
+
+  #@announce
+  Scenario: 20 The jpg file is saved with DTO and CreateDate shifted to MINUS 10 seconds
+    Given a directory named "2settag"
+    And example file "features/media/renamed/20130103-103254_ANB DSC03313_notagset.JPG" copied to file "2settag/20130103-103254_ANB DSC03313.JPG"
+
+    When I cd to "2settag"
+    And I successfully run `fttags '20130103-103254_ANB DSC03313.JPG'`
+
+    Then the stdout from "fttags '20130103-103254_ANB DSC03313.JPG'" should match each of:
+      |/^DateTimeOriginal( *):( *)2013-01-03 10:32:54/|
+      |/^CreateDate( *):( *)2013-01-03 10:32:54/|
+
+    When I successfully run `ftls_ftfixdate -s -10`
+
+    Then the stderr from "ftls_ftfixdate -s -10" should contain "20130103-103254_ANB DSC03313.JPG"
+
+    When I successfully run `fttags '20130103-103254_ANB DSC03313.JPG'`
+    Then the stdout from "fttags '20130103-103254_ANB DSC03313.JPG'" should match each of:
+      |/^DateTimeOriginal( *):( *)2013-01-03 10:32:44/|
+      |/^CreateDate( *):( *)2013-01-03 10:32:44/|
 

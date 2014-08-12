@@ -10,12 +10,6 @@ module ExifTagger
     class ModifyDate < TagDate
       EXIFTOOL_TAGS = %w(ModifyDate)
 
-      # TODO: like DTO + write_ignoring_warnings
-      def validate_with_original(values)
-        @warnings = []
-        @warnings.freeze
-      end
-
       private
 
       def generate_write_script_lines

@@ -66,8 +66,13 @@ module ExifTagger
       warn
     end
 
+    # DEPRECATED TODO: delete!
     def validate_with_original(tags_original)
       @collection.each { |i| i.validate_with_original(tags_original) }
+    end
+
+    def check_for_warnings(original_values: {})
+      @collection.each { |i| i.check_for_warnings(original_values: {}) }
     end
 
     def error_message

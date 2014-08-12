@@ -53,7 +53,7 @@ module ExifTagger
         @errors.empty?
       end
 
-      # DEPRECATED!!!
+      # DEPRECATED TODO: delete!
       def validate_with_original(values)
         @warnings = []
         self.class::EXIFTOOL_TAGS.each do |tag|
