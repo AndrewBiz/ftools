@@ -53,25 +53,6 @@ module ExifTagger
         @errors.empty?
       end
 
-      # DEPRECATED TODO: delete!
-      def validate_with_original(values)
-        @warnings = []
-        self.class::EXIFTOOL_TAGS.each do |tag|
-          v = values[tag]
-          unless v.nil?
-            case
-            when v.kind_of?(String)
-              @warnings << "#{tag_name} has original value: #{tag}='#{v}'" unless v.empty?
-            when v.kind_of?(Array)
-              @warnings << "#{tag_name} has original value: #{tag}=#{v}" unless v.join.empty?
-            else
-              @warnings << "#{tag_name} has original value: #{tag}=#{v}"
-            end
-          end
-        end
-        @warnings.freeze
-      end
-      
       def check_for_warnings(original_values: {})
         @warnings = []
         self.class::EXIFTOOL_TAGS.each do |tag|

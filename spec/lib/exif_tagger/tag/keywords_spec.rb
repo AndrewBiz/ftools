@@ -30,11 +30,11 @@ describe ExifTagger::Tag::Keywords do
 
   context 'when the original value (read by mini_exiftool) exists -' do
     it 'generates NO warnings' do
-      tag.validate_with_original(val_orig)
+      tag.check_for_warnings(original_values: val_orig)
       expect(tag.warnings).to be_empty
     end
     it 'generates write_script for exiftool' do
-      tag.validate_with_original(val_orig)
+      tag.check_for_warnings(original_values: val_orig)
       expect(tag.to_write_script).to include('-MWG:Keywords-=aaa')
       expect(tag.to_write_script).to include('-MWG:Keywords+=aaa')
       expect(tag.to_write_script).to include('-MWG:Keywords-=bbb')

@@ -15,9 +15,9 @@ module ExifTagger
         super(value_raw.to_s)
       end
 
-      def validate_with_original(values)
+      def check_for_warnings(original_values: {})
         @warnings = []
-        v = values[EXIFTOOL_TAGS[0]]
+        v = original_values[EXIFTOOL_TAGS[0]]
         if v =~ /(\d{8}-\S+)/
           @warnings << "#{tag_name} has original correct value: '#{v}'"
         end

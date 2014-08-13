@@ -16,7 +16,7 @@ module ExifTagger
         super(Array(value_raw).flatten.map { |i| i.to_s })
       end
 
-      def validate_with_original(values)
+      def check_for_warnings(original_values: {})
         @warnings = []
         @warnings.freeze
       end

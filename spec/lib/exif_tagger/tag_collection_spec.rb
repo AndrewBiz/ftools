@@ -230,8 +230,8 @@ describe ExifTagger::TagCollection do
         coded_character_set: 'UTF8',
         modify_date: 'now')
 
-    mytags.validate_with_original('Copyright' => 'Original copyright',
-                                  'State' => 'Old state')
+    mytags.check_for_warnings(original_values: {'Copyright' => 'Original copyright',
+                                  'State' => 'Old state'})
     it 'produce warnings' do
       expect(mytags).to be_with_warnings
       expect(mytags.warning_message).to include('Original copyright')

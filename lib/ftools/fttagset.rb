@@ -68,7 +68,7 @@ module FTools
       tags_to_write[:copyright] = "#{ftfile_out.date_time.year} #{@creators[author][:copyright]}"
       tags_to_write[:image_unique_id] = @tags_default[:image_unique_id] + format('%04d', @writer.added_files_count + 1)
       tags_to_write.item(:modify_date).force_write = true
-      tags_to_write.validate_with_original(tags_original)
+      tags_to_write.check_for_warnings(original_values: tags_original)
       STDERR.puts tags_to_write.warning_message if tags_to_write.with_warnings?
       fail FTools::Error, tags_to_write.error_message unless tags_to_write.valid?
       @writer.add_to_script(ftfile: ftfile_out, tags: tags_to_write)

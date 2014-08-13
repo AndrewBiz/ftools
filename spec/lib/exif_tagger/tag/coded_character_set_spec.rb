@@ -22,19 +22,11 @@ describe ExifTagger::Tag::CodedCharacterSet do
     expect(tag.to_write_script).to include('-IPTC:CodedCharacterSet=UTF8')
   end
 
-  context 'when the original value (read by mini_exiftool) exists -' do
-    it 'generates warnings' do
-      tag.validate_with_original(val_orig)
-      expect(tag.warnings).not_to be_empty
-      expect(tag.warnings.inspect).to include('has original value:')
-    end
-    it 'generates write_script with commented lines' do
-      tag.validate_with_original(val_orig)
-      expect(tag.to_write_script).to include('# -IPTC:CodedCharacterSet=UTF8')
-      expect(tag.to_write_script).to match(/# WARNING: ([\w]*) has original value:/)
-    end
+  it_behaves_like 'any paranoid tag'
+
+  context 'when the original value exists' do
     it 'considers empty strings as a no-value' do
-      tag.validate_with_original(val_orig_empty)
+      tag.check_for_warnings(original_values: val_orig_empty)
       expect(tag.warnings).to be_empty
       expect(tag.warnings.inspect).not_to include('has original value:')
     end
