@@ -36,13 +36,15 @@ module FTools
       rescue
         raise FTools::Error, "EXIF tags reading by mini_exiftool - #{e.message}"
       end
-      # TODO fail if DTO is not set
       # TODO do not touch cd if nil
+      fail FTools::Error, 'DateTimeOriginal is not set' if tags_original[:date_time_original].nil?
       tags_to_write = ExifTagger::TagCollection.new()
       tags_to_write[:date_time_original] = tags_original[:date_time_original] + @shift_seconds*(1.0/86400)
-      tags_to_write[:create_date] = tags_original[:create_date] + @shift_seconds*(1.0/86400)
+      unless tags_original[:create_date].nil?
+        tags_to_write[:create_date] = tags_original[:create_date] + @shift_seconds*(1.0/86400)
+        tags_to_write.item(:create_date).force_write = true
+      end
       tags_to_write.item(:date_time_original).force_write = true
-      tags_to_write.item(:create_date).force_write = true
       tags_to_write.check_for_warnings(original_values: tags_original)
       fail FTools::Error, tags_to_write.error_message unless tags_to_write.valid?
       @writer.add_to_script(ftfile: ftfile_out, tags: tags_to_write)

@@ -69,3 +69,49 @@ Feature: Set or modify EXIF DateTimeOriginal (CreateDate) in photo files
       |/^DateTimeOriginal( *):( *)2013-01-03 10:32:44/|
       |/^CreateDate( *):( *)2013-01-03 10:32:44/|
 
+  #@announce
+  Scenario: 30 The jpg file produces ERROR in no DateTimeOriginal is set
+    Given a directory named "2settag"
+    And example file "features/media/iphone/IMG_0887_no_dto_cd.jpg" copied to file "2settag/IMG_0887.JPG"
+
+    When I cd to "2settag"
+    And I successfully run `fttags 'IMG_0887.JPG'`
+
+    Then the stdout from "fttags 'IMG_0887.JPG'" should not contain any of:
+      |DateTimeOriginal|
+      |CreateDate|
+
+    When I successfully run `ftls_ftfixdate -s -10`
+
+    Then the stderr from "ftls_ftfixdate -s -10" should contain "IMG_0887.JPG"
+    And the stderr from "ftls_ftfixdate -s -10" should contain "ERROR: './IMG_0887.JPG' - DateTimeOriginal is not set"
+
+    When I successfully run `fttags 'IMG_0887.JPG'`
+    Then the stdout from "fttags 'IMG_0887.JPG'" should not contain any of:
+      |DateTimeOriginal|
+      |CreateDate|
+
+  #@announce
+  Scenario: 40 The jpg file does not touch CreateDate if it is not set
+    Given a directory named "2settag"
+    And example file "features/media/iphone/IMG_0887_no_cd.jpg" copied to file "2settag/IMG_0887.JPG"
+
+    When I cd to "2settag"
+    And I successfully run `fttags 'IMG_0887.JPG'`
+
+    Then the stdout from "fttags 'IMG_0887.JPG'" should match each of:
+      |/^DateTimeOriginal( *):( *)2014-07-18 10:00:00/|
+    And the stdout from "fttags 'IMG_0887.JPG'" should not contain any of:
+      |CreateDate|
+
+    When I successfully run `ftls_ftfixdate -s 10`
+
+    Then the stderr from "ftls_ftfixdate -s 10" should contain "IMG_0887.JPG"
+    And the stderr from "ftls_ftfixdate -s 10" should not contain "ERROR"
+
+    When I successfully run `fttags 'IMG_0887.JPG'`
+    Then the stdout from "fttags 'IMG_0887.JPG'" should not contain any of:
+      |CreateDate|
+    Then the stdout from "fttags 'IMG_0887.JPG'" should match each of:
+      |/^DateTimeOriginal( *):( *)2014-07-18 10:00:10/|
+
