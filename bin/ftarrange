@@ -1,0 +1,39 @@
+#!/usr/bin/env ruby
+# encoding: UTF-8
+# (c) ANB Andrew Bizyaev
+
+# Foto processing tools
+module FTools
+  tool_name = File.basename(__FILE__)
+  require_relative "../lib/ftools/#{tool_name}"
+
+  VERSION = '0.1.0'
+
+  file_type = FILE_TYPE_IMAGE + FILE_TYPE_VIDEO + FILE_TYPE_AUDIO
+  usage = <<DOCOPT
+***************************************************
+ftools - *Keep Your Photos In Order* (c) ANB
+***************************************************
+#{tool_name}, version #{VERSION}, collects input file(s) into WORKING_FOLDER 
+separating photo files, RAW photo files and VIDEO files in corresponding 
+subfolders.
+ftools friendly files: #{file_type * ','}
+
+Optimized to be used with other *ftools* via pipes.
+Example: ftls | ftrename -a anb | #{tool_name}
+
+Usage:
+  #{tool_name} [-w WORKING_FOLDER] [-D]
+  #{tool_name} -h | --help
+  #{tool_name} -v | --version
+
+Options:
+  -w FLD --working_folder=FLD  Folder the input files to be
+                               collected to [default: .]
+  -D --debug    Turn on debugging (verbose) mode
+  -h --help     Show this screen.
+  -v --version  Show version.
+DOCOPT
+
+  FTools.const_get(tool_name.capitalize).new(usage, file_type).run!
+end

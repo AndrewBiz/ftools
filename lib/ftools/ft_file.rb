@@ -9,7 +9,9 @@ require 'fileutils'
 # Foto tools
 module FTools
   # media type constants
-  FILE_TYPE_IMAGE = %w{jpg jpeg tif tiff orf arw png dng}
+  FILE_TYPE_IMAGE_NORMAL = %w{jpg jpeg tif tiff png}
+  FILE_TYPE_IMAGE_RAW = %w{orf arw dng}
+  FILE_TYPE_IMAGE = FILE_TYPE_IMAGE_NORMAL + FILE_TYPE_IMAGE_RAW
   FILE_TYPE_VIDEO = %w{avi mp4 mpg mts dv mov}
   FILE_TYPE_AUDIO = %w{wav}
 
