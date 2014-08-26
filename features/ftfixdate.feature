@@ -16,6 +16,7 @@ Feature: Set or modify EXIF DateTimeOriginal (CreateDate) in photo files
     | Usage:                    |
     | Options:                  |
     | -s --shift-seconds        |
+    | -n --name-only            |
     | -D --debug                |
     | -h --help                 |
     | --version                 |
@@ -91,7 +92,7 @@ Feature: Set or modify EXIF DateTimeOriginal (CreateDate) in photo files
       |DateTimeOriginal|
       |CreateDate|
 
-  #@announce
+      #@announce
   Scenario: 40 The jpg file does not touch CreateDate if it is not set
     Given a directory named "2settag"
     And example file "features/media/iphone/IMG_0887_no_cd.jpg" copied to file "2settag/IMG_0887.JPG"
@@ -115,3 +116,47 @@ Feature: Set or modify EXIF DateTimeOriginal (CreateDate) in photo files
     Then the stdout from "fttags 'IMG_0887.JPG'" should match each of:
       |/^DateTimeOriginal( *):( *)2014-07-18 10:00:10/|
 
+      #@announce
+  Scenario: 50 In NAME-ONLY mode the jpg file is renamed while DTO and CreateDate are kept unchanged
+    Given a directory named "2settag"
+    And example file "features/media/renamed/20130103-103254_ANB DSC03313_notagset.JPG" copied to file "2settag/20130103-103254_ANB DSC03313.JPG"
+
+    When I cd to "2settag"
+    And I successfully run `fttags '20130103-103254_ANB DSC03313.JPG'`
+
+    Then the stdout from "fttags '20130103-103254_ANB DSC03313.JPG'" should match each of:
+      |/^DateTimeOriginal( *):( *)2013-01-03 10:32:54/|
+      |/^CreateDate( *):( *)2013-01-03 10:32:54/|
+
+    When I successfully run `ftls_ftfixdate -s 100 -n`
+
+    Then the stdout from "ftls_ftfixdate -s 100 -n" should contain "20130103-103434_ANB DSC03313.JPG"
+    And the following files should exist:
+      | 20130103-103434_ANB DSC03313.JPG |
+
+    When I successfully run `fttags '20130103-103434_ANB DSC03313.JPG'`
+    Then the stdout from "fttags '20130103-103434_ANB DSC03313.JPG'" should match each of:
+      |/^DateTimeOriginal( *):( *)2013-01-03 10:32:54/|
+      |/^CreateDate( *):( *)2013-01-03 10:32:54/|
+
+
+      #@announce
+  Scenario: 60 In NAME-ONLY mode the jpg file produces error if the name is not standard 
+    Given a directory named "2settag"
+    And example file "features/media/renamed/20130103-103254_ANB DSC03313_notagset.JPG" copied to file "2settag/DSC03313.JPG"
+
+    When I cd to "2settag"
+    And I successfully run `fttags 'DSC03313.JPG'`
+
+    Then the stdout from "fttags 'DSC03313.JPG'" should match each of:
+      |/^DateTimeOriginal( *):( *)2013-01-03 10:32:54/|
+      |/^CreateDate( *):( *)2013-01-03 10:32:54/|
+
+    When I successfully run `ftls_ftfixdate -s 100 -n`
+    
+    Then the stderr from "ftls_ftfixdate -s 100 -n" should contain "ERROR: './DSC03313.JPG' - incorrect file name"
+
+    When I successfully run `fttags 'DSC03313.JPG'`
+    Then the stdout from "fttags 'DSC03313.JPG'" should match each of:
+      |/^DateTimeOriginal( *):( *)2013-01-03 10:32:54/|
+      |/^CreateDate( *):( *)2013-01-03 10:32:54/|

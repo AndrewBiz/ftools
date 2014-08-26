@@ -7,7 +7,7 @@ module FTools
   tool_name = File.basename(__FILE__)
   require_relative "../lib/ftools/#{tool_name}"
 
-  VERSION = '0.1.0'
+  VERSION = '0.2.0'
   # TODO: only supported types - to check
   file_type = FILE_TYPE_IMAGE #+ FILE_TYPE_VIDEO + FILE_TYPE_AUDIO
   usage = <<DOCOPT
@@ -24,7 +24,7 @@ Optimized to be used with other *ftools* via pipes.
 Example: ftls | #{tool_name}
 
 Usage:
-  #{tool_name} -s DELTA [-D]
+  #{tool_name} -s DELTA [-n] [-D]
   #{tool_name} -h | --help
   #{tool_name} -v | --version
 
@@ -37,9 +37,12 @@ Options:
                             If DELTA is negative the photo will become older.
                             e.g. DTO = 2014-07-20 10:00:05, DELTA = -10,
                             result DTO = 2014-07-20 09:59:55
-  -D --debug    Turn on debugging (verbose) mode
-  -h --help     Show this screen.
-  -v --version  Show version.
+  -n --name-only  Only renames the file, no changes in EXIF tags are made.
+                  The file name must comply with ftools standard:
+                  YYYYMMDD-HHMMSS_AAA file_name.ext.
+  -D --debug      Turn on debugging (verbose) mode
+  -h --help       Show this screen.
+  -v --version    Show version.
 DOCOPT
 
   FTools.const_get(tool_name.capitalize).new(usage, file_type).run!
