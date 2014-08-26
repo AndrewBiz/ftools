@@ -7,7 +7,7 @@ module FTools
   tool_name = File.basename(__FILE__)
   require_relative "../lib/ftools/#{tool_name}"
 
-  VERSION = '0.2.0'
+  VERSION = '0.2.1'
   # TODO: only supported types - to check
   file_type = FILE_TYPE_IMAGE #+ FILE_TYPE_VIDEO + FILE_TYPE_AUDIO
   usage = <<DOCOPT
@@ -18,10 +18,12 @@ ftools - *Keep Your Photos In Order* (c) ANB
 CreateDate (represent the date-time stamp of the photo creation). Changes to
 these tags usually need to be done when the incorrect date-time was set in the
 camera and author wants to fix this mistake before further processing.
-#{tool_name} can only process files: #{file_type * ','}
+#{tool_name} supports EXIF tag change in following files: #{file_type * ','}.
+For the other file types use --name-only option to change the timestamp in the
+file name.
 
 Optimized to be used with other *ftools* via pipes.
-Example: ftls | #{tool_name}
+Example: ftls | #{tool_name} -s 10
 
 Usage:
   #{tool_name} -s DELTA [-n] [-D]
