@@ -12,7 +12,7 @@ module FTools
   FILE_TYPE_IMAGE_NORMAL = %w{jpg jpeg tif tiff png}
   FILE_TYPE_IMAGE_RAW = %w{orf arw dng}
   FILE_TYPE_IMAGE = FILE_TYPE_IMAGE_NORMAL + FILE_TYPE_IMAGE_RAW
-  FILE_TYPE_VIDEO = %w{avi mp4 mpg mts dv mov}
+  FILE_TYPE_VIDEO = %w{avi mp4 mpg mts dv mov mkv m2ts}
   FILE_TYPE_AUDIO = %w{wav}
 
   # ftools file name operations
