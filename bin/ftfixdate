@@ -9,7 +9,7 @@ module FTools
 
   VERSION = '0.2.1'
   # TODO: only supported types - to check
-  file_type = FILE_TYPE_IMAGE #+ FILE_TYPE_VIDEO + FILE_TYPE_AUDIO
+  file_type = FILE_TYPE_IMAGE + FILE_TYPE_VIDEO + FILE_TYPE_AUDIO
   usage = <<DOCOPT
 ***************************************************
 ftools - *Keep Your Photos In Order* (c) ANB
