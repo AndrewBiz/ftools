@@ -25,10 +25,10 @@ module FTools
       end
       puts "#{ftfile}"
       if @options_cli['--full_dump']
-        all_tags = tags.tags.uniq
-        all_tags.delete nil
-        all_tags.sort.each do |t|
-          v = tags[t]
+        all_tags = tags.to_hash
+        #puts all_tags
+        #all_tags.delete nil
+        all_tags.each do |t,v|
           puts format('  %-27s %-10s %s', t, "(#{v.class})", v)
         end
       else
