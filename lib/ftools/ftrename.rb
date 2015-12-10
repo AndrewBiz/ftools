@@ -24,6 +24,16 @@ module FTools
       rescue
         raise FTools::Error, 'EXIF tags reading'
       end
+      begin
+        user_tag_date = @options_cli['--tag_date'] || ''
+        if user_tag_date.empty?
+          dto = tag.date_time_original || tag.create_date || FTFile::ZERO_DATE
+        else
+          dto = tag[user_tag_date] || FTFile::ZERO_DATE
+        end
+      rescue
+        #raise FTools::Error, 'EXIF tags reading'
+      end
       ftfile_out.standardize!(date_time: dto, author: @author)
       FileUtils.mv(ftfile.filename, ftfile_out.filename) unless
         ftfile == ftfile_out

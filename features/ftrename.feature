@@ -6,7 +6,7 @@ Feature: Rename photo and video files
   I want to get the given files to be renamed to the standard ftools name template
 
   #@announce
-  Scenario: 00 Default output with -h produces usage information 
+  Scenario: 00 Default output with -h produces usage information
     When I successfully run `ftrename -h`
     Then the stderr should contain each of:
     | Keep Your Photos In Order |
@@ -18,23 +18,25 @@ Feature: Rename photo and video files
     | -h --help                 |
     | --version                 |
     | -v                        |
+    | -t                        |
+    | --tag_date                |
 
   #@announce
-  Scenario: 01 Output with -v produces version information 
+  Scenario: 01 Output with -v produces version information
     When I successfully run `ftrename -v`
     Then the output should match /[0-9]+\.[0-9]+\.[0-9]+ \(core [0-9]+\.[0-9]+\.[0-9]+\)/
 
   #@announce
   Scenario: 1 Originally named files are renamed to ftools standard
-    Given a directory named "2rename"
-    And example files from "features/media/sony_jpg" copied to "2rename" named:
+    Given a directory named "rename1"
+    And example files from "features/media/sony_jpg" copied to "rename1" named:
    | DSC03403.JPG |
    | DSC03313.JPG |
    | DSC03499.JPG |
    | DSC03802.JPG |
    | DSC04032.JPG |
 
-    When I cd to "2rename"
+    When I cd to "rename1"
     And I successfully run `ftls_ftrename -a anb`
 
     Then the stdout should contain each of:
@@ -55,3 +57,23 @@ Feature: Rename photo and video files
     | ./DSC03499.JPG |
     | ./DSC03802.JPG |
     | ./DSC04032.JPG |
+
+  #@announce
+  Scenario: 2 File is renamed using ModifyDate tag
+    Given a directory named "rename2"
+    And example files from "features/media/sony_jpg" copied to "rename2" named:
+   | DSC03313.JPG |
+
+    When I cd to "rename2"
+    And I successfully run `ftls_ftrename -a anb -t ModifyDate`
+
+    Then the stdout should contain each of:
+    | 20131114-225114_ANB DSC03313.JPG |
+    And the following files should exist:
+    | ./20131114-225114_ANB DSC03313.JPG |
+    And the following files should not exist:
+    | ./DSC03313.JPG |
+    And the following files should not exist:
+    | ./20130103-103254_ANB DSC03313.JPG |
+
+#TODO unhappy path: no such tag, not DateTime

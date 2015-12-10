@@ -7,7 +7,7 @@ module FTools
   tool_name = File.basename(__FILE__)
   require_relative "../lib/ftools/#{tool_name}"
 
-  VERSION = '0.4.0'
+  VERSION = '0.5.0'
 
   file_type = FILE_TYPE_IMAGE + FILE_TYPE_VIDEO + FILE_TYPE_AUDIO
   usage = <<DOCOPT
@@ -15,9 +15,9 @@ module FTools
 ftools - *Keep Your Photos In Order* (c) ANB
 ***************************************************
 #{tool_name}, version #{VERSION}, renames the input file based on EXIF
-DateTimeOriginal tag and author NICKNAME provided. The target file name
-format is YYYYmmdd-HHMMSS_AAA ORIGINAL.EXT, where:
-  YYYYmmdd-HHMMSS - DateTimeOriginal (normally Date-Time of photo creation),
+DateTimeOriginal (or CreateDate) tag and author NICKNAME provided.
+The target file name format is YYYYmmdd-HHMMSS_AAA ORIGINAL.EXT, where:
+  YYYYmmdd-HHMMSS - Date-Time of photo creation (DateTimeOriginal tag),
   AAA - the author nickname,
   ORIGINAL.EXT - the photo name was given by digital camera.
 Input file should be one of the types: #{file_type * ','}
@@ -31,7 +31,7 @@ Example: input file DSC03455.JPG will be renamed to
 http://www.sno.phy.queensu.ca/~phil/exiftool/install.html)
 
 Usage:
-  #{tool_name} -a NICKNAME [-D]
+  #{tool_name} -a NICKNAME [-D] [-t TAG]
   #{tool_name} -h | --help
   #{tool_name} -v | --version
 
@@ -40,6 +40,11 @@ Options:
                                  have no spaces and other non-word chars,
                                  have no digits,
                                  have only ASCII chars (e.g. ANB)
+  -t TAG --tag_date=TAG          Set the TAG name containing Date_Time creation
+                                 info. The TAG value will be used instead of
+                                 standard DateTimeOriginal tag.
+                                 All existing tags and tag names you can get
+                                 using command `ftls filename|ftmtags -f`
   -D --debug    Turn on debugging (verbose) mode
   -h --help     Show this screen.
   -v --version  Show version.
