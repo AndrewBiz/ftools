@@ -113,3 +113,5 @@ Gemfile.lock
 .rvmrc
 # tmux
 tmux-*.log
+
+rerun.txt
