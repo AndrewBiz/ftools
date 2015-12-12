@@ -1,9 +1,9 @@
 source 'https://rubygems.org'
 
-gem 'nesty', '~>1.0'
-gem 'docopt', '~>0.5'
-gem 'mini_exiftool', '~>2.4'
-gem 'activesupport', '~>3.0'
+gem 'nesty', '~> 1.0'
+gem 'docopt', '~> 0.5'
+gem 'mini_exiftool', '~> 2.4'
+gem 'activesupport', '~> 3.2'
 gem 'i18n'
 
 # Add dependencies to develop your gem here.
@@ -27,7 +27,8 @@ group :development do
   gem 'guard-cucumber'
   gem 'rspec', '~> 2.9'
   gem 'rspec-its', '~> 1.0'
-  gem 'aruba'
+  gem 'cucumber', '~> 1.3'
+  gem 'aruba', '~> 0.6.0'
   gem 'bundler', '>= 0'
   gem 'fuubar'
   gem 'rubocop'
