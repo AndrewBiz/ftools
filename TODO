@@ -2,7 +2,7 @@ TODO:
 +add support of mkv
 +add support of m2ts, m2t
 change ftls - add masks
-change ftfixdate - add WAV
-change ftfixdate - change name with EXIF
++change ftfixdate - add WAV
++change ftfixdate - change name with EXIF
 +ftmtags - to fix all --full_dump option
 +ftrename - to allow user to set dt tag to use instead of DateTimeOriginal
