@@ -1,6 +1,6 @@
 TODO:
-add support of mkv
-add support of m2ts, m2t
++add support of mkv
++add support of m2ts, m2t
 change ftls - add masks
 change ftfixdate - add WAV
 change ftfixdate - change name with EXIF

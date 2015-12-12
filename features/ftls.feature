@@ -43,6 +43,9 @@ Feature: Generate a list of ftools-friendly-files
     | video.dv        |
     | video.mov       |
     | video_wrong.3gp |
+    | video.mkv       |
+    | video.m2t       |
+    | video.m2ts      |
     When I successfully run `ftls`
     Then the stdout should contain each of:
     | foto.jpeg |
@@ -59,6 +62,9 @@ Feature: Generate a list of ftools-friendly-files
     | video.dv  |
     | video.mts |
     | video.mov |
+    | video.mkv |
+    | video.m2t |
+    | video.m2ts|
     And the stdout should not contain "foto_wrong.psd"
     And the stdout should not contain "video_wrong.3gp"
 
