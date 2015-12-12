@@ -76,4 +76,36 @@ Feature: Rename photo and video files
     And the following files should not exist:
     | ./20130103-103254_ANB DSC03313.JPG |
 
-#TODO unhappy path: no such tag, not DateTime
+  #@announce
+  Scenario: 3 cmd reports error if tag does not exist
+    Given a directory named "rename2"
+    And example files from "features/media/sony_jpg" copied to "rename2" named:
+   | DSC03313.JPG |
+
+    When I cd to "rename2"
+    And I successfully run `ftls_ftrename -a anb -t XXXDateTime`
+
+    And the stderr should contain "tag XXXDateTime is not found"
+    And the following files should exist:
+    | ./DSC03313.JPG |
+    And the following files should not exist:
+    | ./20131114-225114_ANB DSC03313.JPG |
+    And the following files should not exist:
+    | ./20130103-103254_ANB DSC03313.JPG |
+
+  #@announce
+  Scenario: 4 cmd reports error if tag is not DateTime type
+    Given a directory named "rename2"
+    And example files from "features/media/sony_jpg" copied to "rename2" named:
+   | DSC03313.JPG |
+
+    When I cd to "rename2"
+    And I successfully run `ftls_ftrename -a anb -t Make`
+
+    And the stderr should contain "tag Make is not a DateTime type"
+    And the following files should exist:
+    | ./DSC03313.JPG |
+    And the following files should not exist:
+    | ./20131114-225114_ANB DSC03313.JPG |
+    And the following files should not exist:
+    | ./20130103-103254_ANB DSC03313.JPG |

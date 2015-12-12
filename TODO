@@ -5,4 +5,4 @@ change ftls - add masks
 change ftfixdate - add WAV
 change ftfixdate - change name with EXIF
 +ftmtags - to fix all --full_dump option
-ftrename - to allow user to set dt tag to use instead of DateTimeOriginal
++ftrename - to allow user to set dt tag to use instead of DateTimeOriginal
