@@ -1,6 +1,10 @@
-== ftools
+# ANB's ftools
 
-A bundle of small CLIs for renaming, tagging etc. my photos and videos. Helps to keep my photo-video assets in order.
+A bundle of small CLI tools for arranging, renaming, tagging  of the photo and video files. Helps keep photo-video assets in order.
 
-[![Codeship Status for AndrewBiz/ftools](https://www.codeship.io/projects/defbe8c0-f222-0131-8e05-6e1868db2282/status)](https://www.codeship.io/projects/27665)
-[![Coverage Status](https://img.shields.io/coveralls/AndrewBiz/ftools.svg)](https://coveralls.io/r/AndrewBiz/ftools)
+## Install
+Clone this repo:
+    git clone git@github.com:AndrewBiz/ftools.git
+  
+Install gems:
+    bundle install
