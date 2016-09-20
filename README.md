@@ -5,6 +5,6 @@ A bundle of small CLI tools for arranging, renaming, tagging  of the photo and v
 ## Install
 Clone this repo:
     git clone git@github.com:AndrewBiz/ftools.git
-  
+
 Install gems:
     bundle install
