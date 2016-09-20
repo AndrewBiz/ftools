@@ -32,6 +32,8 @@ module FTools
           puts format('  %-27s %-10s %s', t, "(#{v.class})", v)
         end
       else
+        puts "******** FILE #{ftfile} ********"
+        puts format('  %-27s %s', "FileModifyDate", "#{File.mtime(ftfile.filename)}")
         ExifTagger::TAGS_SUPPORTED.each do |tag|
           puts "#{tag.to_s.camelize}"
           ExifTagger::Tag.const_get(tag.to_s.camelize).const_get('EXIFTOOL_TAGS').each do |t|
