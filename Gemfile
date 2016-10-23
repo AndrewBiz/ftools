@@ -31,5 +31,5 @@ group :development do
   gem 'aruba', '~> 0.6.0'
   gem 'bundler', '>= 0'
   gem 'fuubar'
-  gem 'rubocop'
+  # gem 'rubocop'
 end
